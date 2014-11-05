@@ -1,0 +1,15 @@
+#version 330
+uniform mat4 perspectiveMatrix;
+uniform mat4 cameraMatrix;
+
+in vec3 inCoords;
+in vec3 inNormals;
+in vec2 inUV;
+out vec2 uv;
+
+
+void main(){
+        vec4 position     = vec4(inCoords,1.0);
+        uv                = inUV;
+	gl_Position       = perspectiveMatrix * cameraMatrix *  position;
+}
