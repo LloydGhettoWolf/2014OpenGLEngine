@@ -1,8 +1,9 @@
 //DepthBuffer.cpp
 #include "DepthBuffer.h"
 
-bool CreateDepthTexture(GLuint& depthTexture,GLuint& depthFBO){
+bool CreateDepthTexture(GLuint& depthFBO){
 
+	GLuint depthTexture;
 	glGenFramebuffers(1, &depthFBO);
 	glGenTextures(1, &depthTexture);
 

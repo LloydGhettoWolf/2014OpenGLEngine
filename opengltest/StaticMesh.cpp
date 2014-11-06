@@ -278,7 +278,7 @@ void RenderStaticMesh(const StaticMesh& mesh)
 	for (unsigned int meshNum = 0; meshNum < mesh.m_numMeshes; meshNum++){
 
 		if (mesh.m_meshData[meshNum]->m_hasTexture){
-			//glBindTexture(GL_TEXTURE_2D, mesh.m_meshData[meshNum]->m_texture);
+			glBindTexture(GL_TEXTURE_2D, mesh.m_meshData[meshNum]->m_texture);
 		}
 
 		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);

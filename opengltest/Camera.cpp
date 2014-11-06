@@ -21,15 +21,25 @@ Camera CreateCamera(vec3& pos, vec3& focusPoint, vec3& upVec){
 
 void   MoveCameraHorizontally(Camera& cam, float amount){
 	vec3 translationVec = amount * cam.rightVec;
+	cam.pos += translationVec;
+	cam.viewMatrix = translate(cam.viewMatrix, -translationVec);
+}
+
+
+void   MoveCameraForward(Camera& cam, float amount){
+	vec3 translationVec = amount * cam.lookVec;
+	cam.pos += translationVec;
 	cam.viewMatrix = translate(cam.viewMatrix, -translationVec);
 }
 
 void   MoveCameraVertically(Camera& cam, float amount){
 	vec3 translationVec = amount * cam.upVec;
+	cam.pos += translationVec;
 	cam.viewMatrix = translate(cam.viewMatrix, -translationVec);
 }
 
 void   MoveCameraCustom(Camera& cam, vec3& pos){
+	cam.pos = pos;;
 	cam.viewMatrix = glm::lookAt(pos, pos+cam.lookVec, cam.upVec);
 }
 
@@ -39,7 +49,7 @@ void   MoveCameraTrackPoint(Camera& cam, vec3& pos,vec3& focus){
 
 void ComboRotate(Camera& cam,float amountX, float amountY){
 	cam.xRotation += glm::radians(amountX);
-	cam.yRotation += glm::radians(amountY);
+	cam.yRotation += glm::radians(-amountY);
 
 	if (cam.xRotation < 0.0f)
 		cam.xRotation += (2.0f *  3.14129f);
