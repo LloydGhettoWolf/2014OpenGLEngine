@@ -6,6 +6,7 @@ using namespace glm;
 
 struct Camera{
 	vec3 lookVec;
+	vec3 heading;
 	vec3 upVec;
 	vec3 rightVec;
 	vec3 pos;

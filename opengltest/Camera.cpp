@@ -16,6 +16,7 @@ Camera CreateCamera(vec3& pos, vec3& focusPoint, vec3& upVec){
 
 	newCam.pos = pos;
 	newCam.viewMatrix = glm::lookAt(pos, focusPoint, upVec);
+	newCam.heading = lookVec;
 	return newCam;
 }
 
@@ -27,7 +28,7 @@ void   MoveCameraHorizontally(Camera& cam, float amount){
 
 
 void   MoveCameraForward(Camera& cam, float amount){
-	vec3 translationVec = amount * cam.lookVec;
+	vec3 translationVec = amount * cam.heading;
 	cam.pos += translationVec;
 	cam.viewMatrix = translate(cam.viewMatrix, -translationVec);
 }
@@ -63,8 +64,8 @@ void ComboRotate(Camera& cam,float amountX, float amountY){
 	if (cam.yRotation < -3.14129 / 2.0f)
 		cam.yRotation =  -3.14129 / 2.0f;
 
-	cam.lookVec.x = cosf(cam.xRotation) - sinf(cam.xRotation);
-	cam.lookVec.z = sinf(cam.xRotation) + cosf(cam.xRotation);
+	cam.lookVec.x = cam.heading.x =  cosf(cam.xRotation) - sinf(cam.xRotation);
+	cam.lookVec.z = cam.heading.z =  sinf(cam.xRotation) + cosf(cam.xRotation);
 
 	cam.lookVec = normalize(cam.lookVec);
 

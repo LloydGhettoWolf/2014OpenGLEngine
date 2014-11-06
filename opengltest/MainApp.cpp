@@ -86,8 +86,20 @@ void App::Run(){
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(shaderProg);
-			glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
-			RenderStaticMesh(m_teapotMesh);
+		glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
+
+		vec3   movementX(7.0f, 0.0f, 0.0f);
+		vec3   movementZ(0.0f, 0.0f, 7.0f);
+		for (int potRow = 0; potRow < 4; potRow++){
+			mat4x4 translationMatrix;
+			translationMatrix = translate(translationMatrix, movementX * -3.0f + (float)potRow * movementZ);
+				for (int pot = 0; pot < 6; pot++){
+					translationMatrix = translate(translationMatrix, movementX);
+					glUniformMatrix4fv(rotationUniform, 1, GL_FALSE, &translationMatrix[0][0]);
+					RenderStaticMesh(m_teapotMesh);
+				}
+		}
+
 		glUseProgram(0);
 
 		glfwSwapBuffers();
@@ -95,6 +107,8 @@ void App::Run(){
 		ReadMouse();
 		ReadKeys();
 		MoveCameraForward(m_camera, m_moveForwardAmount);
+		MoveCameraVertically(m_camera, m_moveUpAmount);
+		MoveCameraHorizontally(m_camera, m_moveSidewaysAmount);
 
 	} while (true);
 
@@ -142,6 +156,18 @@ void App::ReadKeys(){
 			break;
 		case 'S':
 			m_moveForwardAmount = lastKeyAction * -FORWARDS_SPEED;
+			break;
+		case 'A':
+			m_moveSidewaysAmount = lastKeyAction * FORWARDS_SPEED;
+			break;
+		case 'D':
+			m_moveSidewaysAmount = lastKeyAction * -FORWARDS_SPEED;
+			break;
+		case GLFW_KEY_UP:
+			m_moveUpAmount		 = lastKeyAction * -FORWARDS_SPEED;
+			break;
+		case GLFW_KEY_DOWN:
+			m_moveUpAmount		 = lastKeyAction * FORWARDS_SPEED;
 			break;
 	}
 	

@@ -10,10 +10,10 @@
 #include "StaticMesh.h"
 
 const float FORWARDS_SPEED = 0.2f;
-const float SIDEWAYS_SPEED = 50.0f;
+const float SIDEWAYS_SPEED = 0.2f;
 const float ROTATE_YAW_SPEED = 80.0f;
 const float ROTATE_PITCH_SPEED = 80.0f;
-const float CLIMB_SPEED = 80.0f;
+const float CLIMB_SPEED = 0.2f;
 
 const int APP_WIDTH  = 1024;
 const int APP_HEIGHT = 768;
@@ -38,7 +38,9 @@ private:
 	GLuint                m_depthBuffer;
 	StaticMesh            m_teapotMesh;
 
-	float				  m_moveForwardAmount = 0.0f;
+	float				  m_moveForwardAmount  = 0.0f;
+	float				  m_moveUpAmount	   = 0.0f;
+	float				  m_moveSidewaysAmount = 0.0f;
 };
 
 void GLFWCALL KeyCallback(int key, int action);
