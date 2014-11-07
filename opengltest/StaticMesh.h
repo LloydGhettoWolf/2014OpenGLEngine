@@ -29,11 +29,15 @@ struct StaticMesh{
 		glm::vec3					m_boundingBoxMax;
 		unsigned int				m_numMaterials;
 		unsigned int				m_numMeshes;
+		int							m_numInstances = 1;
 };
 
 
 bool				InitStaticMesh(StaticMesh& newMesh,char* fileName);
 void				RenderStaticMesh(const StaticMesh& mesh);
+
+bool				InitInstancedStaticMesh(StaticMesh& newMesh,int numInstances,char* fileName);
+void				RenderInstancedStaticMesh(const StaticMesh& mesh,vec3* positions);
 
 //support functions for use by Init();
 void				GetBoundingBox(glm::vec3& min, glm::vec3& max, const aiScene* scene);

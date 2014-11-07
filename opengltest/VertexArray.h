@@ -20,3 +20,12 @@ GLuint CreateVertexNormUVArray(void* vertices, unsigned int numPoints,
 
 GLuint CreateBumpmappedVertexArray(void* vertices, unsigned int numPoints,
 								unsigned int* indices, unsigned int numFaces);
+
+GLuint CreateInstancedVertexUVArray(void* vertices, unsigned int numPoints,
+									unsigned int* indices, unsigned int numFaces);
+
+GLuint CreateInstancedVertexNormArray(void* vertices, unsigned int numPoints,
+									  unsigned int* indices, unsigned int numFaces);
+
+GLuint CreateInstancedVertexNormUVArray(void* vertices, unsigned int numPoints,
+										unsigned int* indices, unsigned int numFaces);

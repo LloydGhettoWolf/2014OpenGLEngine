@@ -3,6 +3,8 @@
 #include "VertexTypes.h"
 using namespace glm;
 
+GLuint InitVAO(int vertexSize, void* vertices, int numPoints, int numFaces, unsigned int* indices);
+
 void AssignSubData(GLuint buffer, void* vertices, unsigned int vertexSize, unsigned int numPoints,
 	GLintptr offset){
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -25,62 +27,41 @@ void CreateIndexArrayBuffer(unsigned int* indexData, unsigned int numPoints){
 
 GLuint CreateVertexNormUVArray(void* vertices, unsigned int numPoints, 
 								  unsigned int* indices,unsigned int numFaces){
-	GLuint VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
 	int vertexSize = sizeof(CustomVertexNormUV);
-	CreateVertexArrayBuffer(vertices,vertexSize,numPoints);
-	CreateIndexArrayBuffer(indices, numFaces * 3);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)NULL);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)12);
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)24);
-	glBindVertexArray(0);
+	GLuint VAO = InitVAO(vertexSize,vertices,numPoints,numFaces,indices);
+	for (int attrib = 0; attrib < 3; attrib++){
+		glEnableVertexAttribArray(attrib);
+		glVertexAttribPointer(attrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)(attrib * 12));
+	}
 	return VAO;
 }
 
 GLuint CreateVertexUVArray(void* vertices, unsigned int numPoints,
 	unsigned int* indices, unsigned int numFaces){
-	GLuint VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
 	int vertexSize = sizeof(CustomVertexUV);
-	CreateVertexArrayBuffer(vertices, vertexSize, numPoints);
-	CreateIndexArrayBuffer(indices, numFaces * 3);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)NULL);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)12);
-	glBindVertexArray(0);
+	GLuint VAO = InitVAO(vertexSize, vertices, numPoints, numFaces, indices);
+	for (int attrib = 0; attrib < 2; attrib++){
+		glEnableVertexAttribArray(attrib);
+		glVertexAttribPointer(attrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)(attrib * 12));
+	}
 	return VAO;
 }
 
 GLuint CreateVertexNormArray(void* vertices, unsigned int numPoints,
 	unsigned int* indices, unsigned int numFaces){
-	GLuint VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
 	int vertexSize = sizeof(CustomVertexNorm);
-	CreateVertexArrayBuffer(vertices, vertexSize, numPoints);
-	CreateIndexArrayBuffer(indices, numFaces * 3);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)NULL);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)12);
-	glBindVertexArray(0);
+	GLuint VAO = InitVAO(vertexSize, vertices, numPoints, numFaces, indices);
+	for (int attrib = 0; attrib < 2; attrib++){
+		glEnableVertexAttribArray(attrib);
+		glVertexAttribPointer(attrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)(attrib * 12));
+	}
 	return VAO;
 }
 
 GLuint CreateSimpleVertexArray(void* vertices, unsigned int numPoints,
 	unsigned int* indices, unsigned int numFaces){
-	GLuint VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
 	int vertexSize = sizeof(glm::vec3);
-	CreateVertexArrayBuffer(vertices, vertexSize, numPoints);
-	CreateIndexArrayBuffer(indices, numFaces * 3);
+	GLuint VAO = InitVAO(vertexSize, vertices, numPoints, numFaces, indices);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)NULL);
 	glBindVertexArray(0);
@@ -89,20 +70,36 @@ GLuint CreateSimpleVertexArray(void* vertices, unsigned int numPoints,
 
 GLuint CreateBumpmappedVertexArray(void* vertices, unsigned int numPoints,
 	unsigned int* indices, unsigned int numFaces){
+	int vertexSize = sizeof(CustomVertexNormBiNormUV);
+	GLuint VAO = InitVAO(vertexSize, vertices, numPoints, numFaces, indices);
+	for (int attrib = 0; attrib < 4; attrib++){
+		glEnableVertexAttribArray(attrib);
+		glVertexAttribPointer(attrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)(attrib*12));
+	}
+	glBindVertexArray(0);
+	return VAO;
+}
+
+GLuint CreateInstancedVertexUVArray(void* vertices, unsigned int numPoints,
+	unsigned int* indices, unsigned int numFaces){
+	return 1;
+}
+
+GLuint CreateInstancedVertexNormArray(void* vertices, unsigned int numPoints,
+	unsigned int* indices, unsigned int numFaces){
+	return 1;
+}
+
+GLuint CreateInstancedVertexNormUVArray(void* vertices, unsigned int numPoints,
+	unsigned int* indices, unsigned int numFaces){
+	return 1;
+}
+
+GLuint InitVAO(int vertexSize,void* vertices,int numPoints,int numFaces,unsigned int* indices){
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
-	int vertexSize = sizeof(CustomVertexNormBiNormUV);
 	CreateVertexArrayBuffer(vertices, vertexSize, numPoints);
 	CreateIndexArrayBuffer(indices, numFaces * 3);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)NULL);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)12);
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)24);
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)36);
-	glBindVertexArray(0);
 	return VAO;
 }
