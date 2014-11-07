@@ -284,5 +284,5 @@ void RenderStaticMesh(const StaticMesh& mesh)
 		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);
 		glDrawElements(GL_TRIANGLES, mesh.m_meshData[meshNum]->m_numFaces * 3, GL_UNSIGNED_INT, 0);
 	}
-
+	glBindVertexArray(0);
 }

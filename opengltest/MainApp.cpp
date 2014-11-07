@@ -11,6 +11,7 @@
 #include "DepthBuffer.h"
 #include "VertexTypes.h"
 #include "MainApp.h"
+#include "Font.h"
 
 bool App::Init(){
 
@@ -63,6 +64,7 @@ bool App::Init(){
 	m_camera = CreateCamera(vec3(0.0f,0.0f,-4.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 500.0f);
 
+	InitText2D("myFont.png", "test test test", 50, 50, 24);
 	
 	return true;
 }
@@ -71,27 +73,36 @@ void App::Run(){
 
 	GLuint shaderProg = m_teapotShader;
 
-	GLint cameraMatrixUniform = glGetUniformLocation(shaderProg, "cameraMatrix");
-	GLint perspectiveMatrixUniform = glGetUniformLocation(shaderProg, "perspectiveMatrix");
-	GLint textureUniform = glGetUniformLocation(shaderProg, "tex");
-	GLint rotationUniform = glGetUniformLocation(shaderProg, "rotationMatrix");
+	GLint cameraMatrixUniform		= glGetUniformLocation(shaderProg, "cameraMatrix");
+	GLint perspectiveMatrixUniform	= glGetUniformLocation(shaderProg, "perspectiveMatrix");
+	GLint textureUniform			= glGetUniformLocation(shaderProg, "tex");
+	GLint rotationUniform			= glGetUniformLocation(shaderProg, "rotationMatrix");
+	GLint eyePosUniform				= glGetUniformLocation(shaderProg, "eyePos");
+	GLint shininessUniform			= glGetUniformLocation(shaderProg, "shininess");
+	GLint lightVecUniform			= glGetUniformLocation(shaderProg, "lightVector");
+	GLint normalMatrixUniform		= glGetUniformLocation(shaderProg, "normalMatrix");
+
+	vec3 lightVec(0.0f, 0.0f, 1.0);
+	mat4x4 rotation = rotate(mat4x4(), 180.0f, vec3(0.0f, 1.0f, 0.0f));
+	mat3x3 normalMatrix = mat3x3(transpose(rotation));
 
 	glUseProgram(shaderProg);
 	glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
-	glUniform1i(textureUniform, 0);
+	glUniformMatrix3fv(normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
+	glUniform3fv(lightVecUniform, 1, &lightVec[0]);
+	glUniform1f(shininessUniform, 128.0f);
 	glUseProgram(0);
 
 	do{
-		static float rotation = 0.0f;
-
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(shaderProg);
 		glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
+		glUniform3fv(eyePosUniform, 1, &m_camera.pos[0]);
 
 		vec3   movementX(7.0f, 0.0f, 0.0f);
 		vec3   movementZ(0.0f, 0.0f, 7.0f);
 		for (int potRow = 0; potRow < 4; potRow++){
-			mat4x4 translationMatrix;
+			mat4x4 translationMatrix = rotation;
 			translationMatrix = translate(translationMatrix, movementX * -3.0f + (float)potRow * movementZ);
 				for (int pot = 0; pot < 6; pot++){
 					translationMatrix = translate(translationMatrix, movementX);
@@ -101,6 +112,8 @@ void App::Run(){
 		}
 
 		glUseProgram(0);
+
+		PrintText2D();
 
 		glfwSwapBuffers();
 
@@ -114,14 +127,16 @@ void App::Run(){
 
 };
 
-void App::ShutDown(){};
+void App::ShutDown(){
+	CleanupText2D();
+};
 
 GLuint App::CreateTriangleShader(){
 	GLuint vertexShader;
 	GLuint fragmentShader;
 
 	const int numAttribs = 3;
-	char* attribs[numAttribs] = { "inCoords", "inNormals", "inUV" };
+	char* attribs[numAttribs] = { "inCoords", "inNormals", "inPositions" };
 
 	vertexShader = CreateShader(GL_VERTEX_SHADER, "basic.vp");
 	fragmentShader = CreateShader(GL_FRAGMENT_SHADER, "basic.fp");

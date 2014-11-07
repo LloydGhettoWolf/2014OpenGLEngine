@@ -2,9 +2,9 @@
 #include "Texture.h"
 #include <string>
 
-GLubyte* ReadImage(char* fileName, unsigned int& width, unsigned int& height);
+GLubyte* ReadImage(const char* fileName, unsigned int& width, unsigned int& height);
 
-GLuint CreateTexture(char* fileName,GLint internalFormat,GLint magFilter,GLint minFilter){
+GLuint CreateTexture(const char* fileName,GLint internalFormat,GLint magFilter,GLint minFilter){
 	GLuint texHandle;
 	glGenTextures(1, &texHandle);
 
@@ -33,7 +33,7 @@ GLuint CreateTexture(char* fileName,GLint internalFormat,GLint magFilter,GLint m
 	return texHandle;
 }
 
-GLubyte* ReadImage(char* fileName, unsigned int& width, unsigned int& height){
+GLubyte* ReadImage(const char* fileName, unsigned int& width, unsigned int& height){
 	
 	if (!ilLoadImage(fileName)){
 		return 0;

@@ -1,0 +1,20 @@
+#version 330
+
+uniform vec2 halfScreenSize;
+
+// Input vertex data, different for all executions of this shader.
+in vec2 inCoords;
+in vec2 inUVs;
+
+// Output data ; will be interpolated for each fragment.
+out vec2 outUV;
+
+void main(){
+
+	vec2 position = inCoords - halfScreenSize;
+	position /= halfScreenSize;
+	gl_Position =  vec4(position,0.0,1.0);
+	
+	// UV of the vertex. No special space for this one.
+	outUV = inUVs;
+}

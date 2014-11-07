@@ -4,4 +4,5 @@
 #include <stdio.h>
 #include <IL\il.h>
 
-GLuint CreateTexture(char*  fileName, GLint internalFormat, GLint magFilter, GLint minFilter);
+GLuint CreateTexture(const char*  fileName, GLint internalFormat, GLint magFilter, GLint minFilter);
+GLuint CreateFontShader();

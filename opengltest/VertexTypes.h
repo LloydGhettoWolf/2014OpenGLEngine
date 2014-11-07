@@ -19,6 +19,7 @@ struct CustomVertexNorm{
 	glm::vec3 normal;
 };
 
+
 struct CustomVertexNormBiNormUV{
 	glm::vec3 vertexPoint;
 	glm::vec3 normal;
