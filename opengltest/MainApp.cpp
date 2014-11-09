@@ -59,7 +59,7 @@ bool App::Init(){
 		return false;
 	}
 
-	InitStaticMesh(m_teapotMesh, "teapot.obj");
+	InitStaticMesh(m_teapotMesh, "buddha.obj",12);
 
 	m_camera = CreateCamera(vec3(0.0f,0.0f,-4.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 500.0f);
@@ -91,7 +91,13 @@ void App::Run(){
 	glUniformMatrix3fv(normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
 	glUniform3fv(lightVecUniform, 1, &lightVec[0]);
 	glUniform1f(shininessUniform, 128.0f);
+	glUniformMatrix4fv(rotationUniform, 1, GL_FALSE, &rotation[0][0]);
 	glUseProgram(0);
+
+	vec3 movement[24];
+
+	vec3   movementX(7.0f, 0.0f, 0.0f);
+	vec3   movementZ(0.0f, 0.0f, 7.0f);
 
 	do{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -99,17 +105,15 @@ void App::Run(){
 		glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
 		glUniform3fv(eyePosUniform, 1, &m_camera.pos[0]);
 
-		vec3   movementX(7.0f, 0.0f, 0.0f);
-		vec3   movementZ(0.0f, 0.0f, 7.0f);
 		for (int potRow = 0; potRow < 4; potRow++){
-			mat4x4 translationMatrix = rotation;
-			translationMatrix = translate(translationMatrix, movementX * -3.0f + (float)potRow * movementZ);
-				for (int pot = 0; pot < 6; pot++){
-					translationMatrix = translate(translationMatrix, movementX);
-					glUniformMatrix4fv(rotationUniform, 1, GL_FALSE, &translationMatrix[0][0]);
-					RenderStaticMesh(m_teapotMesh);
-				}
+			for (int pot = 0; pot < 3; pot++){
+				movement[potRow * 3 + pot] = (float)pot * movementX + (float)potRow * movementZ;
+			}
 		}
+
+		
+		RenderInstancedStaticMesh(m_teapotMesh,&movement[0]);
+		
 
 		glUseProgram(0);
 

@@ -17,6 +17,7 @@ out float shiny;
 
 void main(){
         vec4 position     = rotationMatrix * vec4(inCoords,1.0);
+        position.xyz      += inPositions;
         norm              = normalMatrix * inNormals;
         eyeVec            = normalize(eyePos-position.xyz);
         lightVec          = -lightVector;

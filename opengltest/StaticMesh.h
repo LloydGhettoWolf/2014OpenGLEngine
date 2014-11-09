@@ -30,13 +30,13 @@ struct StaticMesh{
 		unsigned int				m_numMaterials;
 		unsigned int				m_numMeshes;
 		int							m_numInstances = 1;
+		GLuint						m_instancedDataBuffer;
 };
 
 
-bool				InitStaticMesh(StaticMesh& newMesh,char* fileName);
+bool				InitStaticMesh(StaticMesh& newMesh,char* fileName,int instances = 1);
 void				RenderStaticMesh(const StaticMesh& mesh);
 
-bool				InitInstancedStaticMesh(StaticMesh& newMesh,int numInstances,char* fileName);
 void				RenderInstancedStaticMesh(const StaticMesh& mesh,vec3* positions);
 
 //support functions for use by Init();

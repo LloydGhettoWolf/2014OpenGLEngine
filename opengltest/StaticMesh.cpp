@@ -17,10 +17,9 @@
 #include <iostream>
 
 
-bool InitStaticMesh(StaticMesh& mesh,char* fileName){
+bool InitStaticMesh(StaticMesh& mesh,char* fileName,int instances){
 	
 	//check if file exists
-	char buf[40];
 	std::ifstream fin(fileName);
 
 	if(!fin.fail()){
@@ -100,7 +99,12 @@ bool InitStaticMesh(StaticMesh& mesh,char* fileName){
 				memcpy(&vertices[vertex].uv, &thisMesh->mTextureCoords[0][vertex], texVecSize);
 			}
 
-			newComp->m_vertexBuffer = CreateVertexNormUVArray(vertices, numVerts, indices, numFaces);
+			if (instances > 1){
+				newComp->m_vertexBuffer = CreateInstancedVertexNormUVArray(vertices, numVerts, 
+																		indices, numFaces,instances,mesh.m_instancedDataBuffer);
+			}else{
+				newComp->m_vertexBuffer = CreateVertexNormUVArray(vertices, numVerts, indices, numFaces);
+			}
 
 			delete [] vertices;
 
@@ -116,7 +120,13 @@ bool InitStaticMesh(StaticMesh& mesh,char* fileName){
 				memcpy(&vertices[vertex].normal, &thisMesh->mNormals[vertex], vecSize);
 			}
 
-			newComp->m_vertexBuffer = CreateVertexNormArray(vertices, numVerts, indices, numFaces);
+			if (instances > 1){
+				newComp->m_vertexBuffer = CreateInstancedVertexNormArray(vertices, numVerts,
+					indices, numFaces, instances, mesh.m_instancedDataBuffer);
+			}else{
+				newComp->m_vertexBuffer = CreateVertexNormArray(vertices, numVerts,
+					indices, numFaces);
+			}
 
 			delete[] vertices;
 		}else {
@@ -152,6 +162,8 @@ bool InitStaticMesh(StaticMesh& mesh,char* fileName){
 		
 		mesh.m_meshData.push_back(newComp);
 	}
+
+	mesh.m_numInstances = instances;
 	return true;
 }
 
@@ -284,5 +296,26 @@ void RenderStaticMesh(const StaticMesh& mesh)
 		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);
 		glDrawElements(GL_TRIANGLES, mesh.m_meshData[meshNum]->m_numFaces * 3, GL_UNSIGNED_INT, 0);
 	}
+	glBindVertexArray(0);
+}
+
+void RenderInstancedStaticMesh(const StaticMesh& mesh,vec3* positions)
+{
+	
+	
+
+	for (unsigned int meshNum = 0; meshNum < mesh.m_numMeshes; meshNum++){
+
+		if (mesh.m_meshData[meshNum]->m_hasTexture){
+			glBindTexture(GL_TEXTURE_2D, mesh.m_meshData[meshNum]->m_texture);
+		}
+
+		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_instancedDataBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * mesh.m_numInstances, positions, GL_DYNAMIC_DRAW);
+		glDrawElementsInstanced(GL_TRIANGLES, mesh.m_meshData[meshNum]->m_numFaces * 3, 
+								GL_UNSIGNED_INT, 0,mesh.m_numInstances);
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }

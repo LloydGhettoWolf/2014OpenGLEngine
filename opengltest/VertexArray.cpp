@@ -3,6 +3,7 @@
 #include "VertexTypes.h"
 using namespace glm;
 
+void CreateInstancedAttrib(unsigned int attribNum, GLuint VAO, GLuint& instancedData,int numInstances);
 GLuint InitVAO(int vertexSize, void* vertices, int numPoints, int numFaces, unsigned int* indices);
 
 void AssignSubData(GLuint buffer, void* vertices, unsigned int vertexSize, unsigned int numPoints,
@@ -11,11 +12,12 @@ void AssignSubData(GLuint buffer, void* vertices, unsigned int vertexSize, unsig
 	glBufferSubData(GL_ARRAY_BUFFER, offset, numPoints*vertexSize, vertices);
 }
 
-void CreateVertexArrayBuffer(void* vertexData,unsigned int elemSize, unsigned int numPoints){
+GLuint CreateVertexArrayBuffer(void* vertexData,unsigned int elemSize, unsigned int numPoints){
 	GLuint VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, elemSize * numPoints, vertexData, GL_STATIC_DRAW);
+	return VBO;
 }
 
 void CreateIndexArrayBuffer(unsigned int* indexData, unsigned int numPoints){
@@ -81,18 +83,24 @@ GLuint CreateBumpmappedVertexArray(void* vertices, unsigned int numPoints,
 }
 
 GLuint CreateInstancedVertexUVArray(void* vertices, unsigned int numPoints,
-	unsigned int* indices, unsigned int numFaces){
-	return 1;
+	unsigned int* indices, unsigned int numFaces,int numInstances,GLuint& instancedData){
+	GLuint VAO = CreateVertexUVArray(vertices, numPoints, indices, numFaces);
+	CreateInstancedAttrib(2, VAO, instancedData,numInstances);
+	return VAO;
 }
 
 GLuint CreateInstancedVertexNormArray(void* vertices, unsigned int numPoints,
-	unsigned int* indices, unsigned int numFaces){
-	return 1;
+	unsigned int* indices, unsigned int numFaces, int numInstances, GLuint& instancedData){
+	GLuint VAO = CreateVertexNormArray(vertices, numPoints, indices, numFaces);
+	CreateInstancedAttrib(2, VAO,instancedData,numInstances);
+	return VAO;
 }
 
 GLuint CreateInstancedVertexNormUVArray(void* vertices, unsigned int numPoints,
-	unsigned int* indices, unsigned int numFaces){
-	return 1;
+	unsigned int* indices, unsigned int numFaces, int numInstances,GLuint& instancedData){
+	GLuint VAO = CreateVertexNormUVArray(vertices, numPoints, indices, numFaces);
+	CreateInstancedAttrib(3, VAO,instancedData,numInstances);
+	return VAO;
 }
 
 GLuint InitVAO(int vertexSize,void* vertices,int numPoints,int numFaces,unsigned int* indices){
@@ -102,4 +110,13 @@ GLuint InitVAO(int vertexSize,void* vertices,int numPoints,int numFaces,unsigned
 	CreateVertexArrayBuffer(vertices, vertexSize, numPoints);
 	CreateIndexArrayBuffer(indices, numFaces * 3);
 	return VAO;
+}
+
+void CreateInstancedAttrib(unsigned int attribNum,GLuint VAO,GLuint& posVBO,int numInstances){
+	glBindVertexArray(VAO);
+	posVBO = CreateVertexArrayBuffer(0, sizeof(vec3),numInstances);
+	glEnableVertexAttribArray(attribNum);
+	glVertexAttribPointer(attribNum, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), 0);
+	glVertexAttribDivisor(attribNum, 1); 
+	glBindVertexArray(0);
 }
