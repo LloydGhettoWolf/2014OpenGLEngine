@@ -9,11 +9,11 @@
 #include "Camera.h"
 #include "StaticMesh.h"
 
-const float FORWARDS_SPEED = 0.2f;
-const float SIDEWAYS_SPEED = 0.2f;
+const float FORWARDS_SPEED = 200.0f;
+const float SIDEWAYS_SPEED = 200.0f;
 const float ROTATE_YAW_SPEED = 80.0f;
 const float ROTATE_PITCH_SPEED = 80.0f;
-const float CLIMB_SPEED = 0.2f;
+const float CLIMB_SPEED = 400.0f;
 
 const int APP_WIDTH  = 1024;
 const int APP_HEIGHT = 768;
@@ -31,7 +31,7 @@ public:
 	static int			  lastKeyAction;
 
 private:
-	GLuint CreateTriangleShader();
+	GLuint CreateTeapotShader();
 
 	Camera				  m_camera;
 	GLuint		          m_teapotShader;

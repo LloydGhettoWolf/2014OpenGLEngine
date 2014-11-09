@@ -51,7 +51,7 @@ bool App::Init(){
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	m_teapotShader = CreateTriangleShader();	
+	m_teapotShader = CreateTeapotShader();	
 
 
 	if (!CreateDepthTexture(m_depthBuffer)) {
@@ -59,7 +59,7 @@ bool App::Init(){
 		return false;
 	}
 
-	InitStaticMesh(m_teapotMesh, "buddha.obj",12);
+	InitStaticMesh(m_teapotMesh, "teapot.obj");
 
 	m_camera = CreateCamera(vec3(0.0f,0.0f,-4.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 500.0f);
@@ -71,7 +71,16 @@ bool App::Init(){
 
 void App::Run(){
 
+	float lastFrame = 0.0f;
+	float currentFrame = 0.0f;
+	float deltaTime = 0.0f;
+
 	GLuint shaderProg = m_teapotShader;
+
+	Material myMaterial;
+	myMaterial.ambient  = glm::vec3(0.1f, 0.1f, 0.1f);
+	myMaterial.diffuse  = glm::vec3(0.6f, 0.2f, 0.0f);
+	myMaterial.specular = glm::vec3(0.4f,0.4f,0.4f);
 
 	GLint cameraMatrixUniform		= glGetUniformLocation(shaderProg, "cameraMatrix");
 	GLint perspectiveMatrixUniform	= glGetUniformLocation(shaderProg, "perspectiveMatrix");
@@ -81,6 +90,9 @@ void App::Run(){
 	GLint shininessUniform			= glGetUniformLocation(shaderProg, "shininess");
 	GLint lightVecUniform			= glGetUniformLocation(shaderProg, "lightVector");
 	GLint normalMatrixUniform		= glGetUniformLocation(shaderProg, "normalMatrix");
+	GLint diffuseUniform			= glGetUniformLocation(shaderProg, "materialDiffuse");
+	GLint ambientUniform			= glGetUniformLocation(shaderProg, "materialAmbient");
+	GLint specularUniform			= glGetUniformLocation(shaderProg, "materialSpecular");
 
 	vec3 lightVec(0.0f, 0.0f, 1.0);
 	mat4x4 rotation = rotate(mat4x4(), 180.0f, vec3(0.0f, 1.0f, 0.0f));
@@ -90,7 +102,7 @@ void App::Run(){
 	glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
 	glUniformMatrix3fv(normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
 	glUniform3fv(lightVecUniform, 1, &lightVec[0]);
-	glUniform1f(shininessUniform, 128.0f);
+	glUniform1f(shininessUniform, 32.0f);
 	glUniformMatrix4fv(rotationUniform, 1, GL_FALSE, &rotation[0][0]);
 	glUseProgram(0);
 
@@ -99,22 +111,27 @@ void App::Run(){
 	vec3   movementX(7.0f, 0.0f, 0.0f);
 	vec3   movementZ(0.0f, 0.0f, 7.0f);
 
+	for (int potRow = 0; potRow < 4; potRow++){
+		for (int pot = 0; pot < 3; pot++){
+			movement[potRow * 3 + pot] = (float)pot * movementX + (float)potRow * movementZ;
+		}
+	}
+
+	currentFrame = glfwGetTime();
+
 	do{
+		deltaTime = currentFrame - lastFrame;
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(shaderProg);
+		glUniform3fv(diffuseUniform, 1, &myMaterial.diffuse[0]);
+		glUniform3fv(specularUniform, 1, &myMaterial.specular[0]);
+		glUniform3fv(ambientUniform, 1, &myMaterial.ambient[0]);
 		glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
 		glUniform3fv(eyePosUniform, 1, &m_camera.pos[0]);
 
-		for (int potRow = 0; potRow < 4; potRow++){
-			for (int pot = 0; pot < 3; pot++){
-				movement[potRow * 3 + pot] = (float)pot * movementX + (float)potRow * movementZ;
-			}
-		}
-
+		RenderStaticMesh(m_teapotMesh);
 		
-		RenderInstancedStaticMesh(m_teapotMesh,&movement[0]);
-		
-
 		glUseProgram(0);
 
 		PrintText2D();
@@ -123,10 +140,12 @@ void App::Run(){
 
 		ReadMouse();
 		ReadKeys();
-		MoveCameraForward(m_camera, m_moveForwardAmount);
-		MoveCameraVertically(m_camera, m_moveUpAmount);
-		MoveCameraHorizontally(m_camera, m_moveSidewaysAmount);
+		MoveCameraForward(m_camera, deltaTime * m_moveForwardAmount);
+		MoveCameraVertically(m_camera, deltaTime *  m_moveUpAmount);
+		MoveCameraHorizontally(m_camera, deltaTime *  m_moveSidewaysAmount);
 
+		lastFrame = currentFrame;
+		currentFrame = glfwGetTime();
 	} while (true);
 
 };
@@ -135,7 +154,7 @@ void App::ShutDown(){
 	CleanupText2D();
 };
 
-GLuint App::CreateTriangleShader(){
+GLuint App::CreateTeapotShader(){
 	GLuint vertexShader;
 	GLuint fragmentShader;
 
@@ -177,16 +196,16 @@ void App::ReadKeys(){
 			m_moveForwardAmount = lastKeyAction * -FORWARDS_SPEED;
 			break;
 		case 'A':
-			m_moveSidewaysAmount = lastKeyAction * FORWARDS_SPEED;
-			break;
-		case 'D':
 			m_moveSidewaysAmount = lastKeyAction * -FORWARDS_SPEED;
 			break;
+		case 'D':
+			m_moveSidewaysAmount = lastKeyAction * FORWARDS_SPEED;
+			break;
 		case GLFW_KEY_UP:
-			m_moveUpAmount		 = lastKeyAction * -FORWARDS_SPEED;
+			m_moveUpAmount		 = lastKeyAction * FORWARDS_SPEED;
 			break;
 		case GLFW_KEY_DOWN:
-			m_moveUpAmount		 = lastKeyAction * FORWARDS_SPEED;
+			m_moveUpAmount		 = lastKeyAction * -FORWARDS_SPEED;
 			break;
 	}
 	

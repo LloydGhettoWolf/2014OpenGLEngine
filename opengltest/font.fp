@@ -9,7 +9,7 @@ out vec4 color;
 void main(){
 	vec4 testColor = texture2D( fontTexture, outUV );
 	
-	if(testColor.rgb == vec3(1.0,0.0,0.0)) discard;
+	//if(testColor.rgb == vec3(1.0,0.0,0.0)) discard;
 	
-	color = vec4(1.0);//testColor;
+	color = testColor;
 }
