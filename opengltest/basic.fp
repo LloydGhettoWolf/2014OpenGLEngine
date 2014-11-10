@@ -12,13 +12,12 @@ out vec4 color;
 
 void main(){
         vec3 halfVec = normalize((lightVec+eyeVec));
-	norm = normalize(norm);
+	vec3 normal = normalize(norm);
         float spec   = pow(max(dot(halfVec,norm),0.0),shininess);
-        float diff   = max(dot(norm,lightVec),0.0);
-        vec3 ambContribution =  materialAmbient;
-        vec3 diffContribution = (diff) * materialDiffuse;
-	vec3 specContribution = spec   * materialSpecular;
-	vec4 lighting = vec4(ambContribution+specContribution+diffContribution,1.0);
-	color = lighting * texture2D(tex,UVs);
-	//color = vec4(1.0,1.0,1.0,1.0);
+        float diff   = max(dot(normal,lightVec),0.0);
+        vec3 diffContribution = diff * materialDiffuse;
+	vec3 specContribution = spec * materialSpecular;
+	vec3 lighting = diffContribution+specContribution+materialAmbient;
+	vec3 newCol   = lighting * texture2D(tex,UVs).xyz;
+	color = vec4(newCol,1.0);
 }

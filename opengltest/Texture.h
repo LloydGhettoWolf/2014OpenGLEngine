@@ -2,7 +2,6 @@
 #pragma once
 #include <gl\glew.h>
 #include <stdio.h>
-#include <IL\il.h>
 
 GLuint CreateTexture(const char*  fileName, GLint magFilter, GLint minFilter);
 GLuint CreateFontShader();

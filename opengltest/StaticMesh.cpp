@@ -85,7 +85,6 @@ bool InitStaticMesh(StaticMesh& mesh,char* fileName,int instances){
 		//here is a slightly messy way of allocating object data....
 		//generate vertex array for this mesh using objectData
 
-
 		if(thisMesh->HasPositions() && thisMesh->HasNormals() && thisMesh->HasTextureCoords(0)){
 			//create a new objectdata to store the mesh data on the gfx card
 			unsigned int numVerts = thisMesh->mNumVertices;
@@ -94,6 +93,8 @@ bool InitStaticMesh(StaticMesh& mesh,char* fileName,int instances){
 			int vecSize = sizeof(float) * 3;
 			int texVecSize = sizeof(float) * 2;
 			for (unsigned int vertex = 0; vertex < numVerts; vertex++){
+				thisMesh->mTextureCoords[0][vertex].x = -thisMesh->mTextureCoords[0][vertex].x;
+				thisMesh->mTextureCoords[0][vertex].y = -thisMesh->mTextureCoords[0][vertex].y;
 				memcpy(&vertices[vertex].vertexPoint, &thisMesh->mVertices[vertex], vecSize);
 				memcpy(&vertices[vertex].normal, &thisMesh->mNormals[vertex], vecSize);
 				memcpy(&vertices[vertex].uv, &thisMesh->mTextureCoords[0][vertex], texVecSize);
@@ -159,7 +160,6 @@ bool InitStaticMesh(StaticMesh& mesh,char* fileName,int instances){
 			newComp->m_texture = newTex;
 		}
 
-		
 		mesh.m_meshData.push_back(newComp);
 	}
 
@@ -235,9 +235,9 @@ Material LoadMaterials(const aiScene* scene,aiMaterial* material)
 		memcpy(&mat.ambient,c, sizeof(c));
 	}
  
-	c[0] = 0.0f;
-	c[1] = 0.0f; 
-	c[2] = 0.0f;
+	c[0] = 0.4f;
+	c[1] = 0.3f; 
+	c[2] = 0.4f;
 	c[3] = 1.0f;
       
     aiColor4D specular;
@@ -294,7 +294,7 @@ void RenderStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms)
 		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);
 		glUniform3fv(uniforms.diffuseUniform,  1, &mesh.m_meshData[meshNum]->m_material.diffuse[0]);
 		glUniform3fv(uniforms.specularUniform, 1, &mesh.m_meshData[meshNum]->m_material.specular[0]);
-		glUniform3fv(uniforms.ambientUniform, 1, &mesh.m_meshData[meshNum]->m_material.ambient[0]);
+		glUniform3fv(uniforms.ambientUniform,  1, &mesh.m_meshData[meshNum]->m_material.ambient[0]);
 		glUniform1f(uniforms.shininessUniform,   mesh.m_meshData[meshNum]->m_material.shininess);
 		glDrawElements(GL_TRIANGLES, mesh.m_meshData[meshNum]->m_numFaces * 3, GL_UNSIGNED_INT, 0);
 	}
@@ -312,9 +312,24 @@ void RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniform
 		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_instancedDataBuffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * mesh.m_numInstances, positions, GL_DYNAMIC_DRAW);
+		glUniform3fv(uniforms.diffuseUniform, 1, &mesh.m_meshData[meshNum]->m_material.diffuse[0]);
+		glUniform3fv(uniforms.specularUniform, 1, &mesh.m_meshData[meshNum]->m_material.specular[0]);
+		glUniform3fv(uniforms.ambientUniform, 1, &mesh.m_meshData[meshNum]->m_material.ambient[0]);
+		glUniform1f(uniforms.shininessUniform, mesh.m_meshData[meshNum]->m_material.shininess);
 		glDrawElementsInstanced(GL_TRIANGLES, mesh.m_meshData[meshNum]->m_numFaces * 3, 
 								GL_UNSIGNED_INT, 0,mesh.m_numInstances);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+}
+
+void  DestroyMesh(StaticMesh& mesh){
+	for (unsigned int meshNum = 0; meshNum < mesh.m_numMeshes; meshNum++){
+
+		if (mesh.m_meshData[meshNum]->m_hasTexture){
+			glDeleteTextures(1, &mesh.m_meshData[meshNum]->m_texture);
+		}
+
+		glDeleteVertexArrays(1, &mesh.m_meshData[meshNum]->m_vertexBuffer);
+	}
 }

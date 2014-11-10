@@ -39,6 +39,8 @@ private:
 	StaticMesh            m_teapotMesh;
 	GLuint                m_texture;
 
+	bool				  m_run = true;
+
 	float				  m_moveForwardAmount  = 0.0f;
 	float				  m_moveUpAmount	   = 0.0f;
 	float				  m_moveSidewaysAmount = 0.0f;

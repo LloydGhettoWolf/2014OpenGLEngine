@@ -104,6 +104,12 @@ void App::Run(){
 	mat4x4 scaleMatrix; 
 	scaleMatrix = scale(scaleMatrix, vec3(32.0f, 16.0f, 32.0f));
 
+	Material myMaterial;
+	myMaterial.diffuse = vec3(0.6f, 0.6f, 0.6f);
+	myMaterial.ambient = vec3(0.1f, 0.2f, 0.1f);
+	myMaterial.specular = vec3(0.4f, 0.4f, 0.4f);
+	myMaterial.shininess = 32.0f;
+
 	glUseProgram(shaderProg);
 	glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
 	glUniformMatrix3fv(normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
@@ -114,16 +120,11 @@ void App::Run(){
 	glUseProgram(0);
 
 	vec3 movement[12];
-	Material myMaterial;
 	vec3   movementX(40.0f, 0.0f, 0.0f);
 	vec3   movementZ(0.0f, 0.0f, 40.0f);
 
 	srand(time(0));
 
-	myMaterial.diffuse = vec3(0.6f, 0.6f, 0.6f);
-	myMaterial.ambient = vec3(0.1f, 0.2f, 0.1f);
-	myMaterial.specular = vec3(0.4f, 0.4f, 0.4f);
-	myMaterial.shininess = 32.0f;
 
 	currentFrame = glfwGetTime();
 
@@ -139,7 +140,6 @@ void App::Run(){
 		//for (int teapot = 0; teapot < 12; teapot++){
 			glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
 			glUniform3fv(eyePosUniform, 1, &m_camera.pos[0]);
-
 			RenderStaticMesh(m_teapotMesh,matUni);
 		//}
 		
@@ -159,12 +159,16 @@ void App::Run(){
 
 		lastFrame = currentFrame;
 		currentFrame = glfwGetTime();
-	} while (true);
+	} while (m_run);
 
 };
 
 void App::ShutDown(){
 	CleanupText2D();
+	DestroyMesh(m_teapotMesh);
+	glDeleteShader(m_teapotShader);
+
+	m_run = false;
 };
 
 GLuint App::CreateTeapotShader(){
@@ -219,6 +223,9 @@ void App::ReadKeys(){
 			break;
 		case GLFW_KEY_DOWN:
 			m_moveUpAmount		 = lastKeyAction * -FORWARDS_SPEED;
+			break;
+		case 'Q':
+			ShutDown();
 			break;
 	}
 	
