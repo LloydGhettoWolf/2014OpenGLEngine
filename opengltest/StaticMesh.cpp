@@ -17,21 +17,21 @@
 #include <iostream>
 
 
-bool InitStaticMesh(StaticMesh& mesh,char* fileName,int instances){
+bool InitStaticMesh(StaticMesh& mesh,const string& fileName,const string& directory,int instances){
 	
 	//check if file exists
-	std::ifstream fin(fileName);
+	std::ifstream fin(directory + fileName);
 
 	if(!fin.fail()){
 		fin.close();
 	}else{
-		std::cout << "Couldn't open file "<< fileName <<" it doesn't exist!" << std::endl;
+		std::cout << "Couldn't open file "<< directory + fileName <<" it doesn't exist!" << std::endl;
 		return false;
 	}
 
 	Assimp::Importer importer;
 
-	const aiScene* scene = importer.ReadFile(fileName,aiProcess_Triangulate | aiProcess_GenSmoothNormals);
+	const aiScene* scene = importer.ReadFile(directory + fileName,aiProcess_Triangulate | aiProcess_GenSmoothNormals);
 
 	if(!scene){
 		std::cout <<"couldn't load scene! Reason: "<< importer.GetErrorString() <<std::endl;
@@ -150,7 +150,7 @@ bool InitStaticMesh(StaticMesh& mesh,char* fileName,int instances){
 
 		//load materials
 		newMat = LoadMaterials(scene,scene->mMaterials[thisMesh->mMaterialIndex]);
-		newTex = LoadTextures(mesh,scene,scene->mMaterials[thisMesh->mMaterialIndex]);
+		newTex = LoadTextures(mesh,scene,scene->mMaterials[thisMesh->mMaterialIndex],directory);
 		
 		
 		newComp->m_material = newMat;
@@ -255,7 +255,7 @@ Material LoadMaterials(const aiScene* scene,aiMaterial* material)
 	return mat;
 }
 
-GLuint LoadTextures(StaticMesh& mesh, const aiScene* scene,aiMaterial* material){
+GLuint LoadTextures(StaticMesh& mesh, const aiScene* scene,aiMaterial* material,const string& directory){
 		
 	int texIndex = 0;
 	aiString path;  // filename
@@ -269,10 +269,9 @@ GLuint LoadTextures(StaticMesh& mesh, const aiScene* scene,aiMaterial* material)
 
 		map<string,GLuint>::iterator it = mesh.m_textures.find(path.data);
 
-		aiString directory = "sponza\\";
 
 		if (it == mesh.m_textures.end()){
-			texture = CreateTexture(strcat(directory.data,path.data), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+			texture = CreateTexture(directory + path.data, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
 			mesh.m_textures[path.data] = texture;
 		}else{
 			texture = it->second;

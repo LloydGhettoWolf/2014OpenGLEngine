@@ -36,7 +36,7 @@ struct StaticMesh{
 };
 
 
-bool				InitStaticMesh(StaticMesh& newMesh,char* fileName,int instances = 1);
+bool				InitStaticMesh(StaticMesh& newMesh, const string& fileName, const string& directory, int instances = 1);
 void				RenderStaticMesh(const StaticMesh& mesh,MaterialUniforms& uniforms);
 
 void				RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms,vec3* positions);
@@ -45,6 +45,6 @@ void				RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& unif
 void				GetBoundingBox(glm::vec3& min, glm::vec3& max, const aiScene* scene);
 void				GetBoundingBoxForNode(const aiNode* node, glm::vec3& min, glm::vec3& max, aiMatrix4x4& trafo, const aiScene* scene);
 Material			LoadMaterials(const aiScene* scene, aiMaterial* materials);
-GLuint   			LoadTextures(StaticMesh& mesh, const aiScene* scene, aiMaterial* material);
+GLuint   			LoadTextures(StaticMesh& mesh, const aiScene* scene, aiMaterial* material,const string& directory);
 void				DestroyMesh(StaticMesh& mesh);
 

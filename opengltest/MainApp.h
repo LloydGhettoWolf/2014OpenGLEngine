@@ -1,4 +1,5 @@
 //MainApp.h
+#pragma once
 #include <gl\glew.h>
 #include <gl\glfw.h>
 #include <glm\glm.hpp>
@@ -20,9 +21,9 @@ const int APP_HEIGHT = 768;
 
 class App{
 public:
-	bool Init();
-	void Run();
-	void ShutDown();
+	virtual bool Init() = 0;
+	virtual void Run()  = 0;
+	virtual void ShutDown() = 0;
 
 	void ReadMouse();
 	void ReadKeys();
@@ -30,14 +31,8 @@ public:
 	static int			  lastKeyPress;
 	static int			  lastKeyAction;
 
-private:
-	GLuint CreateTeapotShader();
-
+protected:
 	Camera				  m_camera;
-	GLuint		          m_teapotShader;
-	GLuint                m_depthBuffer;
-	StaticMesh            m_teapotMesh;
-	GLuint                m_texture;
 
 	bool				  m_run = true;
 

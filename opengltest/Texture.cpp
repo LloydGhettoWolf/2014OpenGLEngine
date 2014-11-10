@@ -1,12 +1,13 @@
 //Texture.cpp
 #include "Texture.h"
-#include <string>
 #include <IL\il.h>
 #include <IL\ilu.h>
 
-GLubyte* ReadImage(const char* fileName,unsigned int& bytes, unsigned int& width, unsigned int& height);
+using namespace std;
 
-GLuint CreateTexture(const char* fileName,GLint magFilter,GLint minFilter){
+GLubyte* ReadImage(const string& fileName,unsigned int& bytes, unsigned int& width, unsigned int& height);
+
+GLuint CreateTexture(const string& fileName,GLint magFilter,GLint minFilter){
 
 	GLuint newTex;
 	glGenTextures(1, &newTex);
@@ -46,14 +47,14 @@ GLuint CreateTexture(const char* fileName,GLint magFilter,GLint minFilter){
 	return newTex;
 }
 
-GLubyte* ReadImage(const char* fileName,unsigned int& bytes,unsigned int& width, unsigned int& height){
+GLubyte* ReadImage(const string& fileName,unsigned int& bytes,unsigned int& width, unsigned int& height){
 	
 	// Generate a new texture like in opengl
 	ILuint ilTexture;
 	ilGenImages(1, &ilTexture);
 	ilBindImage(ilTexture);
 
-	ilLoadImage(fileName);
+	ilLoadImage(fileName.c_str());
 	
 	//get image info - width height and bytes per pixel
 	width = ilGetInteger(IL_IMAGE_WIDTH);
