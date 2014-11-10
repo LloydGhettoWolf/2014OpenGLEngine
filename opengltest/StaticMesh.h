@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <map>
 #include "Texture.h"
 #include "Shader.h"
 #include "LightsAndMaterials.h"
@@ -17,7 +18,7 @@ struct MeshComponent{
 	GLuint          m_vertexBuffer	= 0;
 	GLuint          m_texture		= 0;
 	GLuint          m_numFaces		= 0;
-	Material*		m_material		= 0;
+	Material		m_material;
 	bool            m_hasTexture	= false;
 };
 
@@ -31,18 +32,19 @@ struct StaticMesh{
 		unsigned int				m_numMeshes;
 		int							m_numInstances = 1;
 		GLuint						m_instancedDataBuffer;
+		std::map<string, GLuint>    m_textures;
 };
 
 
 bool				InitStaticMesh(StaticMesh& newMesh,char* fileName,int instances = 1);
-void				RenderStaticMesh(const StaticMesh& mesh);
+void				RenderStaticMesh(const StaticMesh& mesh,MaterialUniforms& uniforms);
 
-void				RenderInstancedStaticMesh(const StaticMesh& mesh,vec3* positions);
+void				RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms,vec3* positions);
 
 //support functions for use by Init();
 void				GetBoundingBox(glm::vec3& min, glm::vec3& max, const aiScene* scene);
 void				GetBoundingBoxForNode(const aiNode* node, glm::vec3& min, glm::vec3& max, aiMatrix4x4& trafo, const aiScene* scene);
-Material*			LoadMaterials(const aiScene* scene, aiMaterial* materials);
-GLuint   			LoadTextures(const  aiScene* scene, aiMaterial* material);
+Material			LoadMaterials(const aiScene* scene, aiMaterial* materials);
+GLuint   			LoadTextures(StaticMesh& mesh, const aiScene* scene, aiMaterial* material);
 void				DestroyMesh(StaticMesh& mesh);
 

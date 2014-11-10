@@ -31,10 +31,12 @@ GLuint CreateVertexNormUVArray(void* vertices, unsigned int numPoints,
 								  unsigned int* indices,unsigned int numFaces){
 	int vertexSize = sizeof(CustomVertexNormUV);
 	GLuint VAO = InitVAO(vertexSize,vertices,numPoints,numFaces,indices);
-	for (int attrib = 0; attrib < 3; attrib++){
+	for (int attrib = 0; attrib < 2; attrib++){
 		glEnableVertexAttribArray(attrib);
 		glVertexAttribPointer(attrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)(attrib * 12));
 	}
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, vertexSize, (GLubyte*)(24));
 	return VAO;
 }
 

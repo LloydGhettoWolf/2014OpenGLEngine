@@ -28,7 +28,7 @@ void InitText2D(const char * texturePath,const char* textMessage,
 				int x, int y, int size){
 
 	// Initialize texture
-	Text2DTextureID = CreateTexture(texturePath, GL_RGB, GL_NEAREST, GL_NEAREST);
+	Text2DTextureID = CreateTexture(texturePath, GL_NEAREST, GL_NEAREST);
 
 	// Initialize VBO
 	glGenBuffers(1, &Text2DVertexBufferID);

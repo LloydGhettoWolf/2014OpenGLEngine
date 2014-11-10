@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <math.h>
+#include <time.h>
 #include <IL\il.h>
 #include "Shader.h"
 #include "VertexArray.h"
@@ -43,6 +44,8 @@ bool App::Init(){
 	glDepthFunc(GL_LEQUAL);
 	glClearDepth(1.0f);
 
+	glEnable(GL_DEPTH_CLAMP);
+
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
@@ -54,17 +57,19 @@ bool App::Init(){
 	m_teapotShader = CreateTeapotShader();	
 
 
-	if (!CreateDepthTexture(m_depthBuffer)) {
-		cout << "failure to create depthBuffer" << endl;
-		return false;
-	}
+	//if (!CreateDepthTexture(m_depthBuffer)) {
+		//cout << "failure to create depthBuffer" << endl;
+		//return false;
+	//}
 
-	InitStaticMesh(m_teapotMesh, "teapot.obj");
+	InitStaticMesh(m_teapotMesh, "sponza\\sponza.obj");
 
-	m_camera = CreateCamera(vec3(0.0f,0.0f,-4.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 500.0f);
+	m_camera = CreateCamera(vec3(0.0f,2.0f,0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f));
+	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f);
 
 	InitText2D("myFont.png", "test test test", 50, 50, 24);
+
+	m_texture = CreateTexture("rockTexture.png", GL_NEAREST, GL_LINEAR_MIPMAP_LINEAR);
 	
 	return true;
 }
@@ -77,45 +82,48 @@ void App::Run(){
 
 	GLuint shaderProg = m_teapotShader;
 
-	Material myMaterial;
-	myMaterial.ambient  = glm::vec3(0.1f, 0.1f, 0.1f);
-	myMaterial.diffuse  = glm::vec3(0.6f, 0.2f, 0.0f);
-	myMaterial.specular = glm::vec3(0.4f,0.4f,0.4f);
+	MaterialUniforms matUni;
 
 	GLint cameraMatrixUniform		= glGetUniformLocation(shaderProg, "cameraMatrix");
 	GLint perspectiveMatrixUniform	= glGetUniformLocation(shaderProg, "perspectiveMatrix");
 	GLint textureUniform			= glGetUniformLocation(shaderProg, "tex");
 	GLint rotationUniform			= glGetUniformLocation(shaderProg, "rotationMatrix");
 	GLint eyePosUniform				= glGetUniformLocation(shaderProg, "eyePos");
-	GLint shininessUniform			= glGetUniformLocation(shaderProg, "shininess");
 	GLint lightVecUniform			= glGetUniformLocation(shaderProg, "lightVector");
 	GLint normalMatrixUniform		= glGetUniformLocation(shaderProg, "normalMatrix");
-	GLint diffuseUniform			= glGetUniformLocation(shaderProg, "materialDiffuse");
-	GLint ambientUniform			= glGetUniformLocation(shaderProg, "materialAmbient");
-	GLint specularUniform			= glGetUniformLocation(shaderProg, "materialSpecular");
+	matUni.diffuseUniform			= glGetUniformLocation(shaderProg, "materialDiffuse");
+	matUni.ambientUniform			= glGetUniformLocation(shaderProg, "materialAmbient");
+	matUni.specularUniform			= glGetUniformLocation(shaderProg, "materialSpecular");
+	matUni.shininessUniform			= glGetUniformLocation(shaderProg, "shininess");
+	GLint translationUniform		= glGetUniformLocation(shaderProg, "translation");
+	GLint scaleUniform				= glGetUniformLocation(shaderProg, "scaleMatrix");
 
-	vec3 lightVec(0.0f, 0.0f, 1.0);
+	vec3 lightVec(0.0f, -0.5f, 0.7f);
 	mat4x4 rotation = rotate(mat4x4(), 180.0f, vec3(0.0f, 1.0f, 0.0f));
 	mat3x3 normalMatrix = mat3x3(transpose(rotation));
+	mat4x4 scaleMatrix; 
+	scaleMatrix = scale(scaleMatrix, vec3(32.0f, 16.0f, 32.0f));
 
 	glUseProgram(shaderProg);
 	glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
 	glUniformMatrix3fv(normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
 	glUniform3fv(lightVecUniform, 1, &lightVec[0]);
-	glUniform1f(shininessUniform, 32.0f);
 	glUniformMatrix4fv(rotationUniform, 1, GL_FALSE, &rotation[0][0]);
+	glUniformMatrix4fv(scaleUniform, 1, GL_FALSE, &scaleMatrix[0][0]);
+	glUniform1i(textureUniform, 0);
 	glUseProgram(0);
 
-	vec3 movement[24];
+	vec3 movement[12];
+	Material myMaterial;
+	vec3   movementX(40.0f, 0.0f, 0.0f);
+	vec3   movementZ(0.0f, 0.0f, 40.0f);
 
-	vec3   movementX(7.0f, 0.0f, 0.0f);
-	vec3   movementZ(0.0f, 0.0f, 7.0f);
+	srand(time(0));
 
-	for (int potRow = 0; potRow < 4; potRow++){
-		for (int pot = 0; pot < 3; pot++){
-			movement[potRow * 3 + pot] = (float)pot * movementX + (float)potRow * movementZ;
-		}
-	}
+	myMaterial.diffuse = vec3(0.6f, 0.6f, 0.6f);
+	myMaterial.ambient = vec3(0.1f, 0.2f, 0.1f);
+	myMaterial.specular = vec3(0.4f, 0.4f, 0.4f);
+	myMaterial.shininess = 32.0f;
 
 	currentFrame = glfwGetTime();
 
@@ -124,14 +132,19 @@ void App::Run(){
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(shaderProg);
-		glUniform3fv(diffuseUniform, 1, &myMaterial.diffuse[0]);
-		glUniform3fv(specularUniform, 1, &myMaterial.specular[0]);
-		glUniform3fv(ambientUniform, 1, &myMaterial.ambient[0]);
-		glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
-		glUniform3fv(eyePosUniform, 1, &m_camera.pos[0]);
 
-		RenderStaticMesh(m_teapotMesh);
+		glActiveTexture(GL_TEXTURE0);
+		glUniform1i(textureUniform, 0);
+
+		//for (int teapot = 0; teapot < 12; teapot++){
+			glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
+			glUniform3fv(eyePosUniform, 1, &m_camera.pos[0]);
+
+			RenderStaticMesh(m_teapotMesh,matUni);
+		//}
 		
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D,0);
 		glUseProgram(0);
 
 		PrintText2D();
@@ -159,7 +172,7 @@ GLuint App::CreateTeapotShader(){
 	GLuint fragmentShader;
 
 	const int numAttribs = 3;
-	char* attribs[numAttribs] = { "inCoords", "inNormals", "inPositions" };
+	char* attribs[numAttribs] = { "inCoords", "inNormals", "inUVs" };
 
 	vertexShader = CreateShader(GL_VERTEX_SHADER, "basic.vp");
 	fragmentShader = CreateShader(GL_FRAGMENT_SHADER, "basic.fp");
@@ -217,4 +230,8 @@ int App::lastKeyAction = 0;
 void GLFWCALL KeyCallback(int key, int action){
 	App::lastKeyPress  = key;
 	App::lastKeyAction = action;
+}
+
+float RandomFloat(float low,float high){
+	return low + static_cast <float> (rand()) / static_cast <float> (RAND_MAX/(high-low));
 }

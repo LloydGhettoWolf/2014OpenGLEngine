@@ -144,12 +144,12 @@ bool InitStaticMesh(StaticMesh& mesh,char* fileName,int instances){
 			delete[] vertices;
 		}
 
-		Material* newMat = NULL;
+		Material newMat;
 		GLuint	  newTex = NULL;
 
 		//load materials
 		newMat = LoadMaterials(scene,scene->mMaterials[thisMesh->mMaterialIndex]);
-		newTex = LoadTextures(scene,scene->mMaterials[thisMesh->mMaterialIndex]);
+		newTex = LoadTextures(mesh,scene,scene->mMaterials[thisMesh->mMaterialIndex]);
 		
 		
 		newComp->m_material = newMat;
@@ -210,17 +210,17 @@ void GetBoundingBoxForNode(const aiNode* node,glm::vec3& min,glm::vec3& max,aiMa
     trafo = prev;
 }
 
-Material* LoadMaterials(const aiScene* scene,aiMaterial* material)
+Material LoadMaterials(const aiScene* scene,aiMaterial* material)
 {
-	Material* mat = new Material;
+	Material mat;
 
 	float c[4] = {0.8f, 0.8f, 0.8f, 1.0f};
 
     aiColor4D diffuse;
     if(AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse)){
-		memcpy(&mat->diffuse,&diffuse, sizeof(diffuse));
+		memcpy(&mat.diffuse,&diffuse, sizeof(diffuse));
 	}else{
-		memcpy(&mat->diffuse,c, sizeof(c));
+		memcpy(&mat.diffuse,c, sizeof(c));
 	}
  
 	c[0] = 0.2f;
@@ -230,9 +230,9 @@ Material* LoadMaterials(const aiScene* scene,aiMaterial* material)
 
     aiColor4D ambient;
     if(AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &ambient)){
-        memcpy(&mat->ambient, &ambient, sizeof(ambient));
+        memcpy(&mat.ambient, &ambient, sizeof(ambient));
 	}else{
-		memcpy(&mat->ambient,c, sizeof(c));
+		memcpy(&mat.ambient,c, sizeof(c));
 	}
  
 	c[0] = 0.0f;
@@ -242,20 +242,20 @@ Material* LoadMaterials(const aiScene* scene,aiMaterial* material)
       
     aiColor4D specular;
     if(AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specular)){
-            memcpy(&mat->specular, &specular, sizeof(specular));
+            memcpy(&mat.specular, &specular, sizeof(specular));
 	}else{
-		memcpy(&mat->specular, c, sizeof(c));
+		memcpy(&mat.specular, c, sizeof(c));
 	}
  
     float shininess = 0.0;
     unsigned int max;
     aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS, &shininess, &max);
-    mat->shininess = shininess;
+    mat.shininess = shininess;
 
 	return mat;
 }
 
-GLuint LoadTextures(const aiScene* scene,aiMaterial* material){
+GLuint LoadTextures(StaticMesh& mesh, const aiScene* scene,aiMaterial* material){
 		
 	int texIndex = 0;
 	aiString path;  // filename
@@ -264,28 +264,26 @@ GLuint LoadTextures(const aiScene* scene,aiMaterial* material){
 
 	aiReturn texFound = material->GetTexture(aiTextureType_DIFFUSE, texIndex, &path, NULL, NULL, NULL,NULL,NULL);
 
-	while (texFound == AI_SUCCESS) {
-		//fill map with textures, OpenGL image ids set to 0
-		char buf[50];
-		sprintf_s(buf,"%s",path.data);
-		texNames.push_back(buf);
+	GLuint texture = 0;
+	if (texFound == AI_SUCCESS){
 
-		// more textures?
-		texIndex++;
-		texFound = material->GetTexture(aiTextureType_DIFFUSE, texIndex, &path);
+		map<string,GLuint>::iterator it = mesh.m_textures.find(path.data);
+
+		aiString directory = "sponza\\";
+
+		if (it == mesh.m_textures.end()){
+			texture = CreateTexture(strcat(directory.data,path.data), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+			mesh.m_textures[path.data] = texture;
+		}else{
+			texture = it->second;
+		}
+
 	}
-
-
-	int numTextures = texNames.size();
-
-	if (numTextures == 0) return 0;
 	
-	GLuint nextTex = CreateTexture(texNames[0], GL_RGB, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-	
-	return nextTex;
+	return texture;
 }
 
-void RenderStaticMesh(const StaticMesh& mesh)
+void RenderStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms)
 {
 	for (unsigned int meshNum = 0; meshNum < mesh.m_numMeshes; meshNum++){
 
@@ -294,16 +292,17 @@ void RenderStaticMesh(const StaticMesh& mesh)
 		}
 
 		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);
+		glUniform3fv(uniforms.diffuseUniform,  1, &mesh.m_meshData[meshNum]->m_material.diffuse[0]);
+		glUniform3fv(uniforms.specularUniform, 1, &mesh.m_meshData[meshNum]->m_material.specular[0]);
+		glUniform3fv(uniforms.ambientUniform, 1, &mesh.m_meshData[meshNum]->m_material.ambient[0]);
+		glUniform1f(uniforms.shininessUniform,   mesh.m_meshData[meshNum]->m_material.shininess);
 		glDrawElements(GL_TRIANGLES, mesh.m_meshData[meshNum]->m_numFaces * 3, GL_UNSIGNED_INT, 0);
 	}
 	glBindVertexArray(0);
 }
 
-void RenderInstancedStaticMesh(const StaticMesh& mesh,vec3* positions)
-{
+void RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms,vec3* positions){
 	
-	
-
 	for (unsigned int meshNum = 0; meshNum < mesh.m_numMeshes; meshNum++){
 
 		if (mesh.m_meshData[meshNum]->m_hasTexture){

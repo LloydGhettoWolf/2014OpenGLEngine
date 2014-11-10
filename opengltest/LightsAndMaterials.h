@@ -28,3 +28,10 @@ struct Material{
 	vec3 specular;
 	float shininess;
 };
+
+struct MaterialUniforms{
+	GLuint diffuseUniform;
+	GLuint ambientUniform;
+	GLuint specularUniform;
+	GLuint shininessUniform;
+};

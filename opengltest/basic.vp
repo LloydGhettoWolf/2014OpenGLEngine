@@ -1,26 +1,25 @@
 #version 330
 uniform mat4 perspectiveMatrix;
 uniform mat4 rotationMatrix;
+uniform mat4 scaleMatrix;
 uniform mat3 normalMatrix;
 uniform mat4 cameraMatrix;
 uniform vec3 lightVector;
 uniform vec3 eyePos;
-uniform float shininess;
 
 in vec3 inCoords;
 in vec3 inNormals;
-in vec3 inPositions;
+in vec2 inUVs;
 out vec3 norm;
 out vec3 lightVec;
 out vec3 eyeVec;
-out float shiny;
+out vec2 UVs;
 
 void main(){
-        vec4 position     = rotationMatrix * vec4(inCoords,1.0);
-        position.xyz      += inPositions;
+        vec4 position     = scaleMatrix * vec4(inCoords,1.0);
         norm              = normalize(normalMatrix * inNormals);
         eyeVec            = normalize(eyePos-position.xyz);
         lightVec          = normalize(-lightVector);
-        shiny             = shininess;
+        UVs               = inUVs;
 	gl_Position       = perspectiveMatrix * cameraMatrix * position;
 }
