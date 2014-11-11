@@ -1,0 +1,26 @@
+#version 330
+uniform mat4 perspectiveMatrix;
+uniform mat4 rotationMatrix;
+uniform mat4 scaleMatrix;
+uniform mat3 normalMatrix;
+uniform mat4 cameraMatrix;
+uniform vec3 eyePos;
+uniform vec3 lightPos[5];
+
+in vec3 inCoords;
+in vec3 inNormals;
+in vec3 inPositions;
+out vec3 norm;
+varying vec3 eyeVec;
+varying vec3 lightVector[5];
+
+void main(){
+        vec4 position     = rotationMatrix * scaleMatrix * vec4(inCoords,1.0);
+        position          += vec4(inPositions,1.0);
+        norm              = normalize(normalMatrix * inNormals);
+        eyeVec            = normalize(eyePos-position.xyz);
+        for(int light = 0; light < 5; light++){
+          lightVector[light]       = lightPos[light] - position.xyz;
+        }
+	gl_Position       = perspectiveMatrix * cameraMatrix * position;
+}
