@@ -3,9 +3,14 @@
 #include <glm\glm.hpp>
 using namespace glm;
 
+struct CustomVertexHud{
+	glm::vec2 vertexPoint;
+	glm::vec2 uv;
+};
+
 struct CustomVertexUV{
 	glm::vec3 vertexPoint;
-	glm::vec2 uv;
+	glm::vec3 uv;
 };
 
 struct CustomVertexNormUV{

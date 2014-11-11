@@ -19,6 +19,7 @@ struct MeshComponent{
 	GLuint          m_texture		= 0;
 	GLuint          m_numFaces		= 0;
 	Material		m_material;
+	GLuint			m_instancedDataBuffer = 0;
 	bool            m_hasTexture	= false;
 };
 
@@ -31,7 +32,6 @@ struct StaticMesh{
 		unsigned int				m_numMaterials;
 		unsigned int				m_numMeshes;
 		int							m_numInstances = 1;
-		GLuint						m_instancedDataBuffer;
 		std::map<string, GLuint>    m_textures;
 };
 

@@ -13,7 +13,6 @@
 #include "Texture.h"
 #include "DepthBuffer.h"
 #include "VertexTypes.h"
-#include "Font.h"
 
 bool SponzaApp::Init(){
 
@@ -24,6 +23,8 @@ bool SponzaApp::Init(){
 
 	glfwOpenWindowHint(GLFW_VERSION_MAJOR, 3);
 	glfwOpenWindowHint(GLFW_VERSION_MINOR, 3);
+
+	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 4);
 
 	if (!glfwOpenWindow(APP_WIDTH, APP_HEIGHT, 8, 8, 8, 8, 32, 32, GLFW_WINDOW)){
 		std::cout << "cant create window" << std::endl;
@@ -63,8 +64,8 @@ bool SponzaApp::Init(){
 	m_camera = CreateCamera(vec3(0.0f, 2.0f, 0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f);
 
-	InitText2D("myFont.png", "test test test", 50, 50, 24);
-
+	m_fontShader = CreateFontShader();
+	InitText2D(m_counterFont, "exportedFont.bmp", "ms per frame: 0.00", 50, 50, 24, m_fontShader);
 
 	return true;
 }
@@ -99,6 +100,9 @@ void SponzaApp::Run(){
 
 	Material myMaterial;
 
+	string firstStr = "ms per frame: ";
+	string time = to_string(deltaTime);
+
 	glUseProgram(shaderProg);
 	glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
 	glUniformMatrix3fv(normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
@@ -107,7 +111,6 @@ void SponzaApp::Run(){
 	glUniform1i(textureUniform, 0);
 	glUseProgram(0);
 
-	srand(time(0));
 
 	currentFrame = glfwGetTime();
 
@@ -126,7 +129,9 @@ void SponzaApp::Run(){
 
 		glUseProgram(0);
 
-		PrintText2D();
+		time = to_string(deltaTime * 1000.0f);
+		ChangeText2D(m_counterFont, (firstStr + time.substr(0, 4)).c_str(), 50, 50, 24);
+		PrintText2D(m_counterFont);
 
 		glfwSwapBuffers();
 
@@ -143,7 +148,7 @@ void SponzaApp::Run(){
 };
 
 void SponzaApp::ShutDown(){
-	CleanupText2D();
+	CleanupText2D(m_counterFont);
 	DestroyMesh(m_sponzaMesh);
 	glDeleteShader(m_lightingShader);
 

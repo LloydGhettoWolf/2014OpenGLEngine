@@ -102,7 +102,7 @@ bool InitStaticMesh(StaticMesh& mesh,const string& fileName,const string& direct
 
 			if (instances > 1){
 				newComp->m_vertexBuffer = CreateInstancedVertexNormUVArray(vertices, numVerts, 
-																		indices, numFaces,instances,mesh.m_instancedDataBuffer);
+																		indices, numFaces,instances,newComp->m_instancedDataBuffer);
 			}else{
 				newComp->m_vertexBuffer = CreateVertexNormUVArray(vertices, numVerts, indices, numFaces);
 			}
@@ -123,7 +123,7 @@ bool InitStaticMesh(StaticMesh& mesh,const string& fileName,const string& direct
 
 			if (instances > 1){
 				newComp->m_vertexBuffer = CreateInstancedVertexNormArray(vertices, numVerts,
-					indices, numFaces, instances, mesh.m_instancedDataBuffer);
+					indices, numFaces, instances, newComp->m_instancedDataBuffer);
 			}else{
 				newComp->m_vertexBuffer = CreateVertexNormArray(vertices, numVerts,
 					indices, numFaces);
@@ -235,21 +235,21 @@ Material LoadMaterials(const aiScene* scene,aiMaterial* material)
 		memcpy(&mat.ambient,c, sizeof(c));
 	}
  
-	c[0] = 0.4f;
-	c[1] = 0.3f; 
-	c[2] = 0.4f;
+	c[0] = 0.6f;
+	c[1] = 0.6f; 
+	c[2] = 0.6f;
 	c[3] = 1.0f;
       
     aiColor4D specular;
-    if(AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specular)){
-            memcpy(&mat.specular, &specular, sizeof(specular));
-	}else{
+   if(AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specular)){
+          memcpy(&mat.specular, &specular, sizeof(specular));
+   }else{
 		memcpy(&mat.specular, c, sizeof(c));
-	}
+   }
  
-    float shininess = 0.0;
+    float shininess = 64.0f;
     unsigned int max;
-    aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS, &shininess, &max);
+   // aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS, &shininess, &max);
     mat.shininess = shininess;
 
 	return mat;
@@ -309,7 +309,7 @@ void RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniform
 		}
 
 		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_instancedDataBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_meshData[meshNum]->m_instancedDataBuffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * mesh.m_numInstances, positions, GL_DYNAMIC_DRAW);
 		glUniform3fv(uniforms.diffuseUniform, 1, &mesh.m_meshData[meshNum]->m_material.diffuse[0]);
 		glUniform3fv(uniforms.specularUniform, 1, &mesh.m_meshData[meshNum]->m_material.specular[0]);
