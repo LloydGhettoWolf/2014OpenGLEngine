@@ -40,7 +40,7 @@ void App::ReadKeys(){
 			m_moveUpAmount		 = lastKeyAction * -FORWARDS_SPEED;
 			break;
 		case 'Q':
-			ShutDown();
+			m_run = false;
 			break;
 	}
 	

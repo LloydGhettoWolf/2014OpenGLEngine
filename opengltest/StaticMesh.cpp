@@ -4,10 +4,6 @@
 
 //last update 05/11/2014 - made non OOP
 
-
-#include "StaticMesh.h"
-#include "VertexTypes.h"
-#include "VertexArray.h"
 #include <aiScene.h>
 #include <aiPostProcess.h>
 #include <aiMesh.h>
@@ -15,6 +11,9 @@
 #include <assimp.h>
 #include <fstream>
 #include <iostream>
+#include "StaticMesh.h"
+#include "VertexTypes.h"
+#include "VertexArray.h"
 
 
 bool InitStaticMesh(StaticMesh& mesh,const string& fileName,const string& directory,int instances){
@@ -310,7 +309,7 @@ void RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniform
 
 		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_meshData[meshNum]->m_instancedDataBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * mesh.m_numInstances, positions, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(vec3) * mesh.m_numInstances, positions);
 		glUniform3fv(uniforms.diffuseUniform, 1, &mesh.m_meshData[meshNum]->m_material.diffuse[0]);
 		glUniform3fv(uniforms.specularUniform, 1, &mesh.m_meshData[meshNum]->m_material.specular[0]);
 		glUniform3fv(uniforms.ambientUniform, 1, &mesh.m_meshData[meshNum]->m_material.ambient[0]);

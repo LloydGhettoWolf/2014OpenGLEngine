@@ -1,7 +1,7 @@
 //SponzaApp.cpp
 #include "SponzaApp.h"
 
-#include <glm\gtx\inverse_transpose.hpp>
+
 #include <glm\gtc\matrix_transform.hpp>
 
 #include <iostream>
@@ -93,7 +93,7 @@ void SponzaApp::Run(){
 	GLint scaleUniform = glGetUniformLocation(shaderProg, "scaleMatrix");
 
 	vec3 lightVec(0.0f, -0.5f, 0.7f);
-	mat4x4 rotation = rotate(mat4x4(), 180.0f, vec3(0.0f, 1.0f, 0.0f));
+	mat4x4 rotation = rotate(mat4x4(), glm::radians(180.0f), vec3(0.0f, 1.0f, 0.0f));
 	mat3x3 normalMatrix = mat3x3(transpose(rotation));
 	mat4x4 scaleMatrix;
 	scaleMatrix = scale(scaleMatrix, vec3(32.0f, 16.0f, 32.0f));

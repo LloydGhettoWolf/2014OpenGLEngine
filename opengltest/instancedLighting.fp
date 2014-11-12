@@ -1,19 +1,22 @@
 #version 330
+const int    numLights = 5;
 uniform vec3 materialDiffuse;
 uniform vec3 materialSpecular;
 uniform vec3 materialAmbient;
 uniform float shininess;
-uniform vec3 lightColors[5];
+uniform vec3 lightColors[numLights];
+
 in vec3  norm;
 in vec3  eyeVec;
-varying vec3  lightVector[5];
+in vec3  lightVector[numLights];
 out vec4 color;
 
 void main(){
         vec3 halfVec;
 	vec3 normal = normalize(norm);
-        vec3 spec = vec3(0.0,0.0,0.0),diff = vec3(0.0,0.0,0.0);
-        for(int light = 0; light < 5; light++){
+        vec3 spec = vec3(0.0,0.0,0.0);
+        vec3 diff = vec3(0.0,0.0,0.0);
+        for(int light = 0; light < numLights; light++){
             vec3 normalizedLight = normalize(lightVector[light]);
             halfVec = normalize((normalizedLight+eyeVec)* 0.5);
             float dist  = length(lightVector[light]);

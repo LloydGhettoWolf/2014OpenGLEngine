@@ -12,11 +12,11 @@ void AssignSubData(GLuint buffer, void* vertices, unsigned int vertexSize, unsig
 	glBufferSubData(GL_ARRAY_BUFFER, offset, numPoints*vertexSize, vertices);
 }
 
-GLuint CreateVertexArrayBuffer(void* vertexData,unsigned int elemSize, unsigned int numPoints){
+GLuint CreateVertexArrayBuffer(void* vertexData,unsigned int elemSize, unsigned int numPoints,GLenum usage = GL_STATIC_DRAW){
 	GLuint VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, elemSize * numPoints, vertexData, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, elemSize * numPoints, vertexData, usage);
 	return VBO;
 }
 
@@ -116,7 +116,7 @@ GLuint InitVAO(int vertexSize,void* vertices,int numPoints,int numFaces,unsigned
 
 void CreateInstancedAttrib(unsigned int attribNum,GLuint VAO,GLuint& posVBO,int numInstances){
 	glBindVertexArray(VAO);
-	posVBO = CreateVertexArrayBuffer(0, sizeof(vec3),numInstances);
+	posVBO = CreateVertexArrayBuffer(0, sizeof(vec3),numInstances,GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(attribNum);
 	glVertexAttribPointer(attribNum, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), 0);
 	glVertexAttribDivisor(attribNum, 1); 
