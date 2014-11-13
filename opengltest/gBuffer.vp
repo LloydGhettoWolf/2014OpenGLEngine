@@ -1,0 +1,26 @@
+#version 330
+uniform mat4 viewProjectionMatrix;
+uniform mat4 rotationMatrix;
+uniform mat4 scaleMatrix;
+uniform mat3 normalMatrix;
+uniform mat4 cameraMatrix;
+uniform bool instanced;
+
+in vec3 inCoords;
+in vec3 inNormals;
+in vec2 inUVs;
+in vec3 inPositions;
+
+out vec3 worldPos;
+out vec3 normals;
+//out vec2 UVs;
+
+void main(){
+        vec4 position     =  vec4(inCoords,1.0);
+        if(instanced == true){
+                position          = rotationMatrix * scaleMatrix * position;
+                position          += vec4(inPositions,1.0);
+        }
+        //UVs = inUVs;
+	gl_Position       = viewProjectionMatrix * position;
+}

@@ -10,6 +10,7 @@
 #include "DepthBuffer.h"
 #include "VertexTypes.h"
 #include "TeapotApp.h"
+#include "GroundPlane.h"
 
 
 bool TeapotApp::Init(){
@@ -57,15 +58,47 @@ bool TeapotApp::Init(){
 
 	m_teapotShader = CreateInstancedLightingShader();
 
+	GLuint shaderProg = m_teapotShader;
+	teapotUniforms.cameraMatrixUniform		= glGetUniformLocation(shaderProg, "cameraMatrix");
+	teapotUniforms.perspectiveMatrixUniform = glGetUniformLocation(shaderProg, "perspectiveMatrix");
+	teapotUniforms.textureUniform			= glGetUniformLocation(shaderProg, "tex");
+	teapotUniforms.rotationUniform			= glGetUniformLocation(shaderProg, "rotationMatrix");
+	teapotUniforms.eyePosUniform			= glGetUniformLocation(shaderProg, "eyePos");
+	teapotUniforms.lightVecUniform			= glGetUniformLocation(shaderProg, "lightPos");
+	teapotUniforms.lightColUniform			= glGetUniformLocation(shaderProg, "lightColors");
+	teapotUniforms.normalMatrixUniform		= glGetUniformLocation(shaderProg, "normalMatrix");
+	teapotUniforms.matUni.diffuseUniform	= glGetUniformLocation(shaderProg, "materialDiffuse");
+	teapotUniforms.matUni.ambientUniform	= glGetUniformLocation(shaderProg, "materialAmbient");
+	teapotUniforms.matUni.specularUniform	= glGetUniformLocation(shaderProg, "materialSpecular");
+	teapotUniforms.matUni.shininessUniform	= glGetUniformLocation(shaderProg, "shininess");
+	teapotUniforms.scaleUniform				= glGetUniformLocation(shaderProg, "scaleMatrix");
+	teapotUniforms.instancedUniform			= glGetUniformLocation(shaderProg, "instanced");
+
+	m_gBufferShader = CreateGBufferShader();
+
+	shaderProg = m_gBufferShader;
+	gBufferUniforms.cameraMatrixUniform			= glGetUniformLocation(shaderProg, "vpMatrix");
+	gBufferUniforms.normalMatrixUniform			= glGetUniformLocation(shaderProg, "normalMatrix");
+	gBufferUniforms.rotationMatrixUniform		= glGetUniformLocation(shaderProg, "rotationMatrix");
+	gBufferUniforms.materialDiffuseUniform		= glGetUniformLocation(shaderProg, "materialDiffuse");
+	gBufferUniforms.materialAmbientUniform		= glGetUniformLocation(shaderProg, "materialAmbient");
+	gBufferUniforms.materialSpecularUniform		= glGetUniformLocation(shaderProg, "materialSpecular");
+	gBufferUniforms.scaleMatrixUniform			= glGetUniformLocation(shaderProg, "scaleMatrix");
+	gBufferUniforms.instancedUniform			= glGetUniformLocation(shaderProg, "instanced");
+
 	InitStaticMesh(m_teapotMesh, "teapot.obj","teapot\\",64);
 
 	m_camera = CreateCamera(vec3(0.0f,0.0f,-40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_camera.projectionMatrix = glm::perspective(45.0f, APP_WIDTH / APP_HEIGHT, 1.0f, 500.0f);
+	m_camera.projectionMatrix = glm::perspective(45.0f, APP_WIDTH / APP_HEIGHT, 3.0f, 500.0f);
 
 	m_fontShader = CreateFontShader();
 	InitText2D(m_counterFont,"exportedFont.bmp", "ms per frame: 0.00", 50, 50, 24,m_fontShader);
 
-	CreateGroundPlaneData();
+	m_groundPlaneBuffer = CreateGroundPlaneData();
+
+	if (!CreateGBuffer()){
+		return false;
+	}
 	
 	return true;
 }
@@ -78,24 +111,6 @@ void TeapotApp::Run(){
 
 	GLuint shaderProg = m_teapotShader;
 
-	MaterialUniforms matUni;
-
-	GLint cameraMatrixUniform		= glGetUniformLocation(shaderProg, "cameraMatrix");
-	GLint perspectiveMatrixUniform	= glGetUniformLocation(shaderProg, "perspectiveMatrix");
-	GLint textureUniform			= glGetUniformLocation(shaderProg, "tex");
-	GLint rotationUniform			= glGetUniformLocation(shaderProg, "rotationMatrix");
-	GLint eyePosUniform				= glGetUniformLocation(shaderProg, "eyePos");
-	GLint lightVecUniform			= glGetUniformLocation(shaderProg, "lightPos");
-	GLint lightColUniform			= glGetUniformLocation(shaderProg, "lightColors");
-	GLint normalMatrixUniform		= glGetUniformLocation(shaderProg, "normalMatrix");
-	matUni.diffuseUniform			= glGetUniformLocation(shaderProg, "materialDiffuse");
-	matUni.ambientUniform			= glGetUniformLocation(shaderProg, "materialAmbient");
-	matUni.specularUniform			= glGetUniformLocation(shaderProg, "materialSpecular");
-	matUni.shininessUniform			= glGetUniformLocation(shaderProg, "shininess");
-	GLint scaleUniform				= glGetUniformLocation(shaderProg, "scaleMatrix");
-	GLint instancedUniform			= glGetUniformLocation(shaderProg, "instanced");
-
-
 	mat4x4 scaleMatrix;
 	scaleMatrix = scale(scaleMatrix, vec3(0.2f, 0.2f, 0.2f));
 
@@ -105,7 +120,6 @@ void TeapotApp::Run(){
 	vec3 movement[64];
 
 	vec3 lightPositions[5];
-
 
 	vec3 lightColors[5];
 
@@ -128,17 +142,25 @@ void TeapotApp::Run(){
 
 	shaderProg = m_teapotShader;
 	glUseProgram(shaderProg);
-	glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
-	glUniformMatrix4fv(scaleUniform, 1, GL_FALSE, &scaleMatrix[0][0]);
-	glUniformMatrix3fv(normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
-	glUniform3fv(lightColUniform, 5, &lightColors[0][0]);
+	glUniformMatrix4fv(teapotUniforms.perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
+	glUniformMatrix4fv(teapotUniforms.scaleUniform, 1, GL_FALSE, &scaleMatrix[0][0]);
+	glUniformMatrix3fv(teapotUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
+	glUniform3fv(teapotUniforms.lightColUniform, 5, &lightColors[0][0]);
+	mat4x4 translationMatrix = rotation;
+	glUniformMatrix4fv(teapotUniforms.rotationUniform, 1, GL_FALSE, &translationMatrix[0][0]);
+	glUseProgram(0);
+
+	shaderProg = m_gBufferShader;
+	glUseProgram(shaderProg);
+	glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &scaleMatrix[0][0]);
+	glUniformMatrix3fv(gBufferUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
+	glUniformMatrix4fv(gBufferUniforms.rotationMatrixUniform, 1, GL_FALSE, &translationMatrix[0][0]);
 	glUseProgram(0);
 
 	lastFrame = currentFrame = glfwGetTime();
 
 	float rotationAmount = 0.0f;
 
-	vec3 diff = vec3(0.4f, 0.4f, 0.4f);
 
 	do{
 		float cosAmount = cosf(rotationAmount);
@@ -148,32 +170,17 @@ void TeapotApp::Run(){
 
 		rotationAmount += 0.02f;
 
-		
 		lightPositions[0] = vec3(45.0f*cosAmount, 20.0f, 180.0f*sinAmount2);
 		lightPositions[1] = vec3(-45.0f*cosAmount, -20.0f, 42.0f*sinAmount);
 		lightPositions[2] = vec3(240.0f*cosAmount2 , 20.0f, -42.0f*sinAmount);
 		lightPositions[3] = vec3(-120.0f*cosAmount,  40.0f, -100.0f*sinAmount);
 		lightPositions[4] = vec3(0.0f, 60.0f * cosAmount, 50.0f*sinAmount2);
 		
-
 		deltaTime = currentFrame - lastFrame;
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(shaderProg);
-			glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
-			glUniform3fv(eyePosUniform, 1, &m_camera.pos[0]);
-			glUniform3fv(lightVecUniform, 5, &lightPositions[0][0]);
 		
-			mat4x4 translationMatrix = rotation;
-			glUniformMatrix4fv(rotationUniform, 1, GL_FALSE, &translationMatrix[0][0]);
-			glUniform1i(instancedUniform, 1);
-			RenderInstancedStaticMesh(m_teapotMesh,matUni,&movement[0]);
-
-			glUniform1i(instancedUniform, 0);
-			glUniform3fv(matUni.diffuseUniform, 1, &diff[0]);
-			glBindVertexArray(m_groundPlaneBuffer);
-			glDrawElements(GL_TRIANGLES,9*9*6,GL_UNSIGNED_INT,0);
-		glUseProgram(0);
+		RenderDeferred(lightPositions, movement);
 				
 		time = to_string(deltaTime * 1000.0f);
 		ChangeText2D(m_counterFont, (firstStr + time.substr(0,4)).c_str(), 50, 50, 24);
@@ -199,6 +206,7 @@ void TeapotApp::ShutDown(){
 	DestroyMesh(m_teapotMesh);
 	glDeleteVertexArrays(1, &m_groundPlaneBuffer);
 	glDeleteShader(m_teapotShader);
+	glDeleteFramebuffers(1, &m_gBuffer.fboObject);
 };
 
 GLuint TeapotApp::CreateInstancedLightingShader(){
@@ -217,49 +225,63 @@ GLuint TeapotApp::CreateInstancedLightingShader(){
 	return CreateShaderProgram(&vertexShader, 1, &fragmentShader, 1, 0, 0, numAttribs, &attribs[0]);
 }
 
+void TeapotApp::RenderForward(vec3* lightPositions,vec3* teapotPositions){
+	vec3 diff = vec3(0.4f, 0.4f, 0.4f);
 
-void TeapotApp::CreateGroundPlaneData(){
-	int width  = 10;
-	int length = 10;
-	int numVertices = width * length;
-	CustomVertexNormUV* groundPlaneData = new CustomVertexNormUV[numVertices];
+	glUseProgram(m_teapotShader);
+		glUniformMatrix4fv(teapotUniforms.cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
+		glUniform3fv(teapotUniforms.eyePosUniform, 1, &m_camera.pos[0]);
+		glUniform3fv(teapotUniforms.lightVecUniform, 5, &lightPositions[0][0]);
 
-	int halfWidth  = width/2;
-	int halfHeight = length/2;
+		glUniform1i(teapotUniforms.instancedUniform, 1);
+		RenderInstancedStaticMesh(m_teapotMesh, teapotUniforms.matUni, &teapotPositions[0]);
 
-	int index = 0;
-	//create a buffer of vertex info using the height map
-	for(int x = 0; x < width; x++){
-		for(int z = 0; z < length; z++){
-			index = x * length + z;
-			groundPlaneData[index].vertexPoint.x = (x - halfWidth) * 50.0f;
-			groundPlaneData[index].vertexPoint.y = -30.0f;
-			groundPlaneData[index].vertexPoint.z = (z - halfHeight) * 50.0f;
-			groundPlaneData[index].uv.x = x * 0.025f;
-			groundPlaneData[index].uv.y = z * 0.025f;
-			groundPlaneData[index].normal = vec3(0.0f, 1.0f, 0.0f);
-		}
-	}
-
-	int numIndices = (width - 1) * (length - 1) * 6;
-	unsigned int *indices = new unsigned int[numIndices];
-
-	index = 0;
-
-	for (int x = 0; x < width - 1; x++){
-		for (int z = 0; z < length - 1; z++){
-			indices[index++] = (width * x) + z;
-			indices[index++] = (width * x) + z + 1;
-			indices[index++] = (width * (x + 1)) + z;
-
-			indices[index++] = (width * (x + 1)) + z;
-			indices[index++] = (width * x) + z + 1;
-			indices[index++] = (width * (x + 1)) + z + 1;
-		}
-	}
-
-	m_groundPlaneBuffer = CreateVertexNormUVArray(groundPlaneData, numVertices, indices, numIndices/3);
-	delete[] indices;
-	delete[] groundPlaneData;
+		glUniform1i(teapotUniforms.instancedUniform, 0);
+		glUniform3fv(teapotUniforms.matUni.diffuseUniform, 1, &diff[0]);
+		glBindVertexArray(m_groundPlaneBuffer);
+		glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
+	glUseProgram(0);
 }
+
+void TeapotApp::RenderDeferred(vec3* lightPositions, vec3* teapotPositions){
+	vec3 diff = vec3(0.4f, 0.4f, 0.4f);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer.fboObject);
+		glUseProgram(m_gBufferShader);
+			mat4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
+			glUniformMatrix4fv(gBufferUniforms.cameraMatrixUniform, 1, GL_FALSE, &viewProjection[0][0]);
+
+			glUniform1i(gBufferUniforms.instancedUniform, 1);
+			RenderInstancedStaticMesh(m_teapotMesh, teapotUniforms.matUni, &teapotPositions[0]);
+
+			glUniform1i(gBufferUniforms.instancedUniform, 0);
+			glUniform3fv(gBufferUniforms.materialDiffuseUniform, 1, &diff[0]);
+			glBindVertexArray(m_groundPlaneBuffer);
+			glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
+		glUseProgram(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+}
+
+GLuint TeapotApp::CreateGBufferShader(){
+	GLuint vertexShader;
+	GLuint fragmentShader;
+
+	const int numAttribs = 4;
+	char* attribs[numAttribs] = { "inCoords", "inNormals", "inUVs", "inPositions" };
+
+	vertexShader = CreateShader(GL_VERTEX_SHADER, "gBuffer.vp");
+	fragmentShader = CreateShader(GL_FRAGMENT_SHADER, "gBuffer.fp");
+
+	if (!vertexShader || !fragmentShader)
+		return -1;
+
+	return CreateShaderProgram(&vertexShader, 1, &fragmentShader, 1, 0, 0, numAttribs, &attribs[0]);
+}
+
+bool TeapotApp::CreateGBuffer(){
+	return CreateGBufferData(m_gBuffer);
+}
+
+
 

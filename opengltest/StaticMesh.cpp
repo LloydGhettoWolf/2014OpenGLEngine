@@ -151,7 +151,6 @@ bool InitStaticMesh(StaticMesh& mesh,const string& fileName,const string& direct
 		newMat = LoadMaterials(scene,scene->mMaterials[thisMesh->mMaterialIndex]);
 		newTex = LoadTextures(mesh,scene,scene->mMaterials[thisMesh->mMaterialIndex],directory);
 		
-		
 		newComp->m_material = newMat;
 
 		if(newTex != 0){
@@ -268,14 +267,12 @@ GLuint LoadTextures(StaticMesh& mesh, const aiScene* scene,aiMaterial* material,
 
 		map<string,GLuint>::iterator it = mesh.m_textures.find(path.data);
 
-
 		if (it == mesh.m_textures.end()){
 			texture = CreateTexture(directory + path.data, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
 			mesh.m_textures[path.data] = texture;
 		}else{
 			texture = it->second;
 		}
-
 	}
 	
 	return texture;

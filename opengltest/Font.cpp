@@ -61,14 +61,10 @@ void PrintText2D(FontData& fData){
 	vec2 halfScreenWidth(APP_WIDTH / 2, APP_HEIGHT / 2);
 	glUniform2fv(fData.halfVecUniformID, 1, &halfScreenWidth[0]);
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	// Draw call
 	glDrawArrays(GL_TRIANGLES, 0, fData.numVertices);
 
-	glDisable(GL_BLEND);
-
+	glBindTexture(GL_TEXTURE_2D,0);
 	glBindVertexArray(0);
 }
 
