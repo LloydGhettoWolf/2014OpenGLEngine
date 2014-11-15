@@ -1,5 +1,5 @@
 #version 330
-uniform mat4 viewProjectionMatrix;
+uniform mat4 vpMatrix;
 uniform mat4 rotationMatrix;
 uniform mat4 scaleMatrix;
 uniform mat3 normalMatrix;
@@ -13,14 +13,17 @@ in vec3 inPositions;
 
 out vec3 worldPos;
 out vec3 normals;
-//out vec2 UVs;
+out vec2 UVs;
 
 void main(){
-        vec4 position     =  vec4(inCoords,1.0);
+        vec4 position     =  scaleMatrix *  vec4(inCoords,1.0);
         if(instanced == true){
-                position          = rotationMatrix * scaleMatrix * position;
+                position          = rotationMatrix  * position;
                 position          += vec4(inPositions,1.0);
         }
-        //UVs = inUVs;
-	gl_Position       = viewProjectionMatrix * position;
+        UVs = inUVs;
+        worldPos = position.xyz;
+        normals = normalMatrix * inNormals;
+
+	gl_Position       = vpMatrix * position;
 }

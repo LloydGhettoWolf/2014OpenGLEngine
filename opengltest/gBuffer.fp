@@ -5,7 +5,7 @@ uniform vec3 materialAmbient;
 
 in vec3 worldPos;
 in vec3 normals;
-//in vec2 UVs;
+in vec2 UVs;
 layout(location = 0) out vec3 worldPosOut;
 layout(location = 1) out vec3 normalsOut;
 layout(location = 2) out vec3 materialsOut;

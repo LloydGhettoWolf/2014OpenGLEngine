@@ -11,7 +11,7 @@
 #include "VertexTypes.h"
 #include "TeapotApp.h"
 #include "GroundPlane.h"
-
+#include "Defines.h"
 
 bool TeapotApp::Init(){
 
@@ -111,11 +111,9 @@ void TeapotApp::Run(){
 
 	GLuint shaderProg = m_teapotShader;
 
-	mat4x4 scaleMatrix;
-	scaleMatrix = scale(scaleMatrix, vec3(0.2f, 0.2f, 0.2f));
 
 	mat4x4 rotation = rotate(mat4x4(), 180.0f, vec3(0.0f, 1.0f, 0.0f));
-	mat3x3 normalMatrix = mat3x3(transpose(rotation * scaleMatrix));
+	mat3x3 normalMatrix = mat3x3(transpose(rotation));
 
 	vec3 movement[64];
 
@@ -143,7 +141,7 @@ void TeapotApp::Run(){
 	shaderProg = m_teapotShader;
 	glUseProgram(shaderProg);
 	glUniformMatrix4fv(teapotUniforms.perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
-	glUniformMatrix4fv(teapotUniforms.scaleUniform, 1, GL_FALSE, &scaleMatrix[0][0]);
+	
 	glUniformMatrix3fv(teapotUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
 	glUniform3fv(teapotUniforms.lightColUniform, 5, &lightColors[0][0]);
 	mat4x4 translationMatrix = rotation;
@@ -152,7 +150,6 @@ void TeapotApp::Run(){
 
 	shaderProg = m_gBufferShader;
 	glUseProgram(shaderProg);
-	glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &scaleMatrix[0][0]);
 	glUniformMatrix3fv(gBufferUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
 	glUniformMatrix4fv(gBufferUniforms.rotationMatrixUniform, 1, GL_FALSE, &translationMatrix[0][0]);
 	glUseProgram(0);
@@ -180,6 +177,7 @@ void TeapotApp::Run(){
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
+	//	RenderForward(lightPositions, movement);
 		RenderDeferred(lightPositions, movement);
 				
 		time = to_string(deltaTime * 1000.0f);
@@ -228,14 +226,19 @@ GLuint TeapotApp::CreateInstancedLightingShader(){
 void TeapotApp::RenderForward(vec3* lightPositions,vec3* teapotPositions){
 	vec3 diff = vec3(0.4f, 0.4f, 0.4f);
 
+	mat4x4 scaleMatrix1, identity;
+	scaleMatrix1 = scale(scaleMatrix1, vec3(0.2f, 0.2f, 0.2f));
+
 	glUseProgram(m_teapotShader);
+		
+		glUniformMatrix4fv(teapotUniforms.scaleUniform, 1, GL_FALSE, &scaleMatrix1[0][0]);
 		glUniformMatrix4fv(teapotUniforms.cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
 		glUniform3fv(teapotUniforms.eyePosUniform, 1, &m_camera.pos[0]);
 		glUniform3fv(teapotUniforms.lightVecUniform, 5, &lightPositions[0][0]);
 
 		glUniform1i(teapotUniforms.instancedUniform, 1);
 		RenderInstancedStaticMesh(m_teapotMesh, teapotUniforms.matUni, &teapotPositions[0]);
-
+		glUniformMatrix4fv(teapotUniforms.scaleUniform, 1, GL_FALSE, &identity[0][0]);
 		glUniform1i(teapotUniforms.instancedUniform, 0);
 		glUniform3fv(teapotUniforms.matUni.diffuseUniform, 1, &diff[0]);
 		glBindVertexArray(m_groundPlaneBuffer);
@@ -246,21 +249,27 @@ void TeapotApp::RenderForward(vec3* lightPositions,vec3* teapotPositions){
 void TeapotApp::RenderDeferred(vec3* lightPositions, vec3* teapotPositions){
 	vec3 diff = vec3(0.4f, 0.4f, 0.4f);
 
+	mat4x4 scaleMatrix1,identity;
+	scaleMatrix1 = scale(scaleMatrix1, vec3(0.2f, 0.2f, 0.2f));
+
 	glBindFramebuffer(GL_FRAMEBUFFER, m_gBuffer.fboObject);
+		
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(m_gBufferShader);
+
+			glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &scaleMatrix1[0][0]);
 			mat4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
 			glUniformMatrix4fv(gBufferUniforms.cameraMatrixUniform, 1, GL_FALSE, &viewProjection[0][0]);
 
 			glUniform1i(gBufferUniforms.instancedUniform, 1);
 			RenderInstancedStaticMesh(m_teapotMesh, teapotUniforms.matUni, &teapotPositions[0]);
-
+			glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &identity[0][0]);
 			glUniform1i(gBufferUniforms.instancedUniform, 0);
 			glUniform3fv(gBufferUniforms.materialDiffuseUniform, 1, &diff[0]);
 			glBindVertexArray(m_groundPlaneBuffer);
 			glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
 		glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 }
 
 GLuint TeapotApp::CreateGBufferShader(){

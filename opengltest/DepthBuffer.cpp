@@ -1,6 +1,7 @@
 //DepthBuffer.cpp
 #include "DepthBuffer.h"
 #include <iostream>
+#include "Defines.h"
 
 bool CreateDepthTexture(GLuint& depthFBO,bool bindBuffer){
 
@@ -13,7 +14,7 @@ bool CreateDepthTexture(GLuint& depthFBO,bool bindBuffer){
 
 	glGenTextures(1, &depthTexture);
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 768, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, APP_WIDTH, APP_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
