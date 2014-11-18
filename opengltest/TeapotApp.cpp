@@ -62,7 +62,7 @@ bool TeapotApp::Init(){
 	}
 	
 	InitStaticMesh(m_teapotMesh, "teapot.obj","teapot\\",64);
-	InitStaticMesh(m_sphereMesh, "sphere.obj", "", 1);
+	InitStaticMesh(m_sphereMesh, "sphere.obj", "meshes\\", 1);
 
 	m_camera = CreateCamera(vec3(0.0f,0.0f,-40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(45.0f, APP_WIDTH / APP_HEIGHT, 3.0f, 500.0f);

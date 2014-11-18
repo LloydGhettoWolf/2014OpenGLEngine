@@ -1,0 +1,21 @@
+uniform mat4 cameraMatrix;
+uniform mat4 perspectiveMatrix;
+uniform mat4 rotationMatrix;
+uniform mat4 scaleMatrix;
+uniform bool instanced;
+
+in vec3 inCoords;
+in vec3 inNormals;
+in vec2 inUVs;
+in vec3 inPositions;
+
+
+void main(){
+       vec4 position     =  vec4(inCoords,1.0);
+       if(instanced == true){
+                position          = rotationMatrix * scaleMatrix * position;
+                position          += vec4(inPositions,1.0);
+        }
+
+	gl_Position       = perspectiveMatrix * cameraMatrix * position;
+}

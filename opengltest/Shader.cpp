@@ -23,7 +23,7 @@ GLuint CompileShader(GLenum eShaderType,const string& shaderFile,bool fromFile){
 	GLuint shader = glCreateShader(eShaderType);
 
 	if(fromFile){
-		string strFileData = ReadFile(shaderFile);
+		string strFileData = ReadFile("shaders\\" + shaderFile);
 
 		if (strFileData == "")
 			return 0;
