@@ -156,17 +156,9 @@ void SponzaApp::ShutDown(){
 };
 
 GLuint SponzaApp::CreateLightingShader(){
-	GLuint vertexShader;
-	GLuint fragmentShader;
 
 	const int numAttribs = 3;
-	char* attribs[numAttribs] = { "inCoords", "inNormals", "inUVs" };
+	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inUVs" };
 
-	vertexShader = CreateShader(GL_VERTEX_SHADER, "lighting.vp");
-	fragmentShader = CreateShader(GL_FRAGMENT_SHADER, "lighting.fp");
-
-	if (!vertexShader || !fragmentShader)
-		return -1;
-
-	return CreateShaderProgram(&vertexShader, 1, &fragmentShader, 1, 0, 0, numAttribs, &attribs[0]);
+	return CreateShader("lighting.vp", "lighting.fp", attribs, numAttribs);
 }

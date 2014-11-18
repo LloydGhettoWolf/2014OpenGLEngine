@@ -4,15 +4,12 @@
 #include <vector>
 #include <cstring>
 
-
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "VertexTypes.h"
 #include "Shader.h"
 #include "Texture.h"
-
 
 using namespace glm;
 
@@ -81,19 +78,11 @@ void CleanupText2D(FontData& fData){
 }
 
 GLuint CreateFontShader(){
-	GLuint vertexShader;
-	GLuint fragmentShader;
 
 	const int numAttribs = 2;
-	char* attribs[numAttribs] = { "inCoords", "inUVs"};
+	const char* attribs[numAttribs] = { "inCoords", "inUVs"};
 
-	vertexShader = CreateShader(GL_VERTEX_SHADER, "font.vp");
-	fragmentShader = CreateShader(GL_FRAGMENT_SHADER, "font.fp");
-
-	if (!vertexShader || !fragmentShader)
-		return -1;
-
-	return CreateShaderProgram(&vertexShader, 1, &fragmentShader, 1, 0, 0, numAttribs, &attribs[0]);
+	return CreateShader("font.vp","font.fp",attribs,numAttribs);
 };
 
 void InitVertexArrays(FontData& fData, std::vector<CustomVertexHud>& vertices){

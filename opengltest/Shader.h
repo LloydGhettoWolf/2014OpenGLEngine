@@ -16,6 +16,7 @@ void InitAttribs(vector<char*>& m_attribs,GLuint program);
 bool LinkProgram(GLuint program);
 
 string ReadFile(const string& filename);
-GLuint CreateShader(GLenum eShaderType, const string& shaderFile, bool fromFile = true);
+GLuint CreateShader(const char* vert,const char* frag,const char** attribs,int numAttribs);
+GLuint CompileShader(GLenum eShaderType, const string& shaderFile, bool fromFile = true);
 GLuint CreateShaderProgram(GLuint* vertShaders, unsigned int numVert, GLuint* fragShaders, unsigned int numFrag,
-	GLuint* geomShaders, unsigned int numGeom, unsigned int numAttribs, char** attribs);
+	GLuint* geomShaders, unsigned int numGeom, unsigned int numAttribs,const char** attribs);

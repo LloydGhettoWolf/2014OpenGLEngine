@@ -5,8 +5,21 @@
 #include <iostream>
 #include <fstream>
 
+GLuint CreateShader(const char* vert, const char* frag, const char** attribs, int numAttribs){
+	GLuint vertexShader;
+	GLuint fragmentShader;
 
-GLuint CreateShader(GLenum eShaderType,const string& shaderFile,bool fromFile){
+	vertexShader = CompileShader(GL_VERTEX_SHADER, vert);
+	fragmentShader = CompileShader(GL_FRAGMENT_SHADER, frag);
+
+	if (!vertexShader || !fragmentShader)
+		return NULL;
+
+	return CreateShaderProgram(&vertexShader, 1, &fragmentShader, 1, 0, 0, numAttribs, attribs);
+	return true;
+}
+
+GLuint CompileShader(GLenum eShaderType,const string& shaderFile,bool fromFile){
 	GLuint shader = glCreateShader(eShaderType);
 
 	if(fromFile){
@@ -58,7 +71,7 @@ GLuint CreateShader(GLenum eShaderType,const string& shaderFile,bool fromFile){
 }
 
 GLuint CreateShaderProgram(GLuint* vertShaders,unsigned int numVert,GLuint* fragShaders,unsigned int numFrag,
-	                       GLuint* geomShaders,unsigned int numGeom,unsigned int numAttribs,char** attribs){
+	                       GLuint* geomShaders,unsigned int numGeom,unsigned int numAttribs,const char** attribs){
 
 	GLuint program = glCreateProgram();
 
@@ -151,7 +164,3 @@ string ReadFile(const string& filename){
     string stringBuffer(istreambuf_iterator<char>(fileIn), (istreambuf_iterator<char>()));
 	return stringBuffer;
 }
-
-
-
-
