@@ -39,7 +39,7 @@ struct StaticMesh{
 bool				InitStaticMesh(StaticMesh& newMesh, const string& fileName, const string& directory, int instances = 1);
 void				RenderStaticMesh(const StaticMesh& mesh,MaterialUniforms& uniforms);
 
-void				RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms,vec3* positions);
+void				RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms,const vec3* positions);
 
 //support functions for use by Init();
 void				GetBoundingBox(glm::vec3& min, glm::vec3& max, const aiScene* scene);

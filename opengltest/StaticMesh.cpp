@@ -296,7 +296,7 @@ void RenderStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms)
 	glBindVertexArray(0);
 }
 
-void RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms,vec3* positions){
+void RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms,const vec3* positions){
 	
 	for (unsigned int meshNum = 0; meshNum < mesh.m_numMeshes; meshNum++){
 

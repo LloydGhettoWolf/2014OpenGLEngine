@@ -7,7 +7,7 @@ enum BufferIndexes{POSITION,DIFFUSE,NORMAL};
 
 struct GBufferData{
 	GLuint  fboObject;
-	GLuint  textures[3];
+	GLuint  textures[4];
 	GLuint  depthTexture;
 };
 
