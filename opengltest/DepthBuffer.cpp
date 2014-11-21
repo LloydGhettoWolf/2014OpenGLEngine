@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Defines.h"
 
-bool CreateDepthTexture(GLuint& depthFBO,bool bindBuffer){
+bool CreateDepthTexture(GLuint& depthFBO, bool bindBuffer, bool stencil){
 
 	GLuint depthTexture;
 
@@ -14,12 +14,25 @@ bool CreateDepthTexture(GLuint& depthFBO,bool bindBuffer){
 
 	glGenTextures(1, &depthTexture);
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, APP_WIDTH, APP_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+
+	if (stencil){
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, APP_WIDTH, APP_HEIGHT, 0, GL_DEPTH_STENCIL,
+			GL_FLOAT_32_UNSIGNED_INT_24_8_REV, 0);
+	}
+	else{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH, APP_WIDTH, APP_HEIGHT, 0, GL_DEPTH,GL_FLOAT, 0);
+	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D,depthTexture, 0);
+	if (stencil){
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+	}
+	else{
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH, GL_TEXTURE_2D, depthTexture, 0);
+	}
+
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){

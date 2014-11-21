@@ -2,4 +2,4 @@
 #pragma once
 #include <gl\glew.h>
 
-bool CreateDepthTexture(GLuint& depthFBO,bool bindBuffer = true);
+bool CreateDepthTexture(GLuint& depthFBO,bool bindBuffer = true,bool stencil = false);

@@ -4,19 +4,19 @@
 bool DeferredShader::CreateGBufferShader(){
 	const int numAttribs = 4;
 	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inUVs", "inPositions" };
-	m_quadPassHandle = CreateShader("gBuffer.vp", "gBuffer.fp", attribs, numAttribs);
+	m_gBufferHandle = CreateShader("gBuffer.vp", "gBuffer.fp", attribs, numAttribs);
 
-	if (!m_quadPassHandle) return false;
+	if (!m_gBufferHandle) return false;
 	
-	m_gBufferUniforms.cameraMatrixUniform   = glGetUniformLocation(m_quadPassHandle, "vpMatrix");
-	m_gBufferUniforms.normalMatrixUniform   = glGetUniformLocation(m_quadPassHandle, "normalMatrix");
-	m_gBufferUniforms.rotationMatrixUniform = glGetUniformLocation(m_quadPassHandle, "rotationMatrix");
-	m_gBufferUniforms.scaleMatrixUniform    = glGetUniformLocation(m_quadPassHandle, "scaleMatrix");
-	m_gBufferUniforms.instancedUniform      = glGetUniformLocation(m_quadPassHandle, "instanced");
+	m_gBufferUniforms.cameraMatrixUniform   = glGetUniformLocation(m_gBufferHandle, "vpMatrix");
+	m_gBufferUniforms.normalMatrixUniform   = glGetUniformLocation(m_gBufferHandle, "normalMatrix");
+	m_gBufferUniforms.rotationMatrixUniform = glGetUniformLocation(m_gBufferHandle, "rotationMatrix");
+	m_gBufferUniforms.scaleMatrixUniform    = glGetUniformLocation(m_gBufferHandle, "scaleMatrix");
+	m_gBufferUniforms.instancedUniform      = glGetUniformLocation(m_gBufferHandle, "instanced");
 
-	m_gBufferUniforms.materialUniforms.diffuseUniform  = glGetUniformLocation(m_quadPassHandle, "materialDiffuse");
-	m_gBufferUniforms.materialUniforms.ambientUniform  = glGetUniformLocation(m_quadPassHandle, "materialAmbient");
-	m_gBufferUniforms.materialUniforms.specularUniform = glGetUniformLocation(m_quadPassHandle, "materialSpecular");
+	m_gBufferUniforms.materialUniforms.diffuseUniform  = glGetUniformLocation(m_gBufferHandle, "materialDiffuse");
+	m_gBufferUniforms.materialUniforms.ambientUniform  = glGetUniformLocation(m_gBufferHandle, "materialAmbient");
+	//m_gBufferUniforms.materialUniforms.specularUniform = glGetUniformLocation(m_gBufferHandle, "materialSpecular");
 
 	return true;
 }
@@ -35,6 +35,7 @@ bool DeferredShader::CreateLightPassShader(){
 	m_lightPassUniforms.lightPosUniform    = glGetUniformLocation(m_lightPassHandle, "lightPos");
 	m_lightPassUniforms.lightColUniform    = glGetUniformLocation(m_lightPassHandle, "lightColor");
 	m_lightPassUniforms.wvpMatrixUniform   = glGetUniformLocation(m_lightPassHandle, "mvpMatrix");
+	m_lightPassUniforms.eyePosUniform	   = glGetUniformLocation(m_lightPassHandle, "eyePos");
 
 	return true;
 }
@@ -48,6 +49,18 @@ bool DeferredShader::CreateQuadPassShader(){
 
 	m_quadPassUniforms.ambTextureUniform = glGetUniformLocation(m_quadPassHandle, "ambient");
 	m_quadPassUniforms.screenSizeUniform = glGetUniformLocation(m_quadPassHandle, "screenSize");
+	m_quadPassUniforms.bufferUniform     = glGetUniformLocation(m_quadPassHandle, "buffer");
+
+	return true;
+}
+
+bool DeferredShader::CreateNULLShader(){
+	const char* attribs[1] = { "inCoords" };
+	m_nullPassHandle = CreateShader("nullTechnique.vp", "nullTechnique.fp", attribs, 1);
+
+	if (!m_nullPassHandle) return false;
+
+	m_nullWVPMatrixUniform = glGetUniformLocation(m_nullPassHandle,"WVPMatrix");
 
 	return true;
 }
@@ -63,9 +76,13 @@ bool DeferredShader::CreateDeferredShader(){
 	if (!CreateQuadPassShader())
 		return false;
 
+	if (!CreateNULLShader())
+		return false;
+
 	return true;
 }
 
 GLuint DeferredShader::m_gBufferHandle   = 0;
 GLuint DeferredShader::m_lightPassHandle = 0;
 GLuint DeferredShader::m_quadPassHandle  = 0;
+GLuint DeferredShader::m_nullPassHandle = 0;

@@ -1,0 +1,10 @@
+#version 330
+
+in vec3 inCoords;
+
+uniform mat4 WVPMatrix;
+
+void main()
+{
+    gl_Position = WVPMatrix * vec4(inCoords, 1.0);
+}

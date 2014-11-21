@@ -18,7 +18,7 @@ GLuint CreateGroundPlaneData(){
 		for (int z = 0; z < length; z++){
 			index = x * length + z;
 			groundPlaneData[index].vertexPoint.x = (x - halfWidth) * 50.0f;
-			groundPlaneData[index].vertexPoint.y = -15.0f;
+			groundPlaneData[index].vertexPoint.y = -5.0f;
 			groundPlaneData[index].vertexPoint.z = (z - halfHeight) * 50.0f;
 			groundPlaneData[index].uv.x = x * 0.025f;
 			groundPlaneData[index].uv.y = z * 0.025f;

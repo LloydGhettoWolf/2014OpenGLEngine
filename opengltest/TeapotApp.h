@@ -31,7 +31,7 @@ private:
 
 	GBufferData		m_gBuffer;
 	PointLightData  m_lights;
-	vec3            lightPos[5];
+	vec3            lightPos[NUM_POINT_LIGHTS];
 
 	//full screen quad
 	GLuint m_quadBuffer;

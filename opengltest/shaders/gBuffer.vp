@@ -3,7 +3,6 @@ uniform mat4 vpMatrix;
 uniform mat4 rotationMatrix;
 uniform mat4 scaleMatrix;
 uniform mat3 normalMatrix;
-uniform mat4 cameraMatrix;
 uniform bool instanced;
 
 in vec3 inCoords;

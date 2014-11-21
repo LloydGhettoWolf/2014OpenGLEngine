@@ -2,13 +2,14 @@
 #pragma once
 #include <gl\glew.h>
 
+const int NUM_MRT = 4;
 
-enum BufferIndexes{POSITION,DIFFUSE,NORMAL};
 
 struct GBufferData{
 	GLuint  fboObject;
-	GLuint  textures[4];
+	GLuint  textures[NUM_MRT];
 	GLuint  depthTexture;
+	GLuint  finalTexture;
 };
 
 bool CreateGBufferData(GBufferData& data);
