@@ -135,12 +135,12 @@ bool TeapotApp::Init(){
 
 	//cubemap
 	std::vector<string> cubemapFilenames;
-	cubemapFilenames.push_back("sand_positive_x.jpg");
-	cubemapFilenames.push_back("sand_negative_x.jpg");
-	cubemapFilenames.push_back("sand_positive_y.jpg");
-	cubemapFilenames.push_back("sand_negative_y.jpg");
-	cubemapFilenames.push_back("sand_positive_z.jpg");
-	cubemapFilenames.push_back("sand_negative_z.jpg");
+	cubemapFilenames.push_back("posx.jpg");
+	cubemapFilenames.push_back("negx.jpg");
+	cubemapFilenames.push_back("posy.jpg");
+	cubemapFilenames.push_back("negy.jpg");
+	cubemapFilenames.push_back("posz.jpg");
+	cubemapFilenames.push_back("negz.jpg");
 	m_cubeMap = CreateCubeMap(cubemapFilenames);
 	
 	return true;
