@@ -4,6 +4,7 @@
 #include "GBufferData.h"
 #include "ForwardShader.h"
 #include "DeferredShader.h"
+#include "CubemapShader.h"
 
 
 class TeapotApp : public App{
@@ -22,11 +23,13 @@ private:
 
 	ForwardShader		  m_teapotShader;
 	DeferredShader		  m_deferredShader;
+	CubemapShader		  m_cubemapShader;
 
 	StaticMesh            m_teapotMesh;
-	StaticMesh			  m_sphereMesh;
+	StaticMesh			  m_sphereMesh,m_cubeMesh;
 
 	GLuint				  m_groundPlaneBuffer;
+	GLuint				  m_cubeMap;
 
 
 	GBufferData		m_gBuffer;

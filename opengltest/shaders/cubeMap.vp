@@ -1,0 +1,11 @@
+#version 330
+uniform mat4 wvpMatrix;
+in vec3 inCoords;
+
+out vec3 outUV;
+
+void main(){
+        vec4 position = wvpMatrix * vec4(inCoords,1.0);
+        gl_Position = position.xyww;
+        outUV = inCoords;
+}

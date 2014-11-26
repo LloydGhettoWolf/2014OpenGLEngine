@@ -5,9 +5,8 @@
 
 using namespace std;
 
-GLubyte* ReadImage(const string& fileName,unsigned int& bytes, unsigned int& width, unsigned int& height);
 
-GLuint CreateTexture(const string& fileName,GLint magFilter,GLint minFilter){
+GLuint CreateTexture(const string& fileName,GLint magFilter,GLint minFilter,bool anisotropic){
 
 	GLuint newTex;
 	glGenTextures(1, &newTex);
@@ -41,6 +40,7 @@ GLuint CreateTexture(const string& fileName,GLint magFilter,GLint minFilter){
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
