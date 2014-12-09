@@ -5,6 +5,7 @@
 #include "ForwardShader.h"
 #include "DeferredShader.h"
 #include "CubemapShader.h"
+#include "PointSprite.h"
 
 
 class TeapotApp : public App{
@@ -30,6 +31,8 @@ private:
 
 	GLuint				  m_groundPlaneBuffer;
 	GLuint				  m_cubeMap;
+
+	PointSprite			 m_lightPointSprite;
 
 
 	GBufferData		m_gBuffer;

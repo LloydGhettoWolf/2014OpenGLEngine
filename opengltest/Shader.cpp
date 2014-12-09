@@ -19,6 +19,22 @@ GLuint CreateShader(const char* vert, const char* frag, const char** attribs, in
 	return true;
 }
 
+GLuint CreateShader(const char* vert, const char* frag,const char* geom, const char** attribs, int numAttribs){
+	GLuint vertexShader;
+	GLuint fragmentShader;
+	GLuint geomShader;
+
+	vertexShader = CompileShader(GL_VERTEX_SHADER, vert);
+	fragmentShader = CompileShader(GL_FRAGMENT_SHADER, frag);
+	geomShader = CompileShader(GL_GEOMETRY_SHADER, geom);
+
+	if (!vertexShader || !fragmentShader || !geomShader)
+		return NULL;
+
+	return CreateShaderProgram(&vertexShader, 1, &fragmentShader, 1, &geomShader, 1, numAttribs, attribs);
+	return true;
+}
+
 GLuint CompileShader(GLenum eShaderType,const string& shaderFile,bool fromFile){
 	GLuint shader = glCreateShader(eShaderType);
 

@@ -13,6 +13,7 @@
 #include "Defines.h"
 #include "CubeMap.h"
 
+
 bool TeapotApp::Init(){
 
 	if (glfwInit() != GL_TRUE){
@@ -66,6 +67,11 @@ bool TeapotApp::Init(){
 		cout << "failed to load shader!" << endl;
 		return 1;
 	}
+	vec3 point = vec3(0.0f, 0.0f, 0.0f);
+	if (!SetupPointSprite(m_lightPointSprite, &point, "pointSprite.jpg", 1)){
+		cout << "failed to setupPointSprite!" << endl;
+		return 1;
+	}
 	
 	InitStaticMesh(m_teapotMesh, "teapot.obj", "teapot\\",64);
 	InitStaticMesh(m_sphereMesh, "sphere.obj", "meshes\\", 1);
@@ -93,32 +99,8 @@ bool TeapotApp::Init(){
 	screenQuad[5] = vec3(1.0f, -1.0f, 0.0f);
 
 	m_lights.color[0] = vec3(0.0f, 0.0f, 1.0f);
-	m_lights.color[1] = vec3(1.0f, 0.0f, 0.0f);
-	m_lights.color[2] = vec3(0.0f, 1.0f, 0.0f);
-	m_lights.color[3] = vec3(0.5f, 0.0f, 0.5f);
-	m_lights.color[4] = vec3(0.2f, 0.6f, 0.2f);
-	m_lights.color[5] = vec3(0.0f, 0.3f, 1.0f);
-	m_lights.color[6] = vec3(1.0f, 0.3f, 0.0f);
-	m_lights.color[7] = vec3(0.3f, 1.0f, 0.0f);
-	m_lights.color[8] = vec3(0.5f, 0.3f, 0.5f);
-	m_lights.color[9] = vec3(0.2f, 0.6f, 0.2f);
-	m_lights.color[10] = vec3(0.0f, 0.6f, 1.0f);
-	m_lights.color[11] = vec3(1.0f, 0.6f, 0.0f);
 	
-
 	lightPos[0] = vec3(12.0f,  40.0f, -12.0f);
-	lightPos[1] = vec3(12.0f,  40.0f, 12.0f);
-	lightPos[2] = vec3(-12.0f, 40.0f, -12.0f);
-	lightPos[3] = vec3(-12.0f, 40.0f, 12.0f);
-	lightPos[4] = vec3(60.0f,  40.0f, .0f);
-	lightPos[5] = vec3(60.0f,  40.0f, -60.0f);
-	lightPos[6] = vec3(-60.0f, 40.0f, 60.0f);
-	lightPos[7] = vec3(-60.0f, 40.0f, -60.0f);
-	lightPos[8] = vec3(90.0f,  40.0f, -90.0f);
-	lightPos[9] = vec3(90.0f,  40.0f,   90.0f);
-	lightPos[10] = vec3(-90.0f, 40.0f, -90.0f);
-	lightPos[11] = vec3(-90.0f, 40.0f, 90.0f);
-	
 
 	for (int light = 0; light < NUM_POINT_LIGHTS; light++){
 		m_lights.constantAtt[light] = 0.0f;
@@ -172,7 +154,7 @@ void TeapotApp::Run(){
 		ForwardShaderUniforms teapotUniforms = m_teapotShader.GetUniforms();
 		glUniformMatrix4fv(teapotUniforms.perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
 		glUniformMatrix3fv(teapotUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
-		glUniform3fv(teapotUniforms.lightColUniform, 5, &m_lights.color[0][0]);
+		glUniform3fv(teapotUniforms.lightColUniform, 1, &m_lights.color[0][0]);
 		mat4x4 translationMatrix = rotation;
 		glUniformMatrix4fv(teapotUniforms.rotationUniform, 1, GL_FALSE, &translationMatrix[0][0]);
 	glUseProgram(0);
@@ -190,6 +172,10 @@ void TeapotApp::Run(){
 
 	glUseProgram(m_deferredShader.GetQuadPassHandle());
 	glUniform2fv(m_deferredShader.GetQuadPassUniforms().screenSizeUniform, 1, &screenSize[0]);
+	glUseProgram(0);
+
+	glUseProgram(m_lightPointSprite.shader);
+	glUniform1i(m_lightPointSprite.textureUniform, 0);
 	glUseProgram(0);
 
 	lastFrame = currentFrame = glfwGetTime();
@@ -244,21 +230,32 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 	mat4x4 scaleMatrix1, identity;
 	scaleMatrix1 = scale(scaleMatrix1, vec3(0.2f, 0.2f, 0.2f));
 	//mat4x4 cubemapScaleMatrix = scale(scaleMatrix1, vec3(400.0f, 400.0f, 400.0f));
+	mat4x4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
+
+	glUseProgram(m_lightPointSprite.shader);
+		glUniformMatrix4fv(m_lightPointSprite.matrixUniform, 1, GL_FALSE, &viewProjection[0][0]);
+		glUniform3fv(m_lightPointSprite.camPos, 1, &m_camera.pos[0]);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_lightPointSprite.texture);
+		UpdatePointSpritePosition(m_lightPointSprite, (void*)&lightPositions[0][0]);
+		DrawPointSprites(m_lightPointSprite);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	glUseProgram(0);
 
 	glUseProgram(m_teapotShader.GetHandle());
 	ForwardShaderUniforms teapotUniforms = m_teapotShader.GetUniforms();
 		glUniformMatrix4fv(teapotUniforms.scaleUniform, 1, GL_FALSE, &scaleMatrix1[0][0]);
 		glUniformMatrix4fv(teapotUniforms.cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
 		glUniform3fv(teapotUniforms.eyePosUniform, 1, &m_camera.pos[0]);
-		glUniform3fv(teapotUniforms.lightVecUniform, 5, &lightPositions[0][0]);
+		glUniform3fv(teapotUniforms.lightVecUniform, 1, &lightPositions[0][0]);
 
 		glUniform1i(teapotUniforms.instancedUniform, 1);
-		RenderStaticMesh(m_teapotMesh, teapotUniforms.matUni);
+		//RenderInstancedStaticMesh(m_teapotMesh, teapotUniforms.matUni,teapotPositions);
 		glUniformMatrix4fv(teapotUniforms.scaleUniform, 1, GL_FALSE, &identity[0][0]);
 		glUniform1i(teapotUniforms.instancedUniform, 0);
 		glUniform3fv(teapotUniforms.matUni.diffuseUniform, 1, &diff[0]);
 		glBindVertexArray(m_groundPlaneBuffer);
-		//glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
 	glUseProgram(0);
 
 	glUseProgram(m_cubemapShader.GetHandle());
@@ -314,12 +311,8 @@ void TeapotApp::RenderDeferred(const vec3* teapotPositions){
 			glBindVertexArray(0);
 			glDepthMask(GL_FALSE);
 		glUseProgram(0);
-
-
 	
 	mat4 worldMatrix;
-
-	
 	MaterialUniforms matuni;
 
 	for (int light = 0; light < NUM_POINT_LIGHTS; light++){
@@ -420,12 +413,14 @@ void TeapotApp::ShutDown(){
 	DestroyMesh(m_sphereMesh);
 	DestroyMesh(m_cubeMesh);
 	glDeleteVertexArrays(1, &m_groundPlaneBuffer);
+	glDeleteVertexArrays(1, &m_lightPointSprite.VAO);
 	glDeleteShader(m_teapotShader.GetHandle());
 	glDeleteShader(m_deferredShader.GetGBufferHandle());
 	glDeleteShader(m_deferredShader.GetQuadPassHandle());
 	glDeleteShader(m_deferredShader.GetLightPassHandle());
 	glDeleteShader(m_cubemapShader.GetHandle());
+	glDeleteShader(m_lightPointSprite.shader);
 	glDeleteFramebuffers(1, &m_gBuffer.fboObject);
 	glDeleteTextures(1, &m_cubeMap);
-
+	glDeleteTextures(1, &m_lightPointSprite.texture);
 };
