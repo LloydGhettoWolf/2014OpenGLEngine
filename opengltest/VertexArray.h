@@ -1,7 +1,7 @@
 //VertexArray.h
 #pragma once
 #include <gl\glew.h>
-#include <glm\glm.hpp>
+#include <glm.hpp>
 
 void AssignSubData(GLuint buffer, void* vertices, unsigned int vertexSize, unsigned int numPoints,
 					GLintptr offset);
@@ -29,3 +29,6 @@ GLuint CreateInstancedVertexNormArray(void* vertices, unsigned int numPoints,uns
 
 GLuint CreateInstancedVertexNormUVArray(void* vertices, unsigned int numPoints,unsigned int* indices, 
 										unsigned int numFaces, int numInstances, GLuint& instancedData);
+
+GLuint CreateInstancedBumpmappedVertexArray(void* vertices, unsigned int numPoints,
+	unsigned int* indices, unsigned int numFaces, int numInstances, GLuint& instancedData);

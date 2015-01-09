@@ -74,7 +74,7 @@ GLuint CreateSimpleVertexArray(void* vertices, unsigned int numPoints,
 
 GLuint CreateBumpmappedVertexArray(void* vertices, unsigned int numPoints,
 	unsigned int* indices, unsigned int numFaces){
-	int vertexSize = sizeof(CustomVertexNormBiNormUV);
+	int vertexSize = sizeof(CustomVertexNormBiTangentUV);
 	GLuint VAO = InitVAO(vertexSize, vertices, numPoints, numFaces, indices);
 	for (int attrib = 0; attrib < 4; attrib++){
 		glEnableVertexAttribArray(attrib);
@@ -102,6 +102,13 @@ GLuint CreateInstancedVertexNormUVArray(void* vertices, unsigned int numPoints,
 	unsigned int* indices, unsigned int numFaces, int numInstances,GLuint& instancedData){
 	GLuint VAO = CreateVertexNormUVArray(vertices, numPoints, indices, numFaces);
 	CreateInstancedAttrib(3, VAO,instancedData,numInstances);
+	return VAO;
+}
+
+GLuint CreateInstancedBumpmappedVertexArray(void* vertices, unsigned int numPoints,
+	unsigned int* indices, unsigned int numFaces, int numInstances, GLuint& instancedData){
+	GLuint VAO = CreateBumpmappedVertexArray(vertices, numPoints, indices, numFaces);
+	CreateInstancedAttrib(4, VAO, instancedData, numInstances);
 	return VAO;
 }
 

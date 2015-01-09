@@ -1,6 +1,6 @@
 //VertexTypes.h
 #pragma once
-#include <glm\glm.hpp>
+#include <glm.hpp>
 using namespace glm;
 
 struct CustomVertexHud{
@@ -25,8 +25,9 @@ struct CustomVertexNorm{
 };
 
 
-struct CustomVertexNormBiNormUV{
+struct CustomVertexNormBiTangentUV{
 	glm::vec3 vertexPoint;
 	glm::vec3 normal;
+	glm::vec3 biTangent;
 	glm::vec2 uv;
 };
