@@ -5,7 +5,6 @@
 //last update 05/11/2014 - made non OOP
 
 #include <aiScene.h>
-#include <aiPostProcess.h>
 #include <aiMesh.h>
 #include <assimp.hpp>
 #include <assimp.h>
@@ -16,7 +15,7 @@
 #include "VertexArray.h"
 
 
-bool InitStaticMesh(StaticMesh& mesh,const string& fileName,const string& directory,int instances){
+bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& directory, int instances,unsigned int flags){
 	
 	//check if file exists
 	std::ifstream fin(directory + fileName);
@@ -30,7 +29,7 @@ bool InitStaticMesh(StaticMesh& mesh,const string& fileName,const string& direct
 
 	Assimp::Importer importer;
 
-	const aiScene* scene = importer.ReadFile(directory + fileName,aiProcess_Triangulate | aiProcess_GenSmoothNormals);
+	const aiScene* scene = importer.ReadFile(directory + fileName,flags);
 
 	if(!scene){
 		std::cout <<"couldn't load scene! Reason: "<< importer.GetErrorString() <<std::endl;
@@ -80,13 +79,35 @@ bool InitStaticMesh(StaticMesh& mesh,const string& fileName,const string& direct
 		//create a new objectdata to store the mesh data on the gfx card
 		MeshComponent* newComp = new MeshComponent;
 		newComp->m_numFaces = numFaces;
-			
+		unsigned int numVerts = thisMesh->mNumVertices;
 		//here is a slightly messy way of allocating object data....
 		//generate vertex array for this mesh using objectData
+		if (thisMesh->HasPositions() && thisMesh->HasNormals() && thisMesh->HasTextureCoords(0) && thisMesh->HasTangentsAndBitangents()){
+			CustomVertexNormBiTangentUV *vertices = new CustomVertexNormBiTangentUV[numVerts];
 
-		if(thisMesh->HasPositions() && thisMesh->HasNormals() && thisMesh->HasTextureCoords(0)){
+			int vecSize = sizeof(float) * 3;
+			int texVecSize = sizeof(float) * 2;
+			for (unsigned int vertex = 0; vertex < numVerts; vertex++){
+				thisMesh->mTextureCoords[0][vertex].x = thisMesh->mTextureCoords[0][vertex].x;
+				thisMesh->mTextureCoords[0][vertex].y = thisMesh->mTextureCoords[0][vertex].y;
+				memcpy(&vertices[vertex].vertexPoint, &thisMesh->mVertices[vertex], vecSize);
+				memcpy(&vertices[vertex].normal,      &thisMesh->mNormals[vertex], vecSize);
+				memcpy(&vertices[vertex].biTangent,   &thisMesh->mBitangents[vertex], vecSize);
+				memcpy(&vertices[vertex].uv,          &thisMesh->mTextureCoords[0][vertex], texVecSize);
+			}
+
+			if (instances > 1){
+				newComp->m_vertexBuffer = CreateInstancedBumpmappedVertexArray(vertices, numVerts,
+					indices, numFaces, instances, newComp->m_instancedDataBuffer);
+			}
+			else{
+				newComp->m_vertexBuffer = CreateBumpmappedVertexArray(vertices, numVerts, indices, numFaces);
+			}
+			delete[] vertices;
+
+		}else if(thisMesh->HasPositions() && thisMesh->HasNormals() && thisMesh->HasTextureCoords(0)){
 			//create a new objectdata to store the mesh data on the gfx card
-			unsigned int numVerts = thisMesh->mNumVertices;
+			
 			CustomVertexNormUV *vertices = new CustomVertexNormUV[numVerts];
 			
 			int vecSize = sizeof(float) * 3;
@@ -105,13 +126,10 @@ bool InitStaticMesh(StaticMesh& mesh,const string& fileName,const string& direct
 			}else{
 				newComp->m_vertexBuffer = CreateVertexNormUVArray(vertices, numVerts, indices, numFaces);
 			}
-
-			delete [] vertices;
-
+			delete[] vertices;
 		}else if(thisMesh->HasPositions() && thisMesh->HasNormals())
 		{
 			//create a new objectdata to store the mesh data on the gfx card
-			unsigned int numVerts = thisMesh->mNumVertices;
 			CustomVertexNorm *vertices = new CustomVertexNorm[numVerts];
 
 			int vecSize = sizeof(float) * 3;
@@ -133,7 +151,6 @@ bool InitStaticMesh(StaticMesh& mesh,const string& fileName,const string& direct
 			//create a new objectdata to store the mesh data on the gfx card
 			glm::vec3 *vertices = new glm::vec3[thisMesh->mNumVertices];
 
-			unsigned int numVerts = thisMesh->mNumVertices;
 			unsigned int vecSize = sizeof(float) * 3;
 			for (unsigned int vertex = 0; vertex < numVerts; vertex++){
 				memcpy(&vertices[vertex], &thisMesh->mVertices[vertex], vecSize);
@@ -143,6 +160,7 @@ bool InitStaticMesh(StaticMesh& mesh,const string& fileName,const string& direct
 
 			delete[] vertices;
 		}
+
 
 		Material newMat;
 		GLuint	  newTex = NULL;
@@ -246,7 +264,6 @@ Material LoadMaterials(const aiScene* scene,aiMaterial* material)
    }
  
     float shininess = 64.0f;
-    unsigned int max;
    // aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS, &shininess, &max);
     mat.shininess = shininess;
 

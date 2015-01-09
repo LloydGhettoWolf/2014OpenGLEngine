@@ -5,6 +5,7 @@
 #pragma once
 
 #include <map>
+#include <aiPostProcess.h>
 #include "Texture.h"
 #include "Shader.h"
 #include "LightsAndMaterials.h"
@@ -34,9 +35,11 @@ struct StaticMesh{
 		int							m_numInstances = 1;
 		std::map<string, GLuint>    m_textures;
 };
+ 
 
 
-bool				InitStaticMesh(StaticMesh& newMesh, const string& fileName, const string& directory, int instances = 1);
+bool				InitStaticMesh(StaticMesh& newMesh, const string& fileName, const string& directory, int instances = 1,
+									unsigned int flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals);
 void				RenderStaticMesh(const StaticMesh& mesh,MaterialUniforms& uniforms);
 
 void				RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms,const vec3* positions);
