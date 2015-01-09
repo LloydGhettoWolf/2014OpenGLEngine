@@ -1,7 +1,7 @@
 //LightsAndMaterials.h
 #pragma once
 #include <gl\glew.h>
-#include <glm\glm.hpp>
+#include <glm.hpp>
 #include "Defines.h"
 using namespace glm;
 

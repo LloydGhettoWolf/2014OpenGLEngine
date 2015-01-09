@@ -2,7 +2,7 @@
 //Last update: 20/07/2012
 #pragma once
 #include <gl\glew.h>
-#include <glm\glm.hpp>
+#include <glm.hpp>
 #include <string>
 #include <vector>
 

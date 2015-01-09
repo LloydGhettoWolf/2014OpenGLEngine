@@ -5,7 +5,7 @@
 bool ForwardShader::CreateForwardShader(){
 
 	const int numAttribs = 4;
-	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inUVs", "inPositions" };
+	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inUVs","inPositions" };
 
 	m_handle = CreateShader("instancedLighting.vp", "instancedLighting.fp", attribs, numAttribs);
 

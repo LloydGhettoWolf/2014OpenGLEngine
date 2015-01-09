@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{af115643-c827-4d12-a073-b6962dae3a6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\DeferredShaders">
+      <UniqueIdentifier>{bc6a04c2-964b-480d-9f97-c1339d47cab1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\lightingShaders">
+      <UniqueIdentifier>{e6833d42-c05f-4731-bcfc-16e3b73e57b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\particleShaders">
+      <UniqueIdentifier>{fdabcfd5-1891-42f8-a205-edb98f466af5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -70,6 +82,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PointSprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -140,5 +155,73 @@
     <ClInclude Include="PointSprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\cubeMap.fp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\cubeMap.vp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\depth.fp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\depth.vp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\font.fp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\font.vp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\gBuffer.fp">
+      <Filter>Shaders\DeferredShaders</Filter>
+    </None>
+    <None Include="shaders\gBuffer.vp">
+      <Filter>Shaders\DeferredShaders</Filter>
+    </None>
+    <None Include="shaders\lightPass.fp">
+      <Filter>Shaders\DeferredShaders</Filter>
+    </None>
+    <None Include="shaders\lightPass.vp">
+      <Filter>Shaders\DeferredShaders</Filter>
+    </None>
+    <None Include="shaders\nullTechnique.fp">
+      <Filter>Shaders\DeferredShaders</Filter>
+    </None>
+    <None Include="shaders\nullTechnique.vp">
+      <Filter>Shaders\DeferredShaders</Filter>
+    </None>
+    <None Include="shaders\quadPass.fp">
+      <Filter>Shaders\DeferredShaders</Filter>
+    </None>
+    <None Include="shaders\quadPass.vp">
+      <Filter>Shaders\DeferredShaders</Filter>
+    </None>
+    <None Include="shaders\instancedLighting.fp">
+      <Filter>Shaders\lightingShaders</Filter>
+    </None>
+    <None Include="shaders\instancedLighting.vp">
+      <Filter>Shaders\lightingShaders</Filter>
+    </None>
+    <None Include="shaders\lighting.fp">
+      <Filter>Shaders\lightingShaders</Filter>
+    </None>
+    <None Include="shaders\lighting.vp">
+      <Filter>Shaders\lightingShaders</Filter>
+    </None>
+    <None Include="shaders\pointSprite.fp">
+      <Filter>Shaders\particleShaders</Filter>
+    </None>
+    <None Include="shaders\pointSprite.gp">
+      <Filter>Shaders\particleShaders</Filter>
+    </None>
+    <None Include="shaders\pointSprite.vp">
+      <Filter>Shaders\particleShaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

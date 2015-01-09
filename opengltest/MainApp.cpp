@@ -15,6 +15,16 @@ void App::ReadMouse(){
 		ComboRotate(m_camera,(float)(x - prevX)*1.0f, (float)(y - prevY)*1.0f);
 	}
 
+	if (glfwGetMouseButton(GLFW_MOUSE_BUTTON_RIGHT)){
+		vec3 displacement = (prevY - y) * 0.5f * m_camera.upVec +
+							(prevX - x) * -0.5f * m_camera.rightVec;
+		MoveCameraCustom(m_camera, m_camera.pos + displacement);
+	}
+
+	if (glfwGetMouseButton(GLFW_MOUSE_BUTTON_MIDDLE)){
+		MoveCameraCustom(m_camera, m_camera.pos + (float)(prevY-y) * 0.5f * m_camera.lookVec);
+	}
+
 	prevX = x;
 	prevY = y;
 }

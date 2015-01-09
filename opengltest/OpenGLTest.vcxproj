@@ -41,8 +41,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files\Microsoft Visual Studio 12.0\VC\include\glm;C:\Program Files\assimp2\include\Assimp;C:\Program Files\DevIL\include;C:\Program Files\Microsoft DirectX SDK %28June 2010%29\Include;C:\Program Files\assimp2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\assimp2\lib\assimp_debug-dll_win32;C:\Program Files\DevIL\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.5\include;C:\Program Files\glm-0.9.3.3\glm;C:\assimp--2.0.863-sdk\include;C:\glfw-2.7.9.bin.WIN32\include;C:\Program Files\glew-1.11.0\include;C:\devIL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files\glew-1.11.0\lib\Release\Win32;C:\glfw-2.7.9.bin.WIN32\lib-msvc110;C:\devIL\lib;C:\assimp--2.0.863-sdk\lib\assimp_debug-dll_win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -96,6 +96,7 @@
     <ClCompile Include="GroundPlane.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainApp.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="PointSprite.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SponzaApp.cpp" />
@@ -119,6 +120,7 @@
     <ClInclude Include="GroundPlane.h" />
     <ClInclude Include="LightsAndMaterials.h" />
     <ClInclude Include="MainApp.h" />
+    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="PointSprite.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SponzaApp.h" />
@@ -127,6 +129,29 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="VertexArray.h" />
     <ClInclude Include="VertexTypes.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\cubeMap.fp" />
+    <None Include="shaders\cubeMap.vp" />
+    <None Include="shaders\depth.fp" />
+    <None Include="shaders\depth.vp" />
+    <None Include="shaders\font.fp" />
+    <None Include="shaders\font.vp" />
+    <None Include="shaders\gBuffer.fp" />
+    <None Include="shaders\gBuffer.vp" />
+    <None Include="shaders\instancedLighting.fp" />
+    <None Include="shaders\instancedLighting.vp" />
+    <None Include="shaders\lighting.fp" />
+    <None Include="shaders\lighting.vp" />
+    <None Include="shaders\lightPass.fp" />
+    <None Include="shaders\lightPass.vp" />
+    <None Include="shaders\nullTechnique.fp" />
+    <None Include="shaders\nullTechnique.vp" />
+    <None Include="shaders\pointSprite.fp" />
+    <None Include="shaders\pointSprite.gp" />
+    <None Include="shaders\pointSprite.vp" />
+    <None Include="shaders\quadPass.fp" />
+    <None Include="shaders\quadPass.vp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,5 +1,5 @@
 //MainApp.cpp
-#include <glm\gtc\matrix_transform.hpp>
+#include <gtc\matrix_transform.hpp>
 
 #include <iostream>
 #include <math.h>
@@ -99,8 +99,17 @@ bool TeapotApp::Init(){
 	screenQuad[5] = vec3(1.0f, -1.0f, 0.0f);
 
 	m_lights.color[0] = vec3(0.0f, 0.0f, 1.0f);
+	m_lights.color[1] = vec3(0.0f, 1.0f, 0.0f);
+	m_lights.color[2] = vec3(1.0f, 0.0f, 0.0f);
+	m_lights.color[3] = vec3(0.0f, 1.0f, 1.0f);
+	m_lights.color[4] = vec3(0.1f, 0.0f, 1.0f);
 	
-	lightPos[0] = vec3(12.0f,  40.0f, -12.0f);
+	lightPos[0] = vec3(72.0f,  40.0f, -72.0f);
+	lightPos[1] = vec3(36.0f,  40.0f, -36.0f);
+	lightPos[2] = vec3(-72.0f, 40.0f, 72.0f);
+	lightPos[3] = vec3(-36.0f, 40.0f, 36.0f);
+	lightPos[4] = vec3(108.0f,  40.0f, -108.0f);
+
 
 	for (int light = 0; light < NUM_POINT_LIGHTS; light++){
 		m_lights.constantAtt[light] = 0.0f;
@@ -198,10 +207,9 @@ void TeapotApp::Run(){
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-	    RenderForward(&m_lights.position[0], movement);
-		//RenderDeferred(movement);
+	    //RenderForward(&m_lights.position[0], movement);
+		RenderDeferred(movement);
 
-		//cubemap
 
 				
 		time = to_string(deltaTime * 1000.0f);
@@ -311,6 +319,18 @@ void TeapotApp::RenderDeferred(const vec3* teapotPositions){
 			glBindVertexArray(0);
 			glDepthMask(GL_FALSE);
 		glUseProgram(0);
+
+		ForwardShaderUniforms teapotUniforms = m_teapotShader.GetUniforms();
+		glUseProgram(m_cubemapShader.GetHandle());
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeMap);
+			glUniformMatrix4fv(m_cubemapShader.GetWVPMatrix(), 1, GL_FALSE, &(m_camera.projectionMatrix * m_camera.viewMatrix * translate(identity, m_camera.pos))[0][0]);
+			glUniform1i(m_cubemapShader.GetSampler(), 0);
+			glCullFace(GL_FRONT);
+			RenderStaticMesh(m_cubeMesh, teapotUniforms.matUni);
+			glCullFace(GL_BACK);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+		glUseProgram(0);
 	
 	mat4 worldMatrix;
 	MaterialUniforms matuni;
@@ -399,7 +419,7 @@ bool TeapotApp::CreateGBuffer(){
 }
 
 float TeapotApp::CalcSphereDistance(const PointLightData& pLight,int index){
-	float maxChan = max(max(pLight.color[index].r, pLight.color[index].g), pLight.color[index].b);
+	float maxChan = std::max(std::max(pLight.color[index].r, pLight.color[index].g), pLight.color[index].b);
 
 	float ret = (-pLight.linearAtt[index] + sqrtf(pLight.linearAtt[index] * pLight.linearAtt[index]
 				- 4.0f *pLight.expAtt[index] * (pLight.expAtt[index] - 256.0f * maxChan))) / (2.0f*pLight.expAtt[index]);

@@ -2,7 +2,7 @@
 #pragma once
 #include <gl\glew.h>
 #include <string>
-#include <glm\glm.hpp>
+#include <glm.hpp>
 
 struct PointSprite{
 	GLuint VAO;

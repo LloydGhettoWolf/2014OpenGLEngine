@@ -2,7 +2,7 @@
 #pragma once
 #include <gl\glew.h>
 #include <gl\glfw.h>
-#include <glm\glm.hpp>
+#include <glm.hpp>
 
 #include <map>
 #include <string>

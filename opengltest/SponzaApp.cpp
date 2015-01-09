@@ -2,7 +2,7 @@
 #include "SponzaApp.h"
 
 
-#include <glm\gtc\matrix_transform.hpp>
+#include <gtc\matrix_transform.hpp>
 
 #include <iostream>
 #include <math.h>
