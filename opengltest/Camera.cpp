@@ -1,6 +1,6 @@
 //Camera.cpp
 #include "Camera.h"
-#include <glm\gtc\matrix_transform.hpp>
+#include <gtc\matrix_transform.hpp>
 
 Camera CreateCamera(vec3& pos, vec3& focusPoint, vec3& upVec){
 	vec3 lookVec = focusPoint - pos;
@@ -61,8 +61,8 @@ void ComboRotate(Camera& cam,float amountX, float amountY){
 	if (cam.yRotation > 0.0f)
 		cam.yRotation = 0.0f;
 
-	if (cam.yRotation < -3.14129 / 2.0f)
-		cam.yRotation =  -3.14129 / 2.0f;
+	if (cam.yRotation < -3.14129f / 2.0f)
+		cam.yRotation =  -3.14129f / 2.0f;
 
 	cam.lookVec.x = cam.heading.x =  cosf(cam.xRotation) - sinf(cam.xRotation);
 	cam.lookVec.z = cam.heading.z =  sinf(cam.xRotation) + cosf(cam.xRotation);

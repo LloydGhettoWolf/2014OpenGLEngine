@@ -1,6 +1,6 @@
 //Camera.h
 #pragma once
-#include <glm\glm.hpp>
+#include <glm.hpp>
 
 using namespace glm;
 
