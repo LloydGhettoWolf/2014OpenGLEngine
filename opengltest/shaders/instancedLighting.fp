@@ -1,5 +1,5 @@
 #version 330
-const int    numLights = 1;
+const int    numLights = 4;
 uniform vec3 materialDiffuse;
 uniform vec3 materialSpecular;
 uniform vec3 materialAmbient;
@@ -20,7 +20,7 @@ void main(){
             vec3 normalizedLight = normalize(lightVector[light]);
             halfVec = normalize((normalizedLight+eyeVec)* 0.5);
             float dist  = length(lightVector[light]);
-            float atten = (1.0 / (0.1 +  0.01 * dist + (0.0001 * pow(dist,2.0))));
+            float atten = (1.0 / (0.1 +  0.01 * dist + (0.001 * pow(dist,2.0))));
             spec   +=  atten * pow(max(dot(halfVec,normal),0.0),shininess) ;
             diff   +=  atten * max(dot(normal,normalizedLight),0.0) * lightColors[light];
         }

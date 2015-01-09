@@ -1,5 +1,5 @@
 #version 330
-const int numLights = 1;
+const int numLights = 4;
 uniform mat4 perspectiveMatrix;
 uniform mat4 rotationMatrix;
 uniform mat4 scaleMatrix;

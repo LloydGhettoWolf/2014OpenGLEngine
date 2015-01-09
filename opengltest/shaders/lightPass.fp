@@ -21,6 +21,7 @@ void main(){
         vec3 result   = CalcPointLight(worldPos,norm,diff);
 
         color = vec4(result,1.0);
+		//color = vec4(worldPos,1.0);
 }
 
 vec2 CalcCoord(){

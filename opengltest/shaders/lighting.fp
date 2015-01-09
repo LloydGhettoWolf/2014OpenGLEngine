@@ -1,5 +1,5 @@
 #version 330
-const int numLights = 3;
+const int numLights = 5;
 uniform sampler2D tex;
 uniform vec3 materialDiffuse;
 uniform vec3 materialSpecular;
