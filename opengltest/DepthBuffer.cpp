@@ -17,7 +17,7 @@ bool CreateDepthTexture(GLuint& depthFBO, bool bindBuffer, bool stencil){
 
 	if (stencil){
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, APP_WIDTH, APP_HEIGHT, 0, GL_DEPTH_STENCIL,
-			GL_FLOAT_32_UNSIGNED_INT_24_8_REV, 0);
+			GL_UNSIGNED_INT_24_8, 0);
 	}
 	else{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH, APP_WIDTH, APP_HEIGHT, 0, GL_DEPTH,GL_FLOAT, 0);
