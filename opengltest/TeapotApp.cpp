@@ -209,9 +209,7 @@ void TeapotApp::Run(){
 		
 	    //RenderForward(&m_lights.position[0], movement);
 		RenderDeferred(movement);
-
-
-				
+		
 		time = to_string(deltaTime * 1000.0f);
 		ChangeText2D(m_counterFont, (firstStr + time.substr(0,4)).c_str(), 50, 50, 24);
 		PrintText2D(m_counterFont);

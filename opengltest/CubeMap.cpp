@@ -31,7 +31,9 @@ GLuint CreateCubeMap(const std::vector<std::string>& fileNames){
 			break;
 		}
 
-		glTexImage2D(mapFaces[face], 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		GLenum type;
+		glGetInternalformativ(GL_TEXTURE_2D, GL_RGB, GL_TEXTURE_IMAGE_TYPE, 1, (GLint*)&type);
+		glTexImage2D(mapFaces[face], 0, GL_RGB, width, height, 0, format, type, data);
 
 		delete[] data;
 	}

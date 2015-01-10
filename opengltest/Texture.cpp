@@ -31,11 +31,14 @@ GLuint CreateTexture(const string& fileName,GLint magFilter,GLint minFilter,bool
 			break;
 	}
 
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	GLenum type;
+	glGetInternalformativ(GL_TEXTURE_2D, format, GL_TEXTURE_IMAGE_TYPE, 1, (GLint*)&type);
+	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, type, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	delete[] data;
 
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

@@ -5,15 +5,19 @@
 #include "Defines.h"
 
 bool CreateGBufferData(GBufferData& data){
+	GLenum format, type;
+
 	glGenFramebuffers(1, &data.fboObject);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, data.fboObject);
 	glViewport(0, 0, APP_WIDTH, APP_HEIGHT);
 	
 	glGenTextures(NUM_MRT, data.textures);
 
+	glGetInternalformativ(GL_TEXTURE_2D, GL_RGB32F, GL_TEXTURE_IMAGE_TYPE, 1, (GLint*)&type);
+
 	for (int renderTarget = 0; renderTarget < NUM_MRT; renderTarget++){
 		glBindTexture(GL_TEXTURE_2D, data.textures[renderTarget]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, APP_WIDTH, APP_HEIGHT, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F,APP_WIDTH, APP_HEIGHT, 0, GL_RGBA, type, NULL);
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + renderTarget, GL_TEXTURE_2D,
 							data.textures[renderTarget], 0);
 

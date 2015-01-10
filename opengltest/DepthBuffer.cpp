@@ -16,11 +16,15 @@ bool CreateDepthTexture(GLuint& depthFBO, bool bindBuffer, bool stencil){
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
 
 	if (stencil){
+		GLenum type;
+		glGetInternalformativ(GL_TEXTURE_2D, GL_DEPTH32F_STENCIL8, GL_TEXTURE_IMAGE_TYPE, 1, (GLint*)&type);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, APP_WIDTH, APP_HEIGHT, 0, GL_DEPTH_STENCIL,
-			GL_UNSIGNED_INT_24_8, 0);
+			type, 0);
 	}
 	else{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH, APP_WIDTH, APP_HEIGHT, 0, GL_DEPTH,GL_FLOAT, 0);
+		GLenum type;
+		glGetInternalformativ(GL_TEXTURE_2D, GL_DEPTH, GL_TEXTURE_IMAGE_TYPE, 1, (GLint*)&type);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH, APP_WIDTH, APP_HEIGHT, 0, GL_DEPTH,type, 0);
 	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
