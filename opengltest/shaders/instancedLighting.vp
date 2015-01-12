@@ -1,5 +1,5 @@
 #version 330
-const int numLights = 4;
+const int numLights = 1;
 uniform mat4 perspectiveMatrix;
 uniform mat4 rotationMatrix;
 uniform mat4 scaleMatrix;
@@ -19,9 +19,15 @@ out vec3 lightVector[numLights];
 
 void main(){
         vec4 position     =  vec4(inCoords,1.0);
+	    position  = scaleMatrix * position;
+
        if(instanced == true){
-                position          = rotationMatrix * scaleMatrix * position;
-                position          += vec4(inPositions,1.0);
+				mat4 m = mat4(1.0,0.0,0.0,0.0,
+							  0.0,1.0,0.0,0.0,
+							  0.0,0.0,1.0,0.0,
+							  inPositions.x,inPositions.y,inPositions.z,1.0);
+
+                position          = m * rotationMatrix * scaleMatrix * position;
         }
         norm              = normalize(normalMatrix * inNormals);
         eyeVec            = normalize(eyePos-position.xyz);

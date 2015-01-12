@@ -17,8 +17,12 @@ out vec2 UVs;
 void main(){
         vec4 position     =  scaleMatrix *  vec4(inCoords,1.0);
         if(instanced == true){
-                position          = rotationMatrix  * position;
-                position          += vec4(inPositions,1.0);
+               	mat4 m = mat4(1.0,0.0,0.0,0.0,
+							  0.0,1.0,0.0,0.0,
+							  0.0,0.0,1.0,0.0,
+							  inPositions.x,inPositions.y,inPositions.z,1.0);
+
+                position          = m * rotationMatrix * scaleMatrix * position;
         }
         UVs = inUVs;
         worldPos = position.xyz;

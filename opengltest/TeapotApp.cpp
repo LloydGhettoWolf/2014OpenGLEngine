@@ -104,11 +104,11 @@ bool TeapotApp::Init(){
 	m_lights.color[3] = vec3(0.0f, 1.0f, 1.0f);
 	m_lights.color[4] = vec3(0.1f, 0.0f, 1.0f);
 	
-	lightPos[0] = vec3(72.0f,  40.0f, -72.0f);
-	lightPos[1] = vec3(36.0f,  40.0f, -36.0f);
-	lightPos[2] = vec3(-72.0f, 40.0f, 72.0f);
-	lightPos[3] = vec3(-36.0f, 40.0f, 36.0f);
-	lightPos[4] = vec3(108.0f,  40.0f, -108.0f);
+	lightPos[0] = vec3(60.0f,  40.0f, 42.0f);
+	lightPos[1] = vec3(15.0f,  40.0f, -18.0f);
+	lightPos[2] = vec3(-60.0f, 40.0f, 42.0f);
+	lightPos[3] = vec3(-15.0f, 40.0f, 18.0f);
+	lightPos[4] = vec3(5.0f,  40.0f, -5.0f);
 
 
 	for (int light = 0; light < NUM_POINT_LIGHTS; light++){
@@ -152,7 +152,7 @@ void TeapotApp::Run(){
 	for (int potRow = 0; potRow < 8; potRow++){
 		for (int potCol = 0; potCol < 8; potCol++){
 			int index = potRow * 8 + potCol;
-			movement[index] = vec3(potCol * 60.0f - 240.0f,0.0f,potRow * 42.0f - 168.0f);
+			movement[index] = vec3(potCol * 15.0f - 60.0f,0.0f,potRow * 10.5f - 42.0f);
 		}
 	}
 
@@ -195,7 +195,7 @@ void TeapotApp::Run(){
 		float cosAmount = cosf(rotationAmount);
 		float sinAmount = sinf(rotationAmount);
 
-		rotationAmount += 0.02f;
+		rotationAmount += 0.005f;
 
 		for (int light = 0; light < NUM_POINT_LIGHTS; light++){
 			m_lights.position[light].x = lightPos[light].x * cosAmount;
@@ -256,8 +256,9 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 		glUniform3fv(teapotUniforms.lightVecUniform, 1, &lightPositions[0][0]);
 
 		glUniform1i(teapotUniforms.instancedUniform, 1);
-		//RenderInstancedStaticMesh(m_teapotMesh, teapotUniforms.matUni,teapotPositions);
+		RenderInstancedStaticMesh(m_teapotMesh, teapotUniforms.matUni,&teapotPositions[0]);
 		glUniformMatrix4fv(teapotUniforms.scaleUniform, 1, GL_FALSE, &identity[0][0]);
+		
 		glUniform1i(teapotUniforms.instancedUniform, 0);
 		glUniform3fv(teapotUniforms.matUni.diffuseUniform, 1, &diff[0]);
 		glBindVertexArray(m_groundPlaneBuffer);
