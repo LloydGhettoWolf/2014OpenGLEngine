@@ -165,7 +165,6 @@ void TeapotApp::Run(){
 		glUniformMatrix3fv(teapotUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
 		glUniform3fv(teapotUniforms.lightColUniform, 1, &m_lights.color[0][0]);
 		mat4x4 translationMatrix = rotation;
-		glUniformMatrix4fv(teapotUniforms.rotationUniform, 1, GL_FALSE, &translationMatrix[0][0]);
 	glUseProgram(0);
 
 	glUseProgram(m_deferredShader.GetGBufferHandle());
@@ -207,8 +206,8 @@ void TeapotApp::Run(){
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-	    //RenderForward(&m_lights.position[0], movement);
-		RenderDeferred(movement);
+	    RenderForward(&m_lights.position[0], movement);
+		//RenderDeferred(movement);
 		
 		time = to_string(deltaTime * 1000.0f);
 		ChangeText2D(m_counterFont, (firstStr + time.substr(0,4)).c_str(), 50, 50, 24);
@@ -233,9 +232,11 @@ void TeapotApp::Run(){
 void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPositions){
 	vec3 diff = vec3(0.4f, 0.4f, 0.4f);
 
-	mat4x4 scaleMatrix1, identity;
-	scaleMatrix1 = scale(scaleMatrix1, vec3(0.2f, 0.2f, 0.2f));
-	//mat4x4 cubemapScaleMatrix = scale(scaleMatrix1, vec3(400.0f, 400.0f, 400.0f));
+	mat4x4 scaleMatrix, identity, rotation;
+	scaleMatrix = scale(scaleMatrix, vec3(0.04f, 0.04f, 0.04f));
+	rotation    = rotate(identity, 180.0f, vec3(0.0f, 1.0f, 0.0f));
+	mat4x4 worldMatrix =  rotation * scaleMatrix;
+	mat3x3 normalMatrix = mat3(transpose(worldMatrix));
 	mat4x4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
 
 	glUseProgram(m_lightPointSprite.shader);
@@ -250,14 +251,15 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 
 	glUseProgram(m_teapotShader.GetHandle());
 	ForwardShaderUniforms teapotUniforms = m_teapotShader.GetUniforms();
-		glUniformMatrix4fv(teapotUniforms.scaleUniform, 1, GL_FALSE, &scaleMatrix1[0][0]);
+		glUniformMatrix4fv(teapotUniforms.worldMatrixUniform, 1, GL_FALSE, &worldMatrix[0][0]);
+		glUniformMatrix3fv(teapotUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
 		glUniformMatrix4fv(teapotUniforms.cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
 		glUniform3fv(teapotUniforms.eyePosUniform, 1, &m_camera.pos[0]);
 		glUniform3fv(teapotUniforms.lightVecUniform, 1, &lightPositions[0][0]);
 
 		glUniform1i(teapotUniforms.instancedUniform, 1);
 		RenderInstancedStaticMesh(m_teapotMesh, teapotUniforms.matUni,&teapotPositions[0]);
-		glUniformMatrix4fv(teapotUniforms.scaleUniform, 1, GL_FALSE, &identity[0][0]);
+		glUniformMatrix4fv(teapotUniforms.worldMatrixUniform, 1, GL_FALSE, &identity[0][0]);
 		
 		glUniform1i(teapotUniforms.instancedUniform, 0);
 		glUniform3fv(teapotUniforms.matUni.diffuseUniform, 1, &diff[0]);

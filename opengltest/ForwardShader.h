@@ -7,13 +7,12 @@ struct ForwardShaderUniforms{
 	GLint cameraMatrixUniform;
 	GLint perspectiveMatrixUniform;
 	GLint textureUniform;
-	GLint rotationUniform;
+	GLint worldMatrixUniform;
 	GLint eyePosUniform;
 	GLint lightVecUniform;
 	GLint lightColUniform;
 	GLint normalMatrixUniform;
 	MaterialUniforms matUni;
-	GLint scaleUniform;
 	GLint instancedUniform;
 };
 
