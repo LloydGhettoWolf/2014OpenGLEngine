@@ -21,8 +21,8 @@ bool TeapotApp::Init(){
 		return false;
 	}
 
-	glfwOpenWindowHint(GLFW_VERSION_MAJOR, 3);
-	glfwOpenWindowHint(GLFW_VERSION_MINOR, 3);
+	glfwOpenWindowHint(GLFW_VERSION_MAJOR, 4);
+	glfwOpenWindowHint(GLFW_VERSION_MINOR, 4);
 
 
 	if (!glfwOpenWindow(APP_WIDTH, APP_HEIGHT, 8, 8, 8, 8,32, 32, GLFW_WINDOW)){
@@ -159,18 +159,13 @@ void TeapotApp::Run(){
 	string firstStr = "ms per frame: ";
 	string time     = to_string(deltaTime);
 
-	glUseProgram(m_teapotShader.GetHandle());
-		ForwardShaderUniforms teapotUniforms = m_teapotShader.GetUniforms();
-		glUniformMatrix4fv(teapotUniforms.perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
-		glUniformMatrix3fv(teapotUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
-		glUniform3fv(teapotUniforms.lightColUniform, 1, &m_lights.color[0][0]);
-		mat4x4 translationMatrix = rotation;
-	glUseProgram(0);
+	m_teapotShader.SetUniforms(m_camera.projectionMatrix,m_lights.color[0]);
 
 	glUseProgram(m_deferredShader.GetGBufferHandle());
-	GBufferShaderUniforms gBufferUniforms = m_deferredShader.GetGBufferUniforms();
-	glUniformMatrix3fv(gBufferUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
-	glUniformMatrix4fv(gBufferUniforms.rotationMatrixUniform, 1, GL_FALSE, &translationMatrix[0][0]);
+		mat4x4 translationMatrix = rotation;
+		GBufferShaderUniforms gBufferUniforms = m_deferredShader.GetGBufferUniforms();
+		glUniformMatrix3fv(gBufferUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
+		glUniformMatrix4fv(gBufferUniforms.rotationMatrixUniform, 1, GL_FALSE, &translationMatrix[0][0]);
 	glUseProgram(0);
 
 	glUseProgram(m_deferredShader.GetLightPassHandle());
@@ -240,27 +235,16 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 	mat4x4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
 
 	glUseProgram(m_lightPointSprite.shader);
-		glUniformMatrix4fv(m_lightPointSprite.matrixUniform, 1, GL_FALSE, &viewProjection[0][0]);
-		glUniform3fv(m_lightPointSprite.camPos, 1, &m_camera.pos[0]);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, m_lightPointSprite.texture);
-		UpdatePointSpritePosition(m_lightPointSprite, (void*)&lightPositions[0][0]);
-		DrawPointSprites(m_lightPointSprite);
+		DrawPointSprites(m_lightPointSprite,(void*)&lightPositions[0][0],m_camera.pos,viewProjection);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	glUseProgram(0);
 
 	glUseProgram(m_teapotShader.GetHandle());
-	ForwardShaderUniforms teapotUniforms = m_teapotShader.GetUniforms();
-		glUniformMatrix4fv(teapotUniforms.worldMatrixUniform, 1, GL_FALSE, &worldMatrix[0][0]);
-		glUniformMatrix3fv(teapotUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
-		glUniformMatrix4fv(teapotUniforms.cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
-		glUniform3fv(teapotUniforms.eyePosUniform, 1, &m_camera.pos[0]);
-		glUniform3fv(teapotUniforms.lightVecUniform, 1, &lightPositions[0][0]);
-
-		glUniform1i(teapotUniforms.instancedUniform, 1);
+		ForwardShaderUniforms teapotUniforms = m_teapotShader.GetUniforms();
+		m_teapotShader.UpdateUniforms(worldMatrix, normalMatrix, m_camera.viewMatrix, m_camera.pos, m_lights.position[0], 1);
 		RenderInstancedStaticMesh(m_teapotMesh, teapotUniforms.matUni,&teapotPositions[0]);
-		glUniformMatrix4fv(teapotUniforms.worldMatrixUniform, 1, GL_FALSE, &identity[0][0]);
 		
+		glUniformMatrix4fv(teapotUniforms.worldMatrixUniform, 1, GL_FALSE, &identity[0][0]);
 		glUniform1i(teapotUniforms.instancedUniform, 0);
 		glUniform3fv(teapotUniforms.matUni.diffuseUniform, 1, &diff[0]);
 		glBindVertexArray(m_groundPlaneBuffer);

@@ -16,5 +16,4 @@ struct PointSprite{
 };
 
 bool SetupPointSprite(PointSprite& pSprite, void* positions,const std::string& fileName,int num);
-void DrawPointSprites(PointSprite& pSprite);
-void UpdatePointSpritePosition(PointSprite& pSprite, void* positions);
+void DrawPointSprites(PointSprite& pSprite, void* positions,const glm::vec3& eyePos,const glm::mat4& projMatrix);

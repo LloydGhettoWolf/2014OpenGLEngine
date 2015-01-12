@@ -3,6 +3,8 @@
 #include "Texture.h"
 #include "Shader.h"
 
+void UpdatePointSpritePosition(PointSprite& pSprite, void* positions);
+
 bool SetupPointSprite(PointSprite& pSprite,void* positions, const std::string& fileName, int num){
 	glGenVertexArrays(1, &pSprite.VAO);
 	glBindVertexArray(pSprite.VAO);
@@ -33,7 +35,12 @@ void UpdatePointSpritePosition(PointSprite& pSprite, void* positions){
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void DrawPointSprites(PointSprite& pSprite){
+void DrawPointSprites(PointSprite& pSprite, void* positions,const vec3& eyePos,const mat4& projMatrix){
+	glUniformMatrix4fv(pSprite.matrixUniform, 1, GL_FALSE, &projMatrix[0][0]);
+	glUniform3fv(pSprite.camPos, 1, &eyePos[0]);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, pSprite.texture);
+	UpdatePointSpritePosition(pSprite, positions);
 	glBindVertexArray(pSprite.VAO);
 	glDrawArrays(GL_POINTS, 0, pSprite.num);
 	glBindVertexArray(0);

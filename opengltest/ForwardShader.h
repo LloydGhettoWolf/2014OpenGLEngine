@@ -26,4 +26,8 @@ public:
 	bool CreateForwardShader();
 	static GLuint GetHandle(){ return m_handle; }
 	const ForwardShaderUniforms& GetUniforms()const { return m_uniforms; }
+
+	void SetUniforms(const mat4& projMatrix, const vec3& lightColors);
+	void UpdateUniforms(const mat4& worldMatrix, const mat3& normalMatrix, const mat4& viewMatrix,
+						const vec3& pos, const vec3& lightPos, int instanced);
 };
