@@ -2,6 +2,8 @@
 #pragma once
 #include <glm.hpp>
 #include <GL\glew.h>
+#include "ParticleShader.h"
+#include "PointSpriteShader.h"
 
 const int MAX_PARTICLES = 5000;
 
@@ -10,8 +12,8 @@ enum PARTICLE_TYPE {PARTICLE_TYPE_LAUNCHER};
 class ParticleSystem{
 
 	public:
-		ParticleSystem();
-		~ParticleSystem();
+		ParticleSystem(){};
+		~ParticleSystem(){};
 		bool InitParticleSystem(const glm::vec3& pos);
 		void Render(int deltaTime, const glm::mat4x4& mvp, const glm::vec3& camPos);
 		void UpdateParticles(int deltaTime);
@@ -25,6 +27,9 @@ class ParticleSystem{
 		GLuint mTransformFeedback[2];
 		GLuint mTexture;
 		int mTime;
+
+		PointSpriteShader mSpriteShader;
+		ParticleShader    mParticleShader;
 };
 
 struct Particle{

@@ -18,6 +18,7 @@ bool LinkProgram(GLuint program);
 string ReadFile(const string& filename);
 GLuint CreateShader(const char* vert,const char* frag,const char** attribs,int numAttribs);
 GLuint CreateShader(const char* vert, const char* frag, const char* geom, const char** attribs, int numAttribs);
+GLuint CreateFeedbackShader(const char* vert, const char* geom, const char** attribs, int numAttribs);
 GLuint CompileShader(GLenum eShaderType, const string& shaderFile, bool fromFile = true);
 GLuint CreateShaderProgram(GLuint* vertShaders, unsigned int numVert, GLuint* fragShaders, unsigned int numFrag,
 	GLuint* geomShaders, unsigned int numGeom, unsigned int numAttribs,const char** attribs);

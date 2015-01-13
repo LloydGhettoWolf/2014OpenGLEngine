@@ -87,6 +87,12 @@
     <ClCompile Include="ParticleSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PointSpriteShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -158,6 +164,12 @@
     <ClInclude Include="ParticleSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PointSpriteShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\cubeMap.fp">
@@ -221,6 +233,12 @@
       <Filter>Shaders\particleShaders</Filter>
     </None>
     <None Include="shaders\pointSprite.vp">
+      <Filter>Shaders\particleShaders</Filter>
+    </None>
+    <None Include="shaders\particle.gp">
+      <Filter>Shaders\particleShaders</Filter>
+    </None>
+    <None Include="shaders\particle.vp">
       <Filter>Shaders\particleShaders</Filter>
     </None>
   </ItemGroup>

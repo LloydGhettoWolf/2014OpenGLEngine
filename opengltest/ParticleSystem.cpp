@@ -12,6 +12,14 @@ bool ParticleSystem::InitParticleSystem(const glm::vec3& pos){
 	particles[0].vel = glm::vec3(0.0f,0.0f,0.0f);
 	particles[0].lifetimeMillisecs = 0.0f;
 
+	if (!mParticleShader.CreateParticleShader()){
+		return false;
+	}
+
+	if (!mSpriteShader.CreatePointSpriteShader()){
+		return false;
+	}
+
 	glGenTransformFeedbacks(2, mTransformFeedback);
 	glGenBuffers(2, mParticleBuffer);
 

@@ -16,7 +16,6 @@ GLuint CreateShader(const char* vert, const char* frag, const char** attribs, in
 		return NULL;
 
 	return CreateShaderProgram(&vertexShader, 1, &fragmentShader, 1, 0, 0, numAttribs, attribs);
-	return true;
 }
 
 GLuint CreateShader(const char* vert, const char* frag,const char* geom, const char** attribs, int numAttribs){
@@ -32,7 +31,19 @@ GLuint CreateShader(const char* vert, const char* frag,const char* geom, const c
 		return NULL;
 
 	return CreateShaderProgram(&vertexShader, 1, &fragmentShader, 1, &geomShader, 1, numAttribs, attribs);
-	return true;
+}
+
+GLuint CreateFeedbackShader(const char* vert, const char* geom, const char** attribs, int numAttribs){
+	GLuint vertexShader;
+	GLuint geomShader;
+
+	vertexShader = CompileShader(GL_VERTEX_SHADER, vert);
+	geomShader = CompileShader(GL_GEOMETRY_SHADER, geom);
+
+	if (!vertexShader || !geomShader)
+		return NULL;
+
+	return CreateShaderProgram(&vertexShader, 1, 0,0, &geomShader, 1, numAttribs, attribs);
 }
 
 GLuint CompileShader(GLenum eShaderType,const string& shaderFile,bool fromFile){

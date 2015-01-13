@@ -55,22 +55,22 @@ bool TeapotApp::Init(){
 
 	if (!m_teapotShader.CreateForwardShader()){
 		cout << "failed to load shader!" << endl;
-		return 1;
+		return false;
 	}
 
 	if (!m_deferredShader.CreateDeferredShader()){
 		cout << "failed to load shader!" << endl;
-		return 1;
+		return false;
 	}
 
 	if (!m_cubemapShader.CreateCubemapShader()){
 		cout << "failed to load shader!" << endl;
-		return 1;
+		return false;
 	}
 	vec3 point = vec3(0.0f, 0.0f, 0.0f);
 	if (!SetupPointSprite(m_lightPointSprite, &point, "pointSprite.jpg", 1)){
 		cout << "failed to setupPointSprite!" << endl;
-		return 1;
+		return false;
 	}
 	
 	InitStaticMesh(m_teapotMesh, "teapot.obj", "teapot\\",64);
@@ -133,6 +133,10 @@ bool TeapotApp::Init(){
 	cubemapFilenames.push_back("posz.jpg");
 	cubemapFilenames.push_back("negz.jpg");
 	m_cubeMap = CreateCubeMap(cubemapFilenames);
+
+	if (!mParticles.InitParticleSystem(m_camera.pos)){
+		return false;
+	}
 	
 	return true;
 }

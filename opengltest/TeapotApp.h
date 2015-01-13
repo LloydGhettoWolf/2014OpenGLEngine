@@ -6,7 +6,7 @@
 #include "DeferredShader.h"
 #include "CubemapShader.h"
 #include "PointSprite.h"
-
+#include "ParticleSystem.h"
 
 class TeapotApp : public App{
 public:
@@ -38,6 +38,8 @@ private:
 	GBufferData		m_gBuffer;
 	PointLightData  m_lights;
 	vec3            lightPos[NUM_POINT_LIGHTS];
+
+	ParticleSystem  mParticles;
 
 	//full screen quad
 	GLuint m_quadBuffer;

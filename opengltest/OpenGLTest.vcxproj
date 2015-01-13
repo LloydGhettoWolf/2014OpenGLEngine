@@ -96,8 +96,10 @@
     <ClCompile Include="GroundPlane.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainApp.cpp" />
+    <ClCompile Include="ParticleShader.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="PointSprite.cpp" />
+    <ClCompile Include="PointSpriteShader.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SponzaApp.cpp" />
     <ClCompile Include="StaticMesh.cpp" />
@@ -120,8 +122,10 @@
     <ClInclude Include="GroundPlane.h" />
     <ClInclude Include="LightsAndMaterials.h" />
     <ClInclude Include="MainApp.h" />
+    <ClInclude Include="ParticleShader.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="PointSprite.h" />
+    <ClInclude Include="PointSpriteShader.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SponzaApp.h" />
     <ClInclude Include="StaticMesh.h" />
@@ -147,6 +151,8 @@
     <None Include="shaders\lightPass.vp" />
     <None Include="shaders\nullTechnique.fp" />
     <None Include="shaders\nullTechnique.vp" />
+    <None Include="shaders\particle.gp" />
+    <None Include="shaders\particle.vp" />
     <None Include="shaders\pointSprite.fp" />
     <None Include="shaders\pointSprite.gp" />
     <None Include="shaders\pointSprite.vp" />
