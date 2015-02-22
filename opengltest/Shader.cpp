@@ -43,7 +43,8 @@ GLuint CreateFeedbackShader(const char* vert, const char* geom, const char** att
 	if (!vertexShader || !geomShader)
 		return NULL;
 
-	return CreateShaderProgram(&vertexShader, 1, 0,0, &geomShader, 1, numAttribs, attribs);
+
+	return CreateShaderProgram(&vertexShader, 1, 0,0, &geomShader, 1, numAttribs, attribs,true);
 }
 
 GLuint CompileShader(GLenum eShaderType,const string& shaderFile,bool fromFile){
@@ -98,7 +99,7 @@ GLuint CompileShader(GLenum eShaderType,const string& shaderFile,bool fromFile){
 }
 
 GLuint CreateShaderProgram(GLuint* vertShaders,unsigned int numVert,GLuint* fragShaders,unsigned int numFrag,
-	                       GLuint* geomShaders,unsigned int numGeom,unsigned int numAttribs,const char** attribs){
+	                       GLuint* geomShaders,unsigned int numGeom,unsigned int numAttribs,const char** attribs,bool feedback){
 
 	GLuint program = glCreateProgram();
 
@@ -116,6 +117,17 @@ GLuint CreateShaderProgram(GLuint* vertShaders,unsigned int numVert,GLuint* frag
 
 	for(unsigned int iLoop = 0; iLoop < numAttribs;iLoop++){
 		glBindAttribLocation(program,iLoop,attribs[iLoop]);
+	}
+
+	if (feedback){
+
+		const GLchar* Varyings[4];
+		Varyings[0] = "TypeOut";
+		Varyings[1] = "PositionOut";
+		Varyings[2] = "VelocityOut";
+		Varyings[3] = "AgeOut";
+
+		glTransformFeedbackVaryings(program, 4, Varyings, GL_INTERLEAVED_ATTRIBS);
 	}
 
 	glLinkProgram(program);

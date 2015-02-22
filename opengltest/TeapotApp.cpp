@@ -67,11 +67,7 @@ bool TeapotApp::Init(){
 		cout << "failed to load shader!" << endl;
 		return false;
 	}
-	vec3 point = vec3(0.0f, 0.0f, 0.0f);
-	if (!SetupPointSprite(m_lightPointSprite, &point, "pointSprite.jpg", 1)){
-		cout << "failed to setupPointSprite!" << endl;
-		return false;
-	}
+	
 	
 	InitStaticMesh(m_teapotMesh, "teapot.obj", "teapot\\",64);
 	InitStaticMesh(m_sphereMesh, "sphere.obj", "meshes\\", 1);
@@ -134,10 +130,6 @@ bool TeapotApp::Init(){
 	cubemapFilenames.push_back("negz.jpg");
 	m_cubeMap = CreateCubeMap(cubemapFilenames);
 
-	if (!mParticles.InitParticleSystem(m_camera.pos)){
-		return false;
-	}
-	
 	return true;
 }
 
@@ -181,9 +173,6 @@ void TeapotApp::Run(){
 	glUniform2fv(m_deferredShader.GetQuadPassUniforms().screenSizeUniform, 1, &screenSize[0]);
 	glUseProgram(0);
 
-	glUseProgram(m_lightPointSprite.shader);
-	glUniform1i(m_lightPointSprite.textureUniform, 0);
-	glUseProgram(0);
 
 	lastFrame = currentFrame = glfwGetTime();
 
@@ -238,10 +227,6 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 	mat3x3 normalMatrix = mat3(transpose(worldMatrix));
 	mat4x4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
 
-	glUseProgram(m_lightPointSprite.shader);
-		DrawPointSprites(m_lightPointSprite,(void*)&lightPositions[0][0],m_camera.pos,viewProjection);
-		glBindTexture(GL_TEXTURE_2D, 0);
-	glUseProgram(0);
 
 	glUseProgram(m_teapotShader.GetHandle());
 		ForwardShaderUniforms teapotUniforms = m_teapotShader.GetUniforms();
@@ -422,14 +407,11 @@ void TeapotApp::ShutDown(){
 	DestroyMesh(m_sphereMesh);
 	DestroyMesh(m_cubeMesh);
 	glDeleteVertexArrays(1, &m_groundPlaneBuffer);
-	glDeleteVertexArrays(1, &m_lightPointSprite.VAO);
 	glDeleteShader(m_teapotShader.GetHandle());
 	glDeleteShader(m_deferredShader.GetGBufferHandle());
 	glDeleteShader(m_deferredShader.GetQuadPassHandle());
 	glDeleteShader(m_deferredShader.GetLightPassHandle());
 	glDeleteShader(m_cubemapShader.GetHandle());
-	glDeleteShader(m_lightPointSprite.shader);
 	glDeleteFramebuffers(1, &m_gBuffer.fboObject);
 	glDeleteTextures(1, &m_cubeMap);
-	glDeleteTextures(1, &m_lightPointSprite.texture);
 };

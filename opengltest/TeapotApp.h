@@ -32,14 +32,9 @@ private:
 	GLuint				  m_groundPlaneBuffer;
 	GLuint				  m_cubeMap;
 
-	PointSprite			 m_lightPointSprite;
-
-
 	GBufferData		m_gBuffer;
 	PointLightData  m_lights;
 	vec3            lightPos[NUM_POINT_LIGHTS];
-
-	ParticleSystem  mParticles;
 
 	//full screen quad
 	GLuint m_quadBuffer;

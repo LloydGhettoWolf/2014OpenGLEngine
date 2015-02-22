@@ -21,4 +21,4 @@ GLuint CreateShader(const char* vert, const char* frag, const char* geom, const 
 GLuint CreateFeedbackShader(const char* vert, const char* geom, const char** attribs, int numAttribs);
 GLuint CompileShader(GLenum eShaderType, const string& shaderFile, bool fromFile = true);
 GLuint CreateShaderProgram(GLuint* vertShaders, unsigned int numVert, GLuint* fragShaders, unsigned int numFrag,
-	GLuint* geomShaders, unsigned int numGeom, unsigned int numAttribs,const char** attribs);
+	GLuint* geomShaders, unsigned int numGeom, unsigned int numAttribs,const char** attribs,bool feedback = false);

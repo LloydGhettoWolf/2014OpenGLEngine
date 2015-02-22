@@ -96,6 +96,7 @@
     <ClCompile Include="GroundPlane.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainApp.cpp" />
+    <ClCompile Include="ParticleApp.cpp" />
     <ClCompile Include="ParticleShader.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="PointSprite.cpp" />
@@ -122,6 +123,7 @@
     <ClInclude Include="GroundPlane.h" />
     <ClInclude Include="LightsAndMaterials.h" />
     <ClInclude Include="MainApp.h" />
+    <ClInclude Include="ParticleApp.h" />
     <ClInclude Include="ParticleShader.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="PointSprite.h" />
@@ -135,6 +137,7 @@
     <ClInclude Include="VertexTypes.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="particle.fp" />
     <None Include="shaders\cubeMap.fp" />
     <None Include="shaders\cubeMap.vp" />
     <None Include="shaders\depth.fp" />

@@ -2,6 +2,7 @@
 #pragma once
 #include <glm.hpp>
 #include <GL\glew.h>
+#include "PointSprite.h"
 #include "ParticleShader.h"
 #include "PointSpriteShader.h"
 
@@ -12,7 +13,7 @@ enum PARTICLE_TYPE {PARTICLE_TYPE_LAUNCHER};
 class ParticleSystem{
 
 	public:
-		ParticleSystem(){};
+		ParticleSystem():mCurrVB(0),mCurrTFB(0){};
 		~ParticleSystem(){};
 		bool InitParticleSystem(const glm::vec3& pos);
 		void Render(int deltaTime, const glm::mat4x4& mvp, const glm::vec3& camPos);
@@ -27,6 +28,8 @@ class ParticleSystem{
 		GLuint mTransformFeedback[2];
 		GLuint mTexture;
 		int mTime;
+
+		PointSprite sprite;
 
 		PointSpriteShader mSpriteShader;
 		ParticleShader    mParticleShader;

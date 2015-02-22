@@ -1,5 +1,5 @@
 #include "MainApp.h"
-//#include "SponzaApp.h"
+#include "SponzaApp.h"
 #include "TeapotApp.h"
 #include <iostream>
 

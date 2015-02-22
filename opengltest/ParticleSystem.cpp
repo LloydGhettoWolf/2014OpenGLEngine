@@ -43,7 +43,7 @@ void ParticleSystem::Render(int deltaTime, const glm::mat4x4& mvp, const glm::ve
 
 void ParticleSystem::UpdateParticles(int deltaTimeMillis){
 	glBindTexture(GL_TEXTURE_2D, mTexture);
-
+	glEnable(GL_RASTERIZER_DISCARD);
 	glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffer[mCurrVB]);
 	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, mTransformFeedback[mCurrTFB]);
 
@@ -66,13 +66,25 @@ void ParticleSystem::UpdateParticles(int deltaTimeMillis){
 	else{
 		glDrawTransformFeedback(GL_POINTS, mTransformFeedback[mCurrVB]);
 	}
+
+	glEndTransformFeedback();
+
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
 }
 
 void ParticleSystem::RenderParticles(const glm::mat4x4& mvp, const glm::vec3& camPos){
 
-	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, mTransformFeedback[mCurrTFB]);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (const GLvoid*)4);
+	glUseProgram(mSpriteShader.GetHandle());
+	mSpriteShader.UpdateUniforms(camPos, mvp);
+	//glBindTexture(GL_TEXTURE_1D,m)
+	glDisable(GL_RASTERIZER_DISCARD);
+	glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffer[mCurrTFB]);
 
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (const GLvoid*)4);
 	glDrawTransformFeedback(GL_POINTS, mTransformFeedback[mCurrTFB]);
 	glDisableVertexAttribArray(0);
 }

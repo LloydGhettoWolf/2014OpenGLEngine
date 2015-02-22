@@ -4,15 +4,15 @@ layout(points) in;
 layout(points) out;
 layout(max_vertices = 30) out;
 
-in float type0[];
-in vec3  position0[];
-in vec3  velocity0[];
-in float age0[];
+in float Type0[];
+in vec3  Position0[];
+in vec3  Velocity0[];
+in float Age0[];
 
-out float type1;
-out vec3  position1;
-out vec3  velocity1;
-out float age1;
+out float TypeOut;
+out vec3  PositionOut;
+out vec3  VelocityOut;
+out float AgeOut;
 
 uniform float     gDeltaTimeMillis;
 uniform float     gTime;
@@ -26,10 +26,72 @@ uniform float     gSecondaryShellLifetime;
 #define PARTICLE_TYPE_SECONDARY_SHELL 2.0f
 
 vec3 GetRandomDir(float TexCoord){
-  vec3 Dir = texture(gRandomTexture,texCoord).xyz ;
+  vec3 Dir = texture(gRandomTexture,TexCoord).xyz ;
   Dir -= vec3(0.5,0.5,0.5);
   return Dir;
 }
 
-void main(){
-}
+void main()                                                                         
+{                                                                                   
+    float Age = Age0[0] + gDeltaTimeMillis;                                         
+                                                                                    
+    if (Type0[0] == PARTICLE_TYPE_LAUNCHER) {                                       
+        if (Age >= gLauncherLifetime) {                                             
+            TypeOut = PARTICLE_TYPE_SHELL;                                            
+            PositionOut = Position0[0];                                               
+            vec3 Dir = GetRandomDir(gTime/1000.0);                                  
+            Dir.y = max(Dir.y, 0.5);                                                
+            VelocityOut = normalize(Dir) / 20.0;                                      
+            AgeOut = 0.0;                                                             
+            EmitVertex();                                                           
+            EndPrimitive();                                                         
+            Age = 0.0;                                                              
+        }                                                                           
+                                                                                    
+        TypeOut = PARTICLE_TYPE_LAUNCHER;                                             
+        PositionOut = Position0[0];                                                   
+        VelocityOut = Velocity0[0];                                                   
+        AgeOut = Age;                                                                 
+        EmitVertex();                                                               
+        EndPrimitive();                                                             
+    }                                                                               
+    else {                                                                          
+        float DeltaTimeSecs = gDeltaTimeMillis / 1000.0f;                           
+        float t1 = Age0[0] / 1000.0;                                                
+        float t2 = Age / 1000.0;                                                    
+        vec3 DeltaP = DeltaTimeSecs * Velocity0[0];                                 
+        vec3 DeltaV = vec3(DeltaTimeSecs) * (0.0, -9.81, 0.0);                      
+                                                                                    
+        if (Type0[0] == PARTICLE_TYPE_SHELL)  {                                     
+	        if (Age < gShellLifetime) {                                             
+	            TypeOut = PARTICLE_TYPE_SHELL;                                        
+	            PositionOut = Position0[0] + DeltaP;                                  
+	            VelocityOut = Velocity0[0] + DeltaV;                                  
+	            AgeOut = Age;                                                         
+	            EmitVertex();                                                       
+	            EndPrimitive();                                                     
+	        }                                                                       
+            else {                                                                  
+                for (int i = 0 ; i < 10 ; i++) {                                    
+                     TypeOut = PARTICLE_TYPE_SECONDARY_SHELL;                         
+                     PositionOut = Position0[0];                                      
+                     vec3 Dir = GetRandomDir((gTime + i)/1000.0);                   
+                     VelocityOut = normalize(Dir) / 20.0;                             
+                     AgeOut = 0.0f;                                                   
+                     EmitVertex();                                                  
+                     EndPrimitive();                                                
+                }                                                                   
+            }                                                                       
+        }                                                                           
+        else {                                                                      
+            if (Age < gSecondaryShellLifetime) {                                    
+                TypeOut = PARTICLE_TYPE_SECONDARY_SHELL;                              
+                PositionOut = Position0[0] + DeltaP;                                  
+                VelocityOut = Velocity0[0] + DeltaV;                                  
+                AgeOut = Age;                                                         
+                EmitVertex();
+                EndPrimitive();                                                     
+            }                                                                       
+        }                                                                           
+    }
+} 
