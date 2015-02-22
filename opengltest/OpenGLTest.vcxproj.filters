@@ -25,27 +25,24 @@
     <Filter Include="Shaders\particleShaders">
       <UniqueIdentifier>{fdabcfd5-1891-42f8-a205-edb98f466af5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\ShaderClasses">
+      <UniqueIdentifier>{bc3c36b9-0709-49b0-811c-e9918dd18aeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{8c225179-d7bb-4615-8df9-b973512e6940}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderable Objects">
+      <UniqueIdentifier>{b06d03e4-d749-4d91-9291-edc66a465744}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{6f2af7ba-1aa3-430c-b102-dec1f4a7fa40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderable Objects">
+      <UniqueIdentifier>{1fdc3f40-7bd5-4ddc-b0f1-6f579f2bc1b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexArray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DepthBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StaticMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MainApp.cpp">
@@ -60,68 +57,62 @@
     <ClCompile Include="TeapotApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GroundPlane.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GBufferData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ForwardShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DeferredShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CubeMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CubemapShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Frustum.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PointSprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PointSpriteShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParticleApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CubemapShader.cpp">
+      <Filter>Shaders\ShaderClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="DeferredShader.cpp">
+      <Filter>Shaders\ShaderClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="ForwardShader.cpp">
+      <Filter>Shaders\ShaderClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleShader.cpp">
+      <Filter>Shaders\ShaderClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="PointSpriteShader.cpp">
+      <Filter>Shaders\ShaderClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Frustum.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexArray.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticMesh.cpp">
+      <Filter>Source Files\Renderable Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="PointSprite.cpp">
+      <Filter>Source Files\Renderable Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>Source Files\Renderable Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="GroundPlane.cpp">
+      <Filter>Source Files\Renderable Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthBuffer.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeMap.cpp">
+      <Filter>Source Files\Renderable Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LightsAndMaterials.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DepthBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StaticMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MainApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -134,47 +125,71 @@
     <ClInclude Include="TeapotApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GroundPlane.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GBufferData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ForwardShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DeferredShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CubeMap.h">
+    <ClInclude Include="ParticleApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CubemapShader.h">
-      <Filter>Header Files</Filter>
+      <Filter>Shaders\ShaderClasses</Filter>
     </ClInclude>
-    <ClInclude Include="Frustum.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="DeferredShader.h">
+      <Filter>Shaders\ShaderClasses</Filter>
     </ClInclude>
-    <ClInclude Include="BoundingBox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PointSprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleSystem.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ForwardShader.h">
+      <Filter>Shaders\ShaderClasses</Filter>
     </ClInclude>
     <ClInclude Include="ParticleShader.h">
-      <Filter>Header Files</Filter>
+      <Filter>Shaders\ShaderClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Shaders\ShaderClasses</Filter>
     </ClInclude>
     <ClInclude Include="PointSpriteShader.h">
-      <Filter>Header Files</Filter>
+      <Filter>Shaders\ShaderClasses</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleApp.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="BoundingBox.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthBuffer.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Frustum.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexArray.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexTypes.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticMesh.h">
+      <Filter>Header Files\Renderable Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="PointSprite.h">
+      <Filter>Header Files\Renderable Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>Header Files\Renderable Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="LightsAndMaterials.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMap.h">
+      <Filter>Header Files\Renderable Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="GroundPlane.h">
+      <Filter>Header Files\Renderable Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
