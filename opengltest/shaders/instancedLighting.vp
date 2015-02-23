@@ -17,21 +17,23 @@ out vec3 eyeVec;
 out vec3 lightVector[numLights];
 
 void main(){
-        vec4 position     =  vec4(inCoords,1.0);
-	    position  = worldMatrix * position;
+       vec4 position   = worldMatrix *  vec4(inCoords,1.0);
 
-       if(instanced == true){
+       if(instanced){
 				mat4 m = mat4(1.0,0.0,0.0,0.0,
 							  0.0,1.0,0.0,0.0,
 							  0.0,0.0,1.0,0.0,
 							  inPositions.x,inPositions.y,inPositions.z,1.0);
 
-                position          = m * position;
+                position = m * position;
         }
-        norm              = normalMatrix * normalize(inNormals);
-        eyeVec            = normalize(eyePos-position.xyz);
+
+        norm              = normalMatrix * inNormals;
+        eyeVec            = eyePos-position.xyz;
+
         for(int light = 0; light < numLights; light++){
           lightVector[light]       = lightPos[light] - position.xyz;
         }
+
 	gl_Position       = perspectiveMatrix * cameraMatrix * position;
 }
