@@ -38,5 +38,7 @@ private:
 
 	//full screen quad
 	GLuint m_quadBuffer;
+
+	TwBar* myBar;
 };
 

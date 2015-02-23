@@ -20,9 +20,9 @@ GLuint CreateGroundPlaneData(){
 			groundPlaneData[index].vertexPoint.x = (x - halfWidth) * 25.0f;
 			groundPlaneData[index].vertexPoint.y = -5.0f;
 			groundPlaneData[index].vertexPoint.z = (z - halfHeight) * 25.0f;
+			groundPlaneData[index].normal = vec3(0.0f, 1.0f, 0.0f);
 			groundPlaneData[index].uv.x = x * 0.025f;
 			groundPlaneData[index].uv.y = z * 0.025f;
-			groundPlaneData[index].normal = vec3(0.0f, 1.0f, 0.0f);
 		}
 	}
 

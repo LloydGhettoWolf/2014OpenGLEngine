@@ -5,45 +5,36 @@
 #pragma once
 #include <glm.hpp>
 
+using glm::vec4;
 using glm::vec3;
+
+//bounding box class that has 8 corners stored as 3 component vectors. max is index 7, min is 0
 
 class BoundingBox
 {
 	public:
-		BoundingBox(){};
-		BoundingBox(vec3& min,vec3& max): m_min(min),m_max(max){};
-
-		bool ContainsPoint(const vec3& point)const
-		{
-			return (point.x >= m_min.x && point.y >= m_min.y && 
-				    point.z >= m_min.z && point.x <= m_max.x && 
-					point.y <= m_max.y && point.z <= m_max.z);
+		BoundingBox(vec4& min, vec4& max){
+		
+			tCorners[0] = vec4(min.x, min.y, min.z, 1.0f);
+			tCorners[1] = vec4(max.x, min.y, min.z, 1.0f);
+			tCorners[2] = vec4(min.x, max.y, min.z, 1.0f);
+			tCorners[3] = vec4(min.x, min.y, max.z, 1.0f);
+			tCorners[4] = vec4(max.x, max.y, min.z, 1.0f);
+			tCorners[5] = vec4(min.x, max.y, max.z, 1.0f);
+			tCorners[6] = vec4(max.x, min.y, max.z, 1.0f);
+			tCorners[7] = vec4(max.x, max.y, max.z, 1.0f);
 		}
 
-		void Add(const vec3& v)	{
-			if(v.x > m_max.x)	m_max.x = v.x;
-			if(v.x < m_min.x)	m_min.x = v.x;
-			if(v.y > m_max.y)	m_max.y = v.y;
-			if(v.y < m_min.y)	m_min.y = v.y;
-			if(v.z > m_max.z)	m_max.z = v.z;
-			if(v.z < m_min.z)	m_min.z = v.z;
-		};
 
-		void Add(const BoundingBox& bb)	{
-			if(bb.m_max.x > m_max.x)	m_max.x = bb.m_max.x;
-			if(bb.m_min.x < m_min.x)	m_min.x = bb.m_min.x;
-			if(bb.m_max.y > m_max.y)	m_max.y = bb.m_max.y;
-			if(bb.m_min.y < m_min.y)	m_min.y = bb.m_min.y;
-			if(bb.m_max.z > m_max.z)	m_max.z = bb.m_max.z;
-			if(bb.m_min.z < m_min.z)	m_min.z = bb.m_min.z;
+		bool ContainsPoint(const vec3& point)const{
+			vec4 min = tCorners[0];
+			vec4 max = tCorners[7];
+			return (point.x >= min.x && point.y >= min.y &&
+				    point.z >= min.z && point.x <= max.x && 
+					point.y <= max.y && point.z <= max.z);
 		}
 
-		void Translate(const vec3& v) {
-			m_min += v;
-			m_max += v;
-		}
 
-		inline vec3			GetCenter()const{return (m_min + m_max)/2.0f;}
-		vec3				m_min;
-		vec3				m_max;
+		inline vec4			GetCenter()const{ return (tCorners[0] + tCorners[7]) / 2.0f; }
+		vec4 tCorners[8]; 
 };

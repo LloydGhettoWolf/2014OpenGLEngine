@@ -4,6 +4,8 @@
 #include <gl\glfw.h>
 #include <glm.hpp>
 
+#include <AntTweakBar.h>
+
 #include <map>
 #include <string>
 
@@ -20,6 +22,8 @@ public:
 
 	void ReadMouse();
 	void ReadKeys();
+
+	void Resize(float aspect, int width, int height);
 
 	static int			  lastKeyPress;
 	static int			  lastKeyAction;
@@ -38,5 +42,6 @@ protected:
 };
 
 void GLFWCALL KeyCallback(int key, int action);
+void GLFWCALL MyResize(int width, int height);
 
 float RandomFloat(float high,float low);

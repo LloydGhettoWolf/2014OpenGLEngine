@@ -70,51 +70,35 @@ bool TestSphere(const Frustum& frustum,const vec3& center, float radius)
 }
 
 
-bool TestBox(const Frustum& frustum,const BoundingBox& bbox) 
-{
-	vec3 tCorners[8] = {	vec3(bbox.m_min.x, bbox.m_min.y, bbox.m_min.z),
-							vec3(bbox.m_max.x, bbox.m_min.y, bbox.m_min.z),
-							vec3(bbox.m_min.x, bbox.m_max.y, bbox.m_min.z),
-							vec3(bbox.m_min.x, bbox.m_min.y, bbox.m_max.z),
-							vec3(bbox.m_max.x, bbox.m_max.y, bbox.m_min.z),
-							vec3(bbox.m_min.x, bbox.m_max.y, bbox.m_max.z),
-							vec3(bbox.m_max.x, bbox.m_min.y, bbox.m_max.z),
-							vec3(bbox.m_max.x, bbox.m_max.y, bbox.m_max.z)	};
-	int iTotalIn = 0;
+bool TestBox(const Frustum& frustum,const BoundingBox& bbox,mat4x4& proj) {
 
-	for (int planeNum = 0; planeNum < 6; planeNum++){
+	for (int planeNum = 0; planeNum < 6; ++planeNum){
 		vec4 plane = frustum.m_planes[planeNum];
 		int iInCount = 8;
 		int iPtIn = 1;
 
-		for(int corner = 0; corner < 8; corner++)
-		{
-			float side =	plane[0] * tCorners[corner].x +
-							plane[1] * tCorners[corner].y +
-							plane[2] * tCorners[corner].z +
+		for(int corner = 0; corner < 8; ++corner){
+			vec4 thisCorner = proj * bbox.tCorners[corner];
+
+			float side =	plane[0] * thisCorner.x +
+							plane[1] * thisCorner.y +
+							plane[2] * thisCorner.z +
 							plane[3];
-			if(side < 0) {
-				iPtIn = 0;
-				iInCount--;
+			if(side > 0) {
+				return true;
 			}
 		}
 
-		if(iInCount == 0)
-			return false;
-
-		iTotalIn += iPtIn;
 	}
 
-	return true;
-
+	return false;
 }
 
 
-bool CheckRect(const Frustum& frustum,const vec3& testPoint, float radius)
-{
+bool CheckRect(const Frustum& frustum,const vec3& testPoint, float radius){
 	  
 	    //2d check, so only need 4 planes and 4 points
-	for (int planeNum = 0; planeNum < 4; planeNum++){
+	for (int planeNum = 0; planeNum < 4; ++planeNum){
 		vec4 plane = frustum.m_planes[planeNum];
 			if(glm::dot(vec3(plane), vec3((testPoint.x - radius),0,(testPoint.z - radius)))
 				 + plane.w > 0.0f)

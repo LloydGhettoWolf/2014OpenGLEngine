@@ -1,11 +1,14 @@
 #include "MainApp.h"
-#include "SponzaApp.h"
+//#include "SponzaApp.h"
 #include "TeapotApp.h"
 #include <iostream>
 
+App* app;
+
+
 int main(int argc, char** argv){
 
-	App* app = new TeapotApp();
+	app = new TeapotApp();
 
 	if (!app->Init()){
 		std::cout << "init failed!" << endl;
@@ -20,6 +23,13 @@ int main(int argc, char** argv){
 
 	return 0;
 }
+
+void GLFWCALL MyResize(int width, int height){
+	float aspect = (float)width / (float)height;
+
+	app->Resize(aspect,width,height);
+}
+
 
 
 
