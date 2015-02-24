@@ -28,7 +28,12 @@ public:
 	static int			  lastKeyPress;
 	static int			  lastKeyAction;
 
+	static bool			  mouseDown;
+
 protected:
+
+	bool StandardInit();
+
 	Camera				  m_camera;
 
 	bool				  m_run = true;
@@ -37,8 +42,6 @@ protected:
 	float				  m_moveUpAmount	   = 0.0f;
 	float				  m_moveSidewaysAmount = 0.0f;
 
-	GLuint				 m_fontShader = 0;
-	FontData			 m_counterFont;
 };
 
 void GLFWCALL KeyCallback(int key, int action);

@@ -86,6 +86,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ComparisonApp.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="CubemapShader.cpp" />
     <ClCompile Include="DeferredShader.cpp" />
@@ -112,6 +113,7 @@
   <ItemGroup>
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ComparisonApp.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="CubemapShader.h" />
     <ClInclude Include="DeferredShader.h" />

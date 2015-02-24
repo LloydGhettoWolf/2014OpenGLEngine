@@ -23,7 +23,7 @@ private:
 	ForwardShaderUniforms m_uniforms;
 public:
 	ForwardShader(){};
-	bool CreateForwardShader();
+	bool CreateForwardShader(bool withUVs = true);
 	static GLuint GetHandle(){ return m_handle; }
 	const ForwardShaderUniforms& GetUniforms()const { return m_uniforms; }
 

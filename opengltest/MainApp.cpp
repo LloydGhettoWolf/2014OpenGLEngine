@@ -1,7 +1,48 @@
 //MainApp.cpp
 #include "MainApp.h"
 #include <gtc\matrix_transform.hpp>
+#include <IL\il.h>
+#include <iostream>
 
+using namespace std;
+
+bool App::StandardInit(){
+
+	if (glfwInit() != GL_TRUE){
+		std::cout << "glfw failed!" << std::endl;
+		return false;
+	}
+
+	glfwOpenWindowHint(GLFW_VERSION_MAJOR, 4);
+	glfwOpenWindowHint(GLFW_VERSION_MINOR, 4);
+
+
+	if (!glfwOpenWindow(APP_WIDTH, APP_HEIGHT, 8, 8, 8, 8, 32, 32, GLFW_WINDOW)){
+		std::cout << "cant create window" << std::endl;
+		glfwTerminate();
+		return false;
+	}
+
+	glfwSetKeyCallback(KeyCallback);
+
+	if (glewInit() != GLEW_OK){
+		std::cout << "glew failed!" << std::endl;
+		return false;
+	}
+
+	ilInit();
+
+
+	//Depth states - in deffered render this is disabled
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glClearDepth(1.0f);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+
+	glEnable(GL_TEXTURE_2D);
+}
 
 void App::ReadMouse(){
 	static int prevX, prevY;
@@ -18,13 +59,15 @@ void App::ReadMouse(){
 
 		
 	if (mouseButtonLeft == GLFW_PRESS) {
-		if (TwResult){
+		if (TwResult  && !mouseDown){
 			TwMouseButton(TW_MOUSE_PRESSED, TW_MOUSE_LEFT);
-		}else{
+			mouseDown = true;
+		}else if(!mouseDown){
 			ComboRotate(m_camera, (float)(x - prevX)*1.0f, (float)(y - prevY)*1.0f);
 		}
-	}else if (mouseButtonLeft == GLFW_RELEASE){
+	}else if (mouseButtonLeft == GLFW_RELEASE && mouseDown){
 		TwMouseButton(TW_MOUSE_RELEASED, TW_MOUSE_LEFT);
+		mouseDown = false;
 	}
 
 	if (mouseButtonRight == GLFW_PRESS){
@@ -48,6 +91,7 @@ void App::ReadMouse(){
 	prevX = x;
 	prevY = y;
 }
+
 void App::ReadKeys(){
 
 	switch (lastKeyPress){
@@ -83,8 +127,9 @@ void App::Resize(float aspect,int width,int height){
 	TwWindowSize(width, height);
 }
 
-int App::lastKeyPress  = 0;
-int App::lastKeyAction = 0;
+int  App::lastKeyPress  = 0;
+int  App::lastKeyAction = 0;
+bool App::mouseDown = false;
 
 void GLFWCALL KeyCallback(int key, int action){
 	App::lastKeyPress  = key;

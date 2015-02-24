@@ -127,8 +127,7 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 				newComp->m_vertexBuffer = CreateVertexNormUVArray(vertices, numVerts, indices, numFaces);
 			}
 			delete[] vertices;
-		}else if(thisMesh->HasPositions() && thisMesh->HasNormals())
-		{
+		}else if(thisMesh->HasPositions() && thisMesh->HasNormals()){
 			//create a new objectdata to store the mesh data on the gfx card
 			CustomVertexNorm *vertices = new CustomVertexNorm[numVerts];
 
@@ -295,7 +294,7 @@ GLuint LoadTextures(StaticMesh& mesh, const aiScene* scene,aiMaterial* material,
 	return texture;
 }
 
-void RenderStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms)
+void RenderStaticMesh(const StaticMesh& mesh)
 {
 	for (unsigned int meshNum = 0; meshNum < mesh.m_numMeshes; meshNum++){
 
@@ -304,16 +303,12 @@ void RenderStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms)
 		}
 
 		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);
-		glUniform3fv(uniforms.diffuseUniform,  1, &mesh.m_meshData[meshNum]->m_material.diffuse[0]);
-		glUniform3fv(uniforms.specularUniform, 1, &mesh.m_meshData[meshNum]->m_material.specular[0]);
-		glUniform3fv(uniforms.ambientUniform,  1, &mesh.m_meshData[meshNum]->m_material.ambient[0]);
-		glUniform1f(uniforms.shininessUniform,   mesh.m_meshData[meshNum]->m_material.shininess);
 		glDrawElements(GL_TRIANGLES, mesh.m_meshData[meshNum]->m_numFaces * 3, GL_UNSIGNED_INT, 0);
 	}
 	glBindVertexArray(0);
 }
 
-void RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniforms,const vec3* positions){
+void RenderInstancedStaticMesh(const StaticMesh& mesh,const vec3* positions){
 	
 	for (unsigned int meshNum = 0; meshNum < mesh.m_numMeshes; meshNum++){
 
@@ -324,13 +319,10 @@ void RenderInstancedStaticMesh(const StaticMesh& mesh, MaterialUniforms& uniform
 		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_meshData[meshNum]->m_instancedDataBuffer);
 		glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(vec3) * mesh.m_numInstances, positions);
-		glUniform3fv(uniforms.diffuseUniform, 1, &mesh.m_meshData[meshNum]->m_material.diffuse[0]);
-		glUniform3fv(uniforms.specularUniform, 1, &mesh.m_meshData[meshNum]->m_material.specular[0]);
-		glUniform3fv(uniforms.ambientUniform, 1, &mesh.m_meshData[meshNum]->m_material.ambient[0]);
-		glUniform1f(uniforms.shininessUniform, mesh.m_meshData[meshNum]->m_material.shininess);
 		glDrawElementsInstanced(GL_TRIANGLES, mesh.m_meshData[meshNum]->m_numFaces * 3, 
 								GL_UNSIGNED_INT, 0,mesh.m_numInstances);
 	}
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }

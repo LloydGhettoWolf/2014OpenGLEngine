@@ -2,12 +2,20 @@
 #include "ForwardShader.h"
 #include <gl\glew.h>
 
-bool ForwardShader::CreateForwardShader(){
+bool ForwardShader::CreateForwardShader(bool withUVs){
 
-	const int numAttribs = 4;
-	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inUVs","inPositions" };
+	if (withUVs){
+		const int numAttribs = 4;
+		const char* attribs[numAttribs] = { "inCoords", "inNormals", "inUVs", "inPositions" };
 
-	m_handle = CreateShader("instancedLighting.vp", "instancedLighting.fp", attribs, numAttribs);
+		m_handle = CreateShader("instancedLighting.vp", "instancedLighting.fp", attribs, numAttribs);
+	}
+	else{
+		const int numAttribs = 3;
+		const char* attribs[numAttribs] = { "inCoords", "inNormals", "inPositions" };
+
+		m_handle = CreateShader("instancedLighting.vp", "instancedLighting.fp", attribs, numAttribs);
+	}
 
 	if (!m_handle)
 		return false;
@@ -24,7 +32,6 @@ bool ForwardShader::CreateForwardShader(){
 	m_uniforms.matUni.ambientUniform	= glGetUniformLocation(m_handle, "materialAmbient");
 	m_uniforms.matUni.specularUniform   = glGetUniformLocation(m_handle, "materialSpecular");
 	m_uniforms.matUni.shininessUniform	= glGetUniformLocation(m_handle, "shininess");
-	m_uniforms.instancedUniform			= glGetUniformLocation(m_handle, "instanced");
 
 	return true;
 }

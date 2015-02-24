@@ -64,9 +64,6 @@ bool SponzaApp::Init(){
 	m_camera = CreateCamera(vec3(0.0f, 2.0f, 0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f);
 
-	m_fontShader = CreateFontShader();
-	InitText2D(m_counterFont, "exportedFont.bmp", "ms per frame: 0.00", 50, 50, 24, m_fontShader);
-
 	return true;
 }
 
@@ -125,13 +122,11 @@ void SponzaApp::Run(){
 
 		glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
 		glUniform3fv(eyePosUniform, 1, &m_camera.pos[0]);
-		RenderStaticMesh(m_sponzaMesh, matUni);
+		RenderStaticMesh(m_sponzaMesh);
 
 		glUseProgram(0);
 
 		time = to_string(deltaTime * 1000.0f);
-		ChangeText2D(m_counterFont, (firstStr + time.substr(0, 4)).c_str(), 50, 50, 24);
-		PrintText2D(m_counterFont);
 
 		glfwSwapBuffers();
 
@@ -148,7 +143,6 @@ void SponzaApp::Run(){
 };
 
 void SponzaApp::ShutDown(){
-	CleanupText2D(m_counterFont);
 	DestroyMesh(m_sponzaMesh);
 	glDeleteShader(m_lightingShader);
 

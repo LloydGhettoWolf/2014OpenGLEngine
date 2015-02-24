@@ -16,44 +16,11 @@
 
 bool TeapotApp::Init(){
 
-	if (glfwInit() != GL_TRUE){
-		std::cout << "glfw failed!" << std::endl;
-		return false;
-	}
-
-	glfwOpenWindowHint(GLFW_VERSION_MAJOR, 4);
-	glfwOpenWindowHint(GLFW_VERSION_MINOR, 4);
-
-
-	if (!glfwOpenWindow(APP_WIDTH, APP_HEIGHT, 8, 8, 8, 8,32, 32, GLFW_WINDOW)){
-		std::cout << "cant create window" << std::endl;
-		glfwTerminate();
-		return false;
-	}
-
-	glfwSetKeyCallback(KeyCallback);
-
-	if (glewInit() != GLEW_OK){
-		std::cout << "glew failed!" << std::endl;
-		return false;
-	}
-
-	ilInit();
-
-
-	//Depth states - in deffered render this is disabled
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	glClearDepth(1.0f);
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-
-	glEnable(GL_TEXTURE_2D);
+	StandardInit();
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	if (!m_teapotShader.CreateForwardShader()){
+	if (!m_teapotShader.CreateForwardShader(false)){
 		cout << "failed to load shader!" << endl;
 		return false;
 	}
@@ -69,17 +36,14 @@ bool TeapotApp::Init(){
 	}
 	
 	
-	InitStaticMesh(m_teapotMesh, "teapot.obj", "teapot\\",64);
-	InitStaticMesh(m_sphereMesh, "sphere.obj", "meshes\\", 1);
-	InitStaticMesh(m_cubeMesh,   "cube.obj",   "meshes\\", 1);
+	InitStaticMesh(m_teapotMesh, "buddha.obj",   "meshes\\",64);
+	InitStaticMesh(m_sphereMesh, "sphere.obj",   "meshes\\", 1);
+	InitStaticMesh(m_cubeMesh,   "cube.obj",     "meshes\\", 1);
 
 	m_camera = CreateCamera(vec3(0.0f,0.0f,-40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(45.0f, APP_WIDTH / APP_HEIGHT, 3.0f, 500.0f);
 
 	glfwSetWindowSizeCallback(MyResize);
-
-	m_fontShader = CreateFontShader();
-	InitText2D(m_counterFont,"exportedFont.bmp", "ms per frame: 0.00", 50, 50, 24,m_fontShader);
 
 	m_groundPlaneBuffer = CreateGroundPlaneData();
 
@@ -96,13 +60,13 @@ bool TeapotApp::Init(){
 	screenQuad[4] = vec3(-1.0f, -1.0f, 0.0f);
 	screenQuad[5] = vec3(1.0f, -1.0f, 0.0f);
 
-	m_lights.color[0] = vec3(0.0f, 0.0f, 1.0f);
+	m_lights.color[0] = vec3(0.6f, 0.4f, 1.0f);
 	m_lights.color[1] = vec3(0.0f, 1.0f, 0.0f);
 	m_lights.color[2] = vec3(1.0f, 0.0f, 0.0f);
 	m_lights.color[3] = vec3(0.0f, 1.0f, 1.0f);
 	m_lights.color[4] = vec3(0.1f, 0.0f, 1.0f);
 	
-	lightPos[0] = vec3(60.0f,  40.0f, 42.0f);
+	lightPos[0] = vec3(20.0f,  40.0f, 12.0f);
 	lightPos[1] = vec3(15.0f, 120.0f, -18.0f);
 	lightPos[2] = vec3(-60.0f, 120.0f, 42.0f);
 	lightPos[3] = vec3(-15.0f, 120.0f, 18.0f);
@@ -132,14 +96,37 @@ bool TeapotApp::Init(){
 	cubemapFilenames.push_back("negz.jpg");
 	m_cubeMap = CreateCubeMap(cubemapFilenames);
 
+	m_material.ambient = vec3(0.1f,0.1f,0.1f);
+	m_material.diffuse = vec3(0.5f, 0.4f, 0.5f);
+	m_material.shininess = 64.0f;
+
+	if (!InitGUI()){
+		return false;
+	}
+
+	return true;
+}
+
+bool TeapotApp::InitGUI(){
 	TwInit(TW_OPENGL, NULL);
 	TwWindowSize(APP_WIDTH, APP_HEIGHT);
 
+	myBar = TwNewBar("MaterialProperties");
+	TwAddVarRW(myBar, "shininess", TW_TYPE_FLOAT, &m_material.shininess, "min=0.0f max=512.0f step=2.0f");
+	TwDefine(" MaterialProperties size='200 160'");
 
-	myBar = TwNewBar("MyFirstBar");
-	//TwAddVarRW(myBar, "magicNumber", TW_TYPE_FLOAT, &example, "");
-	TwDefine(" MyFirstBar size='200 40'");
+	//define a 3 component vector for spec, ambient, diff values in the ui
+	TwStructMember members[] = {
+		{ "r", TW_TYPE_FLOAT, offsetof(vec3, x), "min=0.0f max=1.0f step=0.01f" },
+		{ "g", TW_TYPE_FLOAT, offsetof(vec3, y), "min=0.0f max=1.0f step=0.01f" },
+		{ "b", TW_TYPE_FLOAT, offsetof(vec3, z), "min=0.0f max=1.0f step=0.01f" },
+	};
 
+	TwType colType = TwDefineStruct("ColType", members, 3, sizeof(vec3), NULL, NULL);
+	TwAddVarRW(myBar, "Diffuse",  colType, &m_material.diffuse[0],  NULL);
+	TwAddVarRW(myBar, "LightDiffuse", colType, &m_lights.color[0], NULL);
+	TwAddVarRW(myBar, "Specular", colType, &m_material.specular[0], NULL);
+	TwAddVarRW(myBar, "Ambient",  colType, &m_material.ambient[0],  NULL);
 	return true;
 }
 
@@ -158,7 +145,7 @@ void TeapotApp::Run(){
 	for (int potRow = 0; potRow < 8; potRow++){
 		for (int potCol = 0; potCol < 8; potCol++){
 			int index = potRow * 8 + potCol;
-			movement[index] = vec3(potCol * 15.0f - 60.0f,0.0f,potRow * 10.5f - 42.0f);
+			movement[index] = vec3(potCol * 2.5f - 10.0f,0.0f,potRow * 5.0f - 20.0f);
 		}
 	}
 
@@ -167,16 +154,18 @@ void TeapotApp::Run(){
 
 	m_teapotShader.SetUniforms(m_camera.projectionMatrix,m_lights.color[0]);
 
+	/*
 	glUseProgram(m_deferredShader.GetGBufferHandle());
 		mat4x4 translationMatrix = rotation;
 		GBufferShaderUniforms gBufferUniforms = m_deferredShader.GetGBufferUniforms();
 		glUniformMatrix3fv(gBufferUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
 		glUniformMatrix4fv(gBufferUniforms.rotationMatrixUniform, 1, GL_FALSE, &translationMatrix[0][0]);
 	glUseProgram(0);
+	*/
 
 	glUseProgram(m_deferredShader.GetLightPassHandle());
-	vec2 screenSize((float)APP_WIDTH,(float)APP_HEIGHT);
-	glUniform2fv(m_deferredShader.GetLightPassUniforms().screenSizeUniform, 1, &screenSize[0]);
+	  vec2 screenSize((float)APP_WIDTH,(float)APP_HEIGHT);
+	  glUniform2fv(m_deferredShader.GetLightPassUniforms().screenSizeUniform, 1, &screenSize[0]);
 	glUseProgram(0);
 
 	glUseProgram(m_deferredShader.GetQuadPassHandle());
@@ -207,8 +196,6 @@ void TeapotApp::Run(){
 	    RenderForward(&m_lights.position[0], movement);
 		
 		time = to_string(deltaTime * 1000.0f);
-		ChangeText2D(m_counterFont, (firstStr + time.substr(0,4)).c_str(), 50, 50, 24);
-		PrintText2D(m_counterFont);
 		TwDraw();
 
 		glfwSwapBuffers();
@@ -226,14 +213,13 @@ void TeapotApp::Run(){
 	ShutDown();
 };
 
-
 void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPositions){
 	vec3 diff = vec3(0.4f, 0.4f, 0.4f);
 
 	mat4x4 scaleMatrix, identity, rotation;
 	scaleMatrix = scale(scaleMatrix, vec3(0.04f, 0.04f, 0.04f));
 	rotation    = rotate(identity, 180.0f, vec3(0.0f, 1.0f, 0.0f));
-	mat4x4 worldMatrix =  rotation * scaleMatrix;
+	mat4x4 worldMatrix = rotation;// *scaleMatrix;
 	mat3x3 normalMatrix = mat3(transpose(worldMatrix));
 	mat4x4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
 
@@ -241,15 +227,20 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 	glUseProgram(m_teapotShader.GetHandle());
 		ForwardShaderUniforms teapotUniforms = m_teapotShader.GetUniforms();
 		m_teapotShader.UpdateUniforms(worldMatrix, normalMatrix, m_camera.viewMatrix, m_camera.pos, m_lights.position[0], 1);
-		RenderInstancedStaticMesh(m_teapotMesh, teapotUniforms.matUni,&teapotPositions[0]);
+
+		glUniform3fv(teapotUniforms.matUni.diffuseUniform,  1, &m_material.diffuse[0]);
+		glUniform3fv(teapotUniforms.matUni.ambientUniform,  1, &m_material.ambient[0]);
+		glUniform3fv(teapotUniforms.matUni.specularUniform, 1, &m_material.specular[0]);
+		glUniform3fv(teapotUniforms.lightColUniform,        1, &m_lights.color[0][0]);
+		glUniform1f(teapotUniforms.matUni.shininessUniform, m_material.shininess);
+
+		RenderInstancedStaticMesh(m_teapotMesh,&teapotPositions[0]);
 		
-		glUniformMatrix4fv(teapotUniforms.worldMatrixUniform, 1, GL_FALSE, &identity[0][0]);
-		glUniform1i(teapotUniforms.instancedUniform, 0);
-		glUniform3fv(teapotUniforms.matUni.diffuseUniform, 1, &diff[0]);
-		glUniform1f(teapotUniforms.matUni.shininessUniform,32.0f);
-		glBindVertexArray(m_groundPlaneBuffer);
-		m_teapotShader.UpdateUniforms(identity, normalMatrix, m_camera.viewMatrix, m_camera.pos, m_lights.position[0], 1);
-		glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
+		//glUniformMatrix4fv(teapotUniforms.worldMatrixUniform, 1, GL_FALSE, &identity[0][0]);
+		//glUniform1i(teapotUniforms.instancedUniform, 0);
+		//glBindVertexArray(m_groundPlaneBuffer);
+		//m_teapotShader.UpdateUniforms(identity, normalMatrix, m_camera.viewMatrix, m_camera.pos, m_lights.position[0], 1);
+		//glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
 	glUseProgram(0);
 
 	glUseProgram(m_cubemapShader.GetHandle());
@@ -258,7 +249,7 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 		glUniformMatrix4fv(m_cubemapShader.GetWVPMatrix(), 1, GL_FALSE, &(m_camera.projectionMatrix * m_camera.viewMatrix * translate(identity,m_camera.pos) )[0][0]);
 		glUniform1i(m_cubemapShader.GetSampler(), 0);
 		glCullFace(GL_FRONT);
-		RenderStaticMesh(m_cubeMesh, teapotUniforms.matUni);
+		RenderStaticMesh(m_cubeMesh);
 		glCullFace(GL_BACK);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	glUseProgram(0);
@@ -294,7 +285,7 @@ void TeapotApp::RenderDeferred(const vec3* teapotPositions){
 			mat4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
 			glUniformMatrix4fv(gBufferUniforms.cameraMatrixUniform, 1, GL_FALSE, &viewProjection[0][0]);
 			glUniform1i(gBufferUniforms.instancedUniform, 1);
-			RenderInstancedStaticMesh(m_teapotMesh, gBufferUniforms.materialUniforms, &teapotPositions[0]);
+			RenderInstancedStaticMesh(m_teapotMesh, &teapotPositions[0]);
 			
 			glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &identity[0][0]);
 			glUniform1i(gBufferUniforms.instancedUniform, 0);
@@ -313,7 +304,7 @@ void TeapotApp::RenderDeferred(const vec3* teapotPositions){
 			glUniformMatrix4fv(m_cubemapShader.GetWVPMatrix(), 1, GL_FALSE, &(m_camera.projectionMatrix * m_camera.viewMatrix * translate(identity, m_camera.pos))[0][0]);
 			glUniform1i(m_cubemapShader.GetSampler(), 0);
 			glCullFace(GL_FRONT);
-			RenderStaticMesh(m_cubeMesh, teapotUniforms.matUni);
+			RenderStaticMesh(m_cubeMesh);
 			glCullFace(GL_BACK);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		glUseProgram(0);
@@ -334,7 +325,7 @@ void TeapotApp::RenderDeferred(const vec3* teapotPositions){
 		float scale = 85.0f;//CalcSphereDistance(m_lights, light);
 		worldMatrix = viewProjection * translate(identity, m_lights.position[light]) * glm::scale(identity, vec3(scale, scale, scale));
 		glUniformMatrix4fv(m_deferredShader.GetNULLWVPMatrix(),1,false,&worldMatrix[0][0]);
-		RenderStaticMesh(m_sphereMesh, matuni);
+		RenderStaticMesh(m_sphereMesh);
 
 		glUseProgram(0);
 		//lighting pass
@@ -366,7 +357,7 @@ void TeapotApp::RenderDeferred(const vec3* teapotPositions){
 		glUniform3fv(lightPassUniforms.lightPosUniform, 1, &m_lights.position[light][0]);
 		glUniform3fv(lightPassUniforms.lightColUniform, 1, &m_lights.color[light][0]);
 		glUniform3fv(lightPassUniforms.eyePosUniform, 1, &m_camera.pos[0]);
-		RenderStaticMesh(m_sphereMesh, matuni);
+		RenderStaticMesh(m_sphereMesh);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -414,7 +405,6 @@ float TeapotApp::CalcSphereDistance(const PointLightData& pLight,int index){
 }
 
 void TeapotApp::ShutDown(){
-	CleanupText2D(m_counterFont);
 	DestroyMesh(m_teapotMesh);
 	DestroyMesh(m_sphereMesh);
 	DestroyMesh(m_cubeMesh);

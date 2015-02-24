@@ -6,11 +6,10 @@ uniform mat3 normalMatrix;
 uniform mat4 cameraMatrix;
 uniform vec3 eyePos;
 uniform vec3 lightPos[numLights];
-uniform bool instanced;
 
 in vec3 inCoords;
 in vec3 inNormals;
-in vec2 inUVs;
+//in vec2 inUVs;
 in vec3 inPositions;
 out vec3 norm;
 out vec3 eyeVec;

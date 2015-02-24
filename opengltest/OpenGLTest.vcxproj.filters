@@ -111,6 +111,9 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Shaders</Filter>
     </ClCompile>
+    <ClCompile Include="ComparisonApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainApp.h">
@@ -190,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="GroundPlane.h">
       <Filter>Header Files\Renderable Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="ComparisonApp.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

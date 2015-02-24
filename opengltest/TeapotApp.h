@@ -15,7 +15,9 @@ public:
 	void ShutDown();
 
 private:
-	bool   CreateGBuffer();
+	bool InitGUI();
+
+	bool CreateGBuffer();
 
 	void RenderForward(const vec3* lightPositions, const vec3* teapotPositions);
 	void RenderDeferred(const vec3* teapotPositions);
@@ -35,6 +37,8 @@ private:
 	GBufferData		m_gBuffer;
 	PointLightData  m_lights;
 	vec3            lightPos[NUM_POINT_LIGHTS];
+
+	Material       m_material;
 
 	//full screen quad
 	GLuint m_quadBuffer;

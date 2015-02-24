@@ -28,5 +28,5 @@ void main(){
 	}
 	vec3 lighting = diffContribution+specContribution+materialAmbient;
 	//vec3 newCol   = lighting * texture2D(tex,UVs).xyz;
-	color = vec4(lighting,1.0);
+	color = vec4(1.0,1.0,1.0,1.0);//vec4(lighting,1.0);
 }
