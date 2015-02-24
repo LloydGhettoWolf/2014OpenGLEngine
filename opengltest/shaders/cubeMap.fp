@@ -1,4 +1,4 @@
-#version 330
+#version 400
 uniform samplerCube sampler;
 in vec3 outUV;
 

@@ -87,6 +87,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ComparisonApp.cpp" />
+    <ClCompile Include="ComparisonShader.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="CubemapShader.cpp" />
     <ClCompile Include="DeferredShader.cpp" />
@@ -114,6 +115,7 @@
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ComparisonApp.h" />
+    <ClInclude Include="ComparisonShader.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="CubemapShader.h" />
     <ClInclude Include="DeferredShader.h" />
@@ -141,6 +143,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="particle.fp" />
+    <None Include="shaders\comparison.fp" />
+    <None Include="shaders\comparison.vp" />
     <None Include="shaders\cubeMap.fp" />
     <None Include="shaders\cubeMap.vp" />
     <None Include="shaders\depth.fp" />

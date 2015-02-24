@@ -114,6 +114,9 @@
     <ClCompile Include="ComparisonApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ComparisonShader.cpp">
+      <Filter>Shaders\ShaderClasses</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainApp.h">
@@ -197,6 +200,9 @@
     <ClInclude Include="ComparisonApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ComparisonShader.h">
+      <Filter>Shaders\ShaderClasses</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\cubeMap.fp">
@@ -270,6 +276,12 @@
     </None>
     <None Include="particle.fp">
       <Filter>Shaders\particleShaders</Filter>
+    </None>
+    <None Include="shaders\comparison.fp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\comparison.vp">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

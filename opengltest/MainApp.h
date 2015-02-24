@@ -16,6 +16,10 @@
 
 class App{
 public:
+
+	App(){};
+	virtual ~App(){ }
+
 	virtual bool Init() = 0;
 	virtual void Run()  = 0;
 	virtual void ShutDown() = 0;
