@@ -1,0 +1,24 @@
+//cookTorrance.vp
+//comparison.vp
+#version 400
+uniform mat4 perspectiveMatrix;
+uniform mat4 worldMatrix;
+uniform mat3 normalMatrix;
+uniform mat4 cameraMatrix;
+uniform vec3 eyePos;
+
+in vec3 inCoords;
+in vec3 inNormals;
+
+out vec3 norm;
+out vec3 eyeVec;
+
+
+void main(){
+       vec4 position      = worldMatrix *  vec4(inCoords,1.0);
+
+       norm               = normalize(normalMatrix * inNormals);
+       eyeVec             = eyePos-position.xyz;
+
+	   gl_Position        = perspectiveMatrix * cameraMatrix * position;
+}
