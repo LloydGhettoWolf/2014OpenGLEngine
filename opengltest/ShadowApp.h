@@ -34,7 +34,7 @@ private:
 	TwBar* ShadowGUI;
 	TwBar* LightDir;
 
-	mat4 m_worldMatrix,m_shadowMatrix,m_biasMatrix;
+	mat4 m_worldMatrix,m_shadowMatrix,m_biasMatrix,m_scaleMatrix;
 	mat3 m_normalMatrix;
 
 	quat m_model1Rotation;

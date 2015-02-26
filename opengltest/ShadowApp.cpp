@@ -34,12 +34,12 @@ bool ShadowApp::Init(){
 	m_camera = CreateCamera(vec3(0.0f, 0.0f, -40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(45.0f, APP_WIDTH / APP_HEIGHT, 3.0f, 500.0f);
 
-	m_lightPos = vec3(60.0f, 65.0f, 10.0f);
+	m_lightPos = vec3(60.0f, 30.0f, 10.0f);
 	m_lightDir = vec3(1.0f, -1.0f, 0.0f);
 
 
 	m_shadowCamera = CreateCamera(m_lightPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_shadowCamera.projectionMatrix = glm::perspective(70.0f, APP_WIDTH / APP_HEIGHT, 3.0f, 500.0f);
+	m_shadowCamera.projectionMatrix = glm::perspective(30.0f, APP_WIDTH / APP_HEIGHT, 5.0f, 3500.0f);
 
 	glfwSetWindowSizeCallback(MyResize);
 
@@ -126,11 +126,10 @@ void ShadowApp::Run(){
 		
 		mat4 identity;
 		mat4x4 fromQuat = mat4_cast(m_model1Rotation);
-		m_worldMatrix = translate(identity, vec3(5.0f, m_centerOffset, 0.0f)) * fromQuat * rotate(identity, 180.0f, vec3(0.0f, 1.0f, 0.0f)) * translate(identity, vec3(0.0f, -m_centerOffset, 0.0f));
+		m_scaleMatrix = scale(identity, vec3(0.5f, 0.5f, 0.5f));
+		m_worldMatrix =  fromQuat * rotate(identity, 180.0f, vec3(0.0f, 1.0f, 0.0f)) * m_scaleMatrix * translate(identity, vec3(0.0f, -m_centerOffset, 0.0f));
 
 		m_normalMatrix = inverseTranspose(mat3(m_worldMatrix));
-
-
 
 		RenderShadow();
 		RenderMeshes();
@@ -158,7 +157,7 @@ void ShadowApp::RenderShadow(){
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 		glClear(GL_DEPTH_BUFFER_BIT);
-
+		glCullFace(GL_FRONT);
 		glUseProgram(m_shadowShader.GetDepthHandle());
 			DepthShaderUniforms shadowUniforms = m_shadowShader.GetDepthUniforms();
 
@@ -168,6 +167,7 @@ void ShadowApp::RenderShadow(){
 
 			m_shadowShader.UpdateDepthUniforms(identity, m_shadowCamera.viewMatrix);
 			glBindVertexArray(m_groundPlaneBuffer);
+			glCullFace(GL_BACK);
 			glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
 		glUseProgram(0);
@@ -180,6 +180,7 @@ void ShadowApp::RenderMeshes(){
 	mat4 identity;
 
 	glUseProgram(m_shadowShader.GetShadowHandle());
+		
 		ShadowShaderUniforms shadowUniforms = m_shadowShader.GetShadowUniforms();
 		m_shadowShader.UpdateShadowUniforms(m_worldMatrix, m_normalMatrix, m_camera.viewMatrix, m_camera.pos,m_shadowMatrix,m_lightPos);
 		glActiveTexture(GL_TEXTURE0);
@@ -196,7 +197,6 @@ void ShadowApp::RenderMeshes(){
 		RenderStaticMesh(m_teapotMesh);
 
 		m_shadowMatrix = m_biasMatrix * m_shadowCamera.projectionMatrix * m_shadowCamera.viewMatrix;
-
 		glBindVertexArray(m_groundPlaneBuffer);
 		m_shadowShader.UpdateShadowUniforms(identity, mat3(identity), m_camera.viewMatrix, m_camera.pos, m_shadowMatrix, m_lightPos);
 		glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
