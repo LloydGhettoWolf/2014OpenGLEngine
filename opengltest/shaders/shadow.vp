@@ -1,0 +1,27 @@
+//shadow.vp
+#version 400
+uniform mat4 perspectiveMatrix;
+uniform mat4 worldMatrix;
+uniform mat3 normalMatrix;
+uniform mat4 cameraMatrix;
+uniform mat4 shadowMatrix;
+uniform vec3 eyePos;
+uniform vec3 lightPos;
+
+in vec3 inCoords;
+in vec3 inNormals;
+
+out vec3 norm;
+out vec3 eyeVec;
+out vec3 lightVec;
+out vec4 shadowCoords;
+
+void main(){
+        vec4 position     = worldMatrix * vec4(inCoords,1.0);
+        norm              = normalMatrix * inNormals;
+        eyeVec            = eyePos-position.xyz;
+		lightVec          = lightPos - position.xyz;
+		shadowCoords      = shadowMatrix * vec4(inCoords,1.0);
+       
+		gl_Position       = perspectiveMatrix * cameraMatrix * position;
+}

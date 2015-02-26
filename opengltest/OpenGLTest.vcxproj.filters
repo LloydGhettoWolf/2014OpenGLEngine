@@ -117,6 +117,15 @@
     <ClCompile Include="ComparisonShader.cpp">
       <Filter>Shaders\ShaderClasses</Filter>
     </ClCompile>
+    <ClCompile Include="CookTorrance.cpp">
+      <Filter>Shaders\ShaderClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowShader.cpp">
+      <Filter>Shaders\ShaderClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainApp.h">
@@ -203,6 +212,15 @@
     <ClInclude Include="ComparisonShader.h">
       <Filter>Shaders\ShaderClasses</Filter>
     </ClInclude>
+    <ClInclude Include="CookTorrance.h">
+      <Filter>Shaders\ShaderClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowShader.h">
+      <Filter>Shaders\ShaderClasses</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\cubeMap.fp">
@@ -281,6 +299,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\comparison.vp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\cookTorrance.fp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\cookTorrance.vp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\shadow.fp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\shadow.vp">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

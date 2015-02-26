@@ -1,15 +1,12 @@
 #include "MainApp.h"
-//#include "SponzaApp.h"
-#include "ComparisonApp.h"
-#include "TeapotApp.h"
+#include "ShadowApp.h"
 #include <iostream>
 
 App* app;
 
-
 int main(int argc, char** argv){
 
-	app = new ComparisonApp();
+	app = new ShadowApp();
 
 	if (!app->Init()){
 		std::cout << "init failed!" << endl;

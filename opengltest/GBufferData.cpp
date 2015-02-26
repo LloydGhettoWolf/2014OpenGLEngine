@@ -25,7 +25,7 @@ bool CreateGBufferData(GBufferData& data){
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	}
 
-	if (!CreateDepthTexture(data.depthTexture,false,true)){
+	if (!CreateDepthTextureComplex(data.depthTexture)){
 		return false;
 	}
 

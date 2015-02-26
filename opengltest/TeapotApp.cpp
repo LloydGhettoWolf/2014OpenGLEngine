@@ -1,5 +1,6 @@
 //MainApp.cpp
 #include <gtc\matrix_transform.hpp>
+#include <gtc\matrix_inverse.hpp>
 
 #include <iostream>
 #include <math.h>
@@ -220,7 +221,7 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 	scaleMatrix = scale(scaleMatrix, vec3(0.04f, 0.04f, 0.04f));
 	rotation    = rotate(identity, 180.0f, vec3(0.0f, 1.0f, 0.0f));
 	mat4x4 worldMatrix = rotation;// *scaleMatrix;
-	mat3x3 normalMatrix = mat3(transpose(worldMatrix));
+	mat3x3 normalMatrix = inverseTranspose(mat3(worldMatrix));
 	mat4x4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
 
 

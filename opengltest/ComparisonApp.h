@@ -4,6 +4,7 @@
 #pragma once
 #include "MainApp.h"
 #include "ComparisonShader.h"
+#include "CookTorrance.h"
 #include "CubemapShader.h"
 #include <gtc\quaternion.hpp>
 
@@ -24,16 +25,16 @@ private:
 
 	ComparisonShader	  m_modelShader;
 	CubemapShader		  m_cubemapShader;
+	CookTorranceShader	  m_ctShader;
 
 	StaticMesh            m_exampleMesh,m_cubeMesh;
 
-	GLuint				  m_groundPlaneBuffer;
 	GLuint				  m_cubeMap;
 
 	PointLightData  m_lights;
 	vec3            m_lightDir;
 
-	Material        m_material1,m_material2;
+	Material        m_material1;
 
 	
 	TwBar* BlinnGUI;
@@ -41,6 +42,9 @@ private:
 	TwBar* LightDir;
 
 	quat m_model1Rotation, m_model2Rotation;
-	float m_centerOffset, m_reflect1, m_reflect2,refractIndex1, refractIndex2,solidMix1,solidMix2;
+	float m_centerOffset, m_reflect1,refractIndex1,solidMix1;
+
+	//cook torrance 
+	float roughness, fresnel, k,refractiveIndex,n;
 };
 

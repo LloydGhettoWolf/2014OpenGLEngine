@@ -31,16 +31,12 @@ bool ComparisonApp::InitGUI(){
 	TwAddVarRW(BlinnGUI, "SolidMix", TW_TYPE_FLOAT, &solidMix1, "min=0.0f max=1.0f step=0.05f");
 
 	BDRFGUI = TwNewBar("MaterialProperties2");
-	TwAddVarRW(BDRFGUI, "shininess", TW_TYPE_FLOAT, &m_material2.shininess, "min=0.0f max=2048.0f step=2.0f");
 	TwDefine(" MaterialProperties2 size='200 300' position='800 80'");
 	TwAddVarRW(BDRFGUI, "Rotation", TW_TYPE_QUAT4F, &m_model2Rotation, "");
+	TwAddVarRW(BDRFGUI, "Fresnel",  TW_TYPE_FLOAT,	&refractiveIndex, "min=1.0f max=3.0f step=0.05f");
+	TwAddVarRW(BDRFGUI, "Roughness", TW_TYPE_FLOAT, &roughness,       "min=0.0f max=1.0f step=0.02f");
+	TwAddVarRW(BDRFGUI, "K",       TW_TYPE_FLOAT,   &k,		          "min=0.0f max=1.0f step=0.05f");
 	
-	TwAddVarRW(BDRFGUI, "Diffuse", colType,  &m_material2.diffuse[0], NULL);
-	TwAddVarRW(BDRFGUI, "Specular", colType, &m_material2.specular[0], NULL);
-	TwAddVarRW(BDRFGUI, "Ambient", colType,  &m_material2.ambient[0], NULL);
-	TwAddVarRW(BDRFGUI, "Reflection", TW_TYPE_FLOAT, &m_reflect2, "min=0.0f max=1.0f step=0.05f");
-	TwAddVarRW(BDRFGUI, "Refraction", TW_TYPE_FLOAT, &refractIndex2, "min=0.0f max=5.0f step=0.02f");
-	TwAddVarRW(BDRFGUI, "SolidMix", TW_TYPE_FLOAT, &solidMix2, "min=0.0f max=1.0f step=0.05f");
 
 	LightDir = TwNewBar("LightDir");
 	TwAddVarRW(LightDir, "light direction", TW_TYPE_DIR3F,&m_lightDir[0],"");
@@ -58,7 +54,12 @@ bool ComparisonApp::Init(){
 		return false;
 	}
 
-	InitStaticMesh(m_exampleMesh, "simpleTeapot.obj", "teapot\\", 1);
+	if (!m_ctShader.CreateCookTorranceShader()){
+		cout << "failed to load shader!" << endl;
+		return false;
+	}
+
+	InitStaticMesh(m_exampleMesh, "buddha.obj", "meshes\\", 1);
 	InitStaticMesh(m_cubeMesh, "cube.obj", "meshes\\", 1);
 
 	m_centerOffset = (m_exampleMesh.m_boundingBoxMax.y - m_exampleMesh.m_boundingBoxMin.y)/2.0f;
@@ -70,17 +71,19 @@ bool ComparisonApp::Init(){
 	m_material1.specular = vec3(0.6f, 0.6f, 0.6f);
 	m_material1.shininess = 8.0f;
 
-	m_material2.ambient = vec3(0.1f, 0.1f, 0.2f);
-	m_material2.diffuse = vec3(0.7f, 0.3f, 0.4f);
-	m_material2.specular = vec3(0.2f, 0.2f, 0.2f);
-	m_material2.shininess = 128.0f;
 
 	m_lightDir.x = 1.0f;
 	m_lightDir.y = 0.0f;
 	m_lightDir.z = 0.0f;
 
-	m_reflect1 = m_reflect2 = 0.0f;
-	refractIndex1 = refractIndex2 = 0.2f;
+	m_reflect1  = 0.0f;
+	refractIndex1  = 0.2f;
+
+	roughness = 1.0f;
+	k = 1.0f;
+	fresnel = 1.0f;
+	float newRefractive = (1.0f - (n*n) / (1.0f + n));
+	refractiveIndex = newRefractive * newRefractive;
 
 	if (!InitGUI()){
 		return false;
@@ -121,7 +124,7 @@ void ComparisonApp::Run(){
 	m_lights.color[0]    = vec3(1.0f, 1.0f, 1.0f);
 
 	m_modelShader.SetUniforms(m_camera.projectionMatrix);
-	
+	m_ctShader.SetUniforms(m_camera.projectionMatrix);
 
 	do{
 		deltaTime = currentFrame - lastFrame;
@@ -152,7 +155,7 @@ void ComparisonApp::Render(){
 
 	mat4x4 identity;
 	mat4x4 fromQuat = mat4_cast(m_model1Rotation);
-	mat4x4 worldMatrix = translate(identity, vec3(5.0f, m_centerOffset, 0.0f)) * fromQuat * rotate(identity,180.0f,vec3(0.0f,1.0f,0.0f)) * translate(identity, vec3(0.0f, -m_centerOffset, 0.0f));
+	mat4x4 worldMatrix = translate(identity, vec3(0.0f, m_centerOffset, 0.0f)) * fromQuat * rotate(identity,180.0f,vec3(0.0f,1.0f,0.0f)) * translate(identity, vec3(0.0f, -m_centerOffset, 0.0f));
 	mat3x3 normalMatrix = inverseTranspose(mat3(worldMatrix));
 	glDisable(GL_CULL_FACE);
 	glUseProgram(m_modelShader.GetHandle());
@@ -174,27 +177,28 @@ void ComparisonApp::Render(){
 
 
 		RenderStaticMesh(m_exampleMesh);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+	glUseProgram(0);
+
+		
+	glUseProgram(m_ctShader.GetHandle());
 
 		fromQuat = mat4_cast(m_model2Rotation);
 		worldMatrix = translate(identity, vec3(-5.0f, m_centerOffset, 0.0f)) * fromQuat * rotate(identity, 180.0f, vec3(0.0f, 1.0f, 0.0f)) * translate(identity, vec3(0.0f, -m_centerOffset, 0.0f));
 		normalMatrix = inverseTranspose(mat3(worldMatrix));
 
-		m_modelShader.UpdateUniforms(worldMatrix, normalMatrix, m_camera.viewMatrix, m_camera.pos, m_lightDir);
-		
+		CookTorranceShaderUniforms ctUniforms = m_ctShader.GetUniforms();
 
-		glUniform3fv(teapotUniforms.matUni.diffuseUniform, 1, &m_material2.diffuse[0]);
-		glUniform3fv(teapotUniforms.matUni.ambientUniform, 1, &m_material2.ambient[0]);
-		glUniform3fv(teapotUniforms.matUni.specularUniform, 1, &m_material2.specular[0]);
-		glUniform1f(teapotUniforms.matUni.shininessUniform, m_material2.shininess);
-		glUniform1f(teapotUniforms.reflectUniform, m_reflect2);
-		glUniform1f(teapotUniforms.refractUniform, refractIndex2);
-		glUniform1f(teapotUniforms.solidMixUniform, solidMix2);
-
+		m_ctShader.UpdateUniforms(worldMatrix, normalMatrix, m_camera.viewMatrix, m_camera.pos, m_lightDir);
+		glUniform1f(ctUniforms.fresnelUniform,   refractiveIndex);
+		glUniform1f(ctUniforms.kUniform,		 k);
+		glUniform1f(ctUniforms.roughnessUniform, roughness);
 		RenderStaticMesh(m_exampleMesh);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP,0);
-
+		
 	glUseProgram(0);
+	
 
 	glEnable(GL_CULL_FACE);
 	glUseProgram(m_cubemapShader.GetHandle());
@@ -213,4 +217,5 @@ void ComparisonApp::ShutDown(){
 	DestroyMesh(m_exampleMesh);
 	glDeleteShader(m_modelShader.GetHandle());
 	glDeleteShader(m_cubemapShader.GetHandle());
+	glDeleteShader(m_ctShader.GetHandle());
 }

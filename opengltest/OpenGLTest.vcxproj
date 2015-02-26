@@ -88,6 +88,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ComparisonApp.cpp" />
     <ClCompile Include="ComparisonShader.cpp" />
+    <ClCompile Include="CookTorrance.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="CubemapShader.cpp" />
     <ClCompile Include="DeferredShader.cpp" />
@@ -105,6 +106,8 @@
     <ClCompile Include="PointSprite.cpp" />
     <ClCompile Include="PointSpriteShader.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShadowApp.cpp" />
+    <ClCompile Include="ShadowShader.cpp" />
     <ClCompile Include="SponzaApp.cpp" />
     <ClCompile Include="StaticMesh.cpp" />
     <ClCompile Include="TeapotApp.cpp" />
@@ -116,6 +119,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ComparisonApp.h" />
     <ClInclude Include="ComparisonShader.h" />
+    <ClInclude Include="CookTorrance.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="CubemapShader.h" />
     <ClInclude Include="DeferredShader.h" />
@@ -134,6 +138,8 @@
     <ClInclude Include="PointSprite.h" />
     <ClInclude Include="PointSpriteShader.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShadowApp.h" />
+    <ClInclude Include="ShadowShader.h" />
     <ClInclude Include="SponzaApp.h" />
     <ClInclude Include="StaticMesh.h" />
     <ClInclude Include="TeapotApp.h" />
@@ -145,6 +151,8 @@
     <None Include="particle.fp" />
     <None Include="shaders\comparison.fp" />
     <None Include="shaders\comparison.vp" />
+    <None Include="shaders\cookTorrance.fp" />
+    <None Include="shaders\cookTorrance.vp" />
     <None Include="shaders\cubeMap.fp" />
     <None Include="shaders\cubeMap.vp" />
     <None Include="shaders\depth.fp" />
@@ -168,6 +176,8 @@
     <None Include="shaders\pointSprite.vp" />
     <None Include="shaders\quadPass.fp" />
     <None Include="shaders\quadPass.vp" />
+    <None Include="shaders\shadow.fp" />
+    <None Include="shaders\shadow.vp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
