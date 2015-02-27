@@ -2,8 +2,8 @@
 #include "DeferredShader.h"
 
 bool DeferredShader::CreateGBufferShader(){
-	const int numAttribs = 4;
-	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inUVs", "inPositions" };
+	const int numAttribs = 3;
+	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inPositions" };
 	m_gBufferHandle = CreateShader("gBuffer.vp", "gBuffer.fp", attribs, numAttribs);
 
 	if (!m_gBufferHandle) return false;
@@ -12,7 +12,6 @@ bool DeferredShader::CreateGBufferShader(){
 	m_gBufferUniforms.normalMatrixUniform   = glGetUniformLocation(m_gBufferHandle, "normalMatrix");
 	m_gBufferUniforms.rotationMatrixUniform = glGetUniformLocation(m_gBufferHandle, "rotationMatrix");
 	m_gBufferUniforms.scaleMatrixUniform    = glGetUniformLocation(m_gBufferHandle, "scaleMatrix");
-	m_gBufferUniforms.instancedUniform      = glGetUniformLocation(m_gBufferHandle, "instanced");
 
 	m_gBufferUniforms.materialUniforms.diffuseUniform  = glGetUniformLocation(m_gBufferHandle, "materialDiffuse");
 	m_gBufferUniforms.materialUniforms.ambientUniform  = glGetUniformLocation(m_gBufferHandle, "materialAmbient");
@@ -49,7 +48,7 @@ bool DeferredShader::CreateQuadPassShader(){
 
 	m_quadPassUniforms.ambTextureUniform = glGetUniformLocation(m_quadPassHandle, "ambient");
 	m_quadPassUniforms.screenSizeUniform = glGetUniformLocation(m_quadPassHandle, "screenSize");
-	m_quadPassUniforms.bufferUniform     = glGetUniformLocation(m_quadPassHandle, "buffer");
+	m_quadPassUniforms.bufferUniform     = glGetUniformLocation(m_quadPassHandle, "buff");
 
 	return true;
 }
@@ -67,13 +66,13 @@ bool DeferredShader::CreateNULLShader(){
 
 bool DeferredShader::CreateDeferredShader(){
 
+	if (!CreateQuadPassShader())
+		return false;
+
 	if (!CreateGBufferShader())
 		return false;
 
 	if (!CreateLightPassShader())
-		return false;
-
-	if (!CreateQuadPassShader())
 		return false;
 
 	if (!CreateNULLShader())

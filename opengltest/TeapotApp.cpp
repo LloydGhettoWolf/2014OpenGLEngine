@@ -21,7 +21,7 @@ bool TeapotApp::Init(){
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	if (!m_teapotShader.CreateForwardShader(false)){
+	if (!m_teapotShader.CreateForwardShader()){
 		cout << "failed to load shader!" << endl;
 		return false;
 	}
@@ -61,23 +61,26 @@ bool TeapotApp::Init(){
 	screenQuad[4] = vec3(-1.0f, -1.0f, 0.0f);
 	screenQuad[5] = vec3(1.0f, -1.0f, 0.0f);
 
-	m_lights.color[0] = vec3(0.6f, 0.4f, 1.0f);
-	m_lights.color[1] = vec3(0.0f, 1.0f, 0.0f);
-	m_lights.color[2] = vec3(1.0f, 0.0f, 0.0f);
-	m_lights.color[3] = vec3(0.0f, 1.0f, 1.0f);
-	m_lights.color[4] = vec3(0.1f, 0.0f, 1.0f);
 	
-	lightPos[0] = vec3(20.0f,  40.0f, 12.0f);
-	lightPos[1] = vec3(15.0f, 120.0f, -18.0f);
-	lightPos[2] = vec3(-60.0f, 120.0f, 42.0f);
-	lightPos[3] = vec3(-15.0f, 120.0f, 18.0f);
-	lightPos[4] = vec3(5.0f, 120.0f, -5.0f);
-
-
 	for (int light = 0; light < NUM_POINT_LIGHTS; light++){
 		m_lights.constantAtt[light] = 0.0f;
 		m_lights.linearAtt[light] = 0.0f;
 		m_lights.expAtt[light] = 0.7f;
+
+
+		float randomX = (float)(rand() % 120) - 60.0f;
+		float randomZ = (float)(rand() % 90) - 45.0f;
+		float randomY = (float)(rand() % 5);
+
+		lightPos[light] = vec3(randomX, randomY, randomZ);
+
+		float randomR = (float)(rand() % 100)/100.0;
+		float randomG = (float)(rand() % 100)/100.0;
+		float randomB = (float)(rand() % 100)/100.0;
+
+		m_lights.color[light] = vec3(randomR,randomG,randomB);
+
+		m_radii[light] = (float)(rand() % 20) -10.0;
 	}
 
 
@@ -89,21 +92,21 @@ bool TeapotApp::Init(){
 
 	//cubemap
 	std::vector<string> cubemapFilenames;
-	cubemapFilenames.push_back("posx.jpg");
-	cubemapFilenames.push_back("negx.jpg");
-	cubemapFilenames.push_back("posy.jpg");
-	cubemapFilenames.push_back("negy.jpg");
-	cubemapFilenames.push_back("posz.jpg");
-	cubemapFilenames.push_back("negz.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Park\\posx.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Park\\negx.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Park\\posy.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Park\\negy.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Park\\posz.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Park\\negz.jpg");
 	m_cubeMap = CreateCubeMap(cubemapFilenames);
 
 	m_material.ambient = vec3(0.1f,0.1f,0.1f);
 	m_material.diffuse = vec3(0.5f, 0.4f, 0.5f);
 	m_material.shininess = 64.0f;
 
-	if (!InitGUI()){
-		return false;
-	}
+	//if (!InitGUI()){
+	//	return false;
+	//}
 
 	return true;
 }
@@ -146,7 +149,7 @@ void TeapotApp::Run(){
 	for (int potRow = 0; potRow < 8; potRow++){
 		for (int potCol = 0; potCol < 8; potCol++){
 			int index = potRow * 8 + potCol;
-			movement[index] = vec3(potCol * 2.5f - 10.0f,0.0f,potRow * 5.0f - 20.0f);
+			movement[index] = vec3(potCol * 15.0f - 60.0f,0.0f,potRow * 10.0f - 40.0f);
 		}
 	}
 
@@ -155,14 +158,14 @@ void TeapotApp::Run(){
 
 	m_teapotShader.SetUniforms(m_camera.projectionMatrix,m_lights.color[0]);
 
-	/*
+	
 	glUseProgram(m_deferredShader.GetGBufferHandle());
 		mat4x4 translationMatrix = rotation;
 		GBufferShaderUniforms gBufferUniforms = m_deferredShader.GetGBufferUniforms();
 		glUniformMatrix3fv(gBufferUniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
 		glUniformMatrix4fv(gBufferUniforms.rotationMatrixUniform, 1, GL_FALSE, &translationMatrix[0][0]);
 	glUseProgram(0);
-	*/
+	
 
 	glUseProgram(m_deferredShader.GetLightPassHandle());
 	  vec2 screenSize((float)APP_WIDTH,(float)APP_HEIGHT);
@@ -182,11 +185,14 @@ void TeapotApp::Run(){
 		float cosAmount = cosf(rotationAmount);
 		float sinAmount = sinf(rotationAmount);
 
-		rotationAmount += 0.005f;
+		rotationAmount += 0.05f;
+
 
 		for (int light = 0; light < NUM_POINT_LIGHTS; light++){
-			m_lights.position[light].x = lightPos[light].x * cosAmount;
-			m_lights.position[light].z = lightPos[light].z * sinAmount;
+			m_lights.position[light].x = lightPos[light].x + m_radii[light] * cosAmount;
+			m_lights.position[light].z = lightPos[light].z + m_radii[light] * sinAmount;
+
+			m_lights.position[light].y = lightPos[light].y;
 		}
 
 		
@@ -194,10 +200,11 @@ void TeapotApp::Run(){
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-	    RenderForward(&m_lights.position[0], movement);
+	   // RenderForward(&m_lights.position[0], movement);
+		RenderDeferred(movement);
 		
 		time = to_string(deltaTime * 1000.0f);
-		TwDraw();
+		//TwDraw();
 
 		glfwSwapBuffers();
 
@@ -220,7 +227,7 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 	mat4x4 scaleMatrix, identity, rotation;
 	scaleMatrix = scale(scaleMatrix, vec3(0.04f, 0.04f, 0.04f));
 	rotation    = rotate(identity, 180.0f, vec3(0.0f, 1.0f, 0.0f));
-	mat4x4 worldMatrix = rotation;// *scaleMatrix;
+	mat4x4 worldMatrix = rotation *scaleMatrix;
 	mat3x3 normalMatrix = inverseTranspose(mat3(worldMatrix));
 	mat4x4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
 
@@ -237,11 +244,11 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 
 		RenderInstancedStaticMesh(m_teapotMesh,&teapotPositions[0]);
 		
-		//glUniformMatrix4fv(teapotUniforms.worldMatrixUniform, 1, GL_FALSE, &identity[0][0]);
-		//glUniform1i(teapotUniforms.instancedUniform, 0);
-		//glBindVertexArray(m_groundPlaneBuffer);
-		//m_teapotShader.UpdateUniforms(identity, normalMatrix, m_camera.viewMatrix, m_camera.pos, m_lights.position[0], 1);
-		//glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
+		glUniformMatrix4fv(teapotUniforms.worldMatrixUniform, 1, GL_FALSE, &identity[0][0]);
+		glUniform1i(teapotUniforms.instancedUniform, 0);
+		glBindVertexArray(m_groundPlaneBuffer);
+		m_teapotShader.UpdateUniforms(identity, normalMatrix, m_camera.viewMatrix, m_camera.pos, m_lights.position[0], 1);
+		glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
 	glUseProgram(0);
 
 	glUseProgram(m_cubemapShader.GetHandle());
@@ -260,59 +267,43 @@ void TeapotApp::RenderDeferred(const vec3* teapotPositions){
 	vec3 diff = vec3(0.4f, 0.4f, 0.4f);
 
 	mat4x4 scaleMatrix1,cubemapScaleMatrix,identity;
-	scaleMatrix1 = scale(scaleMatrix1, vec3(0.2f, 0.2f, 0.2f));
-	cubemapScaleMatrix = scale(scaleMatrix1, vec3(200.0f, 200.0f, 00.0f));
+	scaleMatrix1 = scale(scaleMatrix1, vec3(0.5f, 0.5f, 0.5f));
+	cubemapScaleMatrix = scale(scaleMatrix1, vec3(200.0f, 200.0f, 200.0f));
 	//geometry pass
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_gBuffer.fboObject);
 	glDrawBuffer(GL_COLOR_ATTACHMENT4);
-	glClear(GL_COLOR_BUFFER_BIT);
-	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0,
+			GL_COLOR_ATTACHMENT1,
+			GL_COLOR_ATTACHMENT2,
+			GL_COLOR_ATTACHMENT3};
 
-	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0,
-		GL_COLOR_ATTACHMENT1,
-		GL_COLOR_ATTACHMENT2,
-		GL_COLOR_ATTACHMENT3};
+		glDrawBuffers(NUM_MRT, DrawBuffers);
 
-	glDrawBuffers(NUM_MRT, DrawBuffers);
-
-	glDepthMask(GL_TRUE);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	glClearDepth(1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(m_deferredShader.GetGBufferHandle());
-			GBufferShaderUniforms gBufferUniforms = m_deferredShader.GetGBufferUniforms();
-			glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &scaleMatrix1[0][0]);
-			mat4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
-			glUniformMatrix4fv(gBufferUniforms.cameraMatrixUniform, 1, GL_FALSE, &viewProjection[0][0]);
-			glUniform1i(gBufferUniforms.instancedUniform, 1);
-			RenderInstancedStaticMesh(m_teapotMesh, &teapotPositions[0]);
+		glDepthMask(GL_TRUE);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
+		glClearDepth(1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glUseProgram(m_deferredShader.GetGBufferHandle());
+				GBufferShaderUniforms gBufferUniforms = m_deferredShader.GetGBufferUniforms();
+				glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &scaleMatrix1[0][0]);
+				mat4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
+				glUniformMatrix4fv(gBufferUniforms.cameraMatrixUniform, 1, GL_FALSE, &viewProjection[0][0]);
+				RenderInstancedStaticMesh(m_teapotMesh, &teapotPositions[0]);
 			
-			glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &identity[0][0]);
-			glUniform1i(gBufferUniforms.instancedUniform, 0);
-			glUniform3fv(gBufferUniforms.materialUniforms.diffuseUniform, 1, &diff[0]);
-			glBindVertexArray(m_groundPlaneBuffer);
+				glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &identity[0][0]);
+				glUniform3fv(gBufferUniforms.materialUniforms.diffuseUniform, 1, &diff[0]);
+				glBindVertexArray(m_groundPlaneBuffer);
 			
-			glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
-			glDepthMask(GL_FALSE);
-		glUseProgram(0);
+				glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
+				glBindVertexArray(0);
+				glDepthMask(GL_FALSE);
+			glUseProgram(0);
 
-		ForwardShaderUniforms teapotUniforms = m_teapotShader.GetUniforms();
-		glUseProgram(m_cubemapShader.GetHandle());
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeMap);
-			glUniformMatrix4fv(m_cubemapShader.GetWVPMatrix(), 1, GL_FALSE, &(m_camera.projectionMatrix * m_camera.viewMatrix * translate(identity, m_camera.pos))[0][0]);
-			glUniform1i(m_cubemapShader.GetSampler(), 0);
-			glCullFace(GL_FRONT);
-			RenderStaticMesh(m_cubeMesh);
-			glCullFace(GL_BACK);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		glUseProgram(0);
-	
 	mat4 worldMatrix;
 	MaterialUniforms matuni;
-
+	
 	for (int light = 0; light < NUM_POINT_LIGHTS; light++){
 		glDrawBuffer(GL_NONE);
 		glEnable(GL_DEPTH_TEST);
@@ -320,15 +311,19 @@ void TeapotApp::RenderDeferred(const vec3* teapotPositions){
 		glDisable(GL_BLEND);
 		glClear(GL_STENCIL_BUFFER_BIT);
 		glStencilFunc(GL_ALWAYS, 0, 0);
+
 		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
 		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+
 		glUseProgram(m_deferredShader.GetNULLPassHandle());
-		float scale = 85.0f;//CalcSphereDistance(m_lights, light);
-		worldMatrix = viewProjection * translate(identity, m_lights.position[light]) * glm::scale(identity, vec3(scale, scale, scale));
-		glUniformMatrix4fv(m_deferredShader.GetNULLWVPMatrix(),1,false,&worldMatrix[0][0]);
-		RenderStaticMesh(m_sphereMesh);
+
+			float scale = 85.0f;//CalcSphereDistance(m_lights, light);
+			worldMatrix = viewProjection * translate(identity, m_lights.position[light]) * glm::scale(identity, vec3(scale, scale, scale));
+			glUniformMatrix4fv(m_deferredShader.GetNULLWVPMatrix(),1,false,&worldMatrix[0][0]);
+			RenderStaticMesh(m_sphereMesh);
 
 		glUseProgram(0);
+
 		//lighting pass
 		glDisable(GL_DEPTH_TEST);
 		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
@@ -338,17 +333,22 @@ void TeapotApp::RenderDeferred(const vec3* teapotPositions){
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_FRONT);
 		glDrawBuffer(GL_COLOR_ATTACHMENT4);
+
 		glUseProgram(m_deferredShader.GetLightPassHandle());
 		LightPassShaderUniforms lightPassUniforms = m_deferredShader.GetLightPassUniforms();
+
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[0]);
 		glUniform1i(lightPassUniforms.posTextureUniform, 0);
+
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[1]);
 		glUniform1i(lightPassUniforms.normTextureUniform, 1);
+
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[2]);
 		glUniform1i(lightPassUniforms.ambTextureUniform, 2);
+
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[3]);
 		glUniform1i(lightPassUniforms.diffTextureUniform, 3);
@@ -362,34 +362,53 @@ void TeapotApp::RenderDeferred(const vec3* teapotPositions){
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
+
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0);
+
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, 0);
+
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, 0);
+
 		glDisable(GL_BLEND);
 		glCullFace(GL_BACK);
 	}
 	glDisable(GL_STENCIL_TEST);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
 
 	QuadPassShaderUniforms uniforms = m_deferredShader.GetQuadPassUniforms();
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	
 	glUseProgram(m_deferredShader.GetQuadPassHandle());
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_gBuffer.finalTexture);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[2]);
-	glUniform1i(uniforms.bufferUniform,0);
-	glUniform1i(uniforms.ambTextureUniform, 1);
-	vec2 screenSize((float)APP_WIDTH, (float)APP_HEIGHT);
-	glUniform2fv(uniforms.screenSizeUniform, 1,&screenSize[0]);
-	glBindBuffer(GL_ARRAY_BUFFER, m_quadBuffer);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), 0);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glUseProgram(0);
+		glActiveTexture(GL_TEXTURE0);
+		glUniform1i(uniforms.bufferUniform, 0);
+		glBindTexture(GL_TEXTURE_2D, m_gBuffer.finalTexture);
+
+		glActiveTexture(GL_TEXTURE1);
+		glUniform1i(uniforms.ambTextureUniform, 1);
+		glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[2]);
+
 		
+		
+		vec2 screenSize((float)APP_WIDTH, (float)APP_HEIGHT);
+
+		glUniform2fv(uniforms.screenSizeUniform, 1,&screenSize[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, m_quadBuffer);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), 0);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+	glUseProgram(0);
+	
 }
 
 bool TeapotApp::CreateGBuffer(){

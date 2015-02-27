@@ -1,6 +1,5 @@
-#version 330
-uniform sampler2D buffer;
-uniform sampler2D ambient;
+#version 400
+uniform sampler2D buff;
 uniform vec2 screenSize;
 out vec4 color;
 
@@ -8,8 +7,7 @@ vec2 CalcCoord();
 
 void main(){
   vec2 texCoords = CalcCoord();
-  color = texture2D(buffer,texCoords);
-  color += texture2D(ambient,texCoords);
+  color = texture2D(buff,texCoords);
 }
 
 vec2 CalcCoord(){

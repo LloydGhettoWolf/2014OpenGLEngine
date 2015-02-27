@@ -44,7 +44,7 @@ void main(){
 		}
 	}
 
-	shadowFactor /= 36.0;
+	shadowFactor /= 81.0;
 
 	vec3 lighting = (1.0 - shadowFactor)  * (diffContribution + specContribution) + materialAmbient;
 	

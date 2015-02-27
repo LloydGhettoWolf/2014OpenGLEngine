@@ -11,7 +11,7 @@ out vec4 color;
 
 vec2 CalcCoord();
 vec3 CalcPointLight(vec3 worldPos,vec3 normal,vec3 diff);
-vec4 ColorPoint(vec3 lightDir,vec3 worldPos,vec3 normal,vec3 lightCol);
+vec4 ColorPoint(vec3 lightDir,vec3 worldPos,vec3 normal,vec3 lightCol,float Attenuation);
 
 void main(){
         vec2 texCoord = CalcCoord();
@@ -32,16 +32,16 @@ vec3 CalcPointLight(vec3 worldPos,vec3 normal,vec3 diffuse){
         vec3 lightDir   = lightPos-worldPos;
         float dist      = length(lightDir);
         vec3 lightNorm  = normalize(lightDir);
-        float Attenuation = 1.0 +  0.002 *  dist * dist;
-        Attenuation = max(1.0, Attenuation);
-    return ColorPoint(lightNorm,worldPos,normal,diffuse).xzy/ Attenuation;
+        float Attenuation = 1.0 +  0.05 *  dist * dist;
+        Attenuation = 1.0/max(1.0, Attenuation);
+    return ColorPoint(lightNorm,worldPos,normal,diffuse,Attenuation).xzy;
 }
 
-vec4 ColorPoint(vec3 lightDir,vec3 worldPos,vec3 normal,vec3 diffuse){
-        float diffFactor = max(dot(normal,lightDir),0.0);
+vec4 ColorPoint(vec3 lightDir,vec3 worldPos,vec3 normal,vec3 diffuse,float Attenuation){
+        float diffFactor = Attenuation * max(dot(normal,lightDir),0.0);
         vec3 viewDir     = normalize(eyePos -worldPos);
         vec3 halfVec     = normalize((lightDir + viewDir) * 0.5);
-        float spec       = pow(max(dot(normal,halfVec),0.0),64.0f);
+        float spec       = Attenuation * pow(max(dot(normal,halfVec),0.0),64.0f);
         vec3 col = diffuse * lightColor * diffFactor;
         col += spec * vec3(1.0,1.0,1.0);
         col = clamp(col,0.0,1.0);

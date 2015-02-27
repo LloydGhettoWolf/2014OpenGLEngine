@@ -39,7 +39,7 @@ bool ShadowApp::Init(){
 
 
 	m_shadowCamera = CreateCamera(m_lightPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_shadowCamera.projectionMatrix = glm::perspective(30.0f, APP_WIDTH / APP_HEIGHT, 5.0f, 3500.0f);
+	m_shadowCamera.projectionMatrix = glm::perspective(30.0f, APP_WIDTH / APP_HEIGHT, 5.0f, 350.0f);
 
 	glfwSetWindowSizeCallback(MyResize);
 
@@ -154,7 +154,6 @@ void ShadowApp::Run(){
 
 void ShadowApp::RenderShadow(){
 	mat4 identity;
-
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glCullFace(GL_FRONT);
@@ -178,7 +177,6 @@ void ShadowApp::RenderShadow(){
 void ShadowApp::RenderMeshes(){
 
 	mat4 identity;
-
 	glUseProgram(m_shadowShader.GetShadowHandle());
 		
 		ShadowShaderUniforms shadowUniforms = m_shadowShader.GetShadowUniforms();

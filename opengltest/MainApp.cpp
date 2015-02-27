@@ -16,8 +16,10 @@ bool App::StandardInit(){
 	glfwOpenWindowHint(GLFW_VERSION_MAJOR, 4);
 	glfwOpenWindowHint(GLFW_VERSION_MINOR, 4);
 
+	m_windowWidth = APP_WIDTH;
+	m_windowHeight= APP_HEIGHT;
 
-	if (!glfwOpenWindow(APP_WIDTH, APP_HEIGHT, 8, 8, 8, 8, 32, 32, GLFW_WINDOW)){
+	if (!glfwOpenWindow(m_windowWidth, m_windowHeight, 8, 8, 8, 8, 32, 32, GLFW_WINDOW)){
 		std::cout << "cant create window" << std::endl;
 		glfwTerminate();
 		return false;
@@ -130,6 +132,9 @@ void App::Resize(float aspect,int width,int height){
 	m_camera.projectionMatrix = glm::perspective(45.0f,aspect, 3.0f, 500.0f);
 	glfwSetWindowSize(width,height);
 	TwWindowSize(width, height);
+
+	m_windowWidth  = width;
+	m_windowHeight = height;
 }
 
 int  App::lastKeyPress  = 0;

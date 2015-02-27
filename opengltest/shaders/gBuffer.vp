@@ -3,7 +3,6 @@ uniform mat4 vpMatrix;
 uniform mat4 rotationMatrix;
 uniform mat4 scaleMatrix;
 uniform mat3 normalMatrix;
-uniform bool instanced;
 
 in vec3 inCoords;
 in vec3 inNormals;
@@ -15,15 +14,15 @@ out vec3 normals;
 out vec2 UVs;
 
 void main(){
-        vec4 position     =  scaleMatrix *  vec4(inCoords,1.0);
-        if(instanced == true){
-               	mat4 m = mat4(1.0,0.0,0.0,0.0,
-							  0.0,1.0,0.0,0.0,
-							  0.0,0.0,1.0,0.0,
-							  inPositions.x,inPositions.y,inPositions.z,1.0);
+        vec4 position     =  vec4(inCoords,1.0);
 
-                position          = m * rotationMatrix * scaleMatrix * position;
-        }
+        mat4 m = mat4(1.0,0.0,0.0,0.0,
+					  0.0,1.0,0.0,0.0,
+				      0.0,0.0,1.0,0.0,
+					  inPositions.x,inPositions.y,inPositions.z,1.0);
+
+        position  = m * rotationMatrix * scaleMatrix * position;
+        
         UVs = inUVs;
         worldPos = position.xyz;
         normals = normalMatrix * inNormals;

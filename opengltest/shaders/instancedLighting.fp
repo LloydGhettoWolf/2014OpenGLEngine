@@ -1,5 +1,5 @@
 #version 330
-const int    numLights = 1;
+const int    numLights = 5;
 uniform vec3 materialDiffuse;
 uniform vec3 materialSpecular;
 uniform vec3 materialAmbient;

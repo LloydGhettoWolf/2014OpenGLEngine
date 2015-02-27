@@ -36,7 +36,8 @@ private:
 
 	GBufferData		m_gBuffer;
 	PointLightData  m_lights;
-	vec3            lightPos[NUM_POINT_LIGHTS];
+	vec3            lightPos[100];
+	float           m_radii[100];
 
 	Material       m_material;
 

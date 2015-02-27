@@ -46,6 +46,8 @@ protected:
 	float				  m_moveUpAmount	   = 0.0f;
 	float				  m_moveSidewaysAmount = 0.0f;
 
+	float				  m_windowWidth, m_windowHeight;
+
 };
 
 void GLFWCALL KeyCallback(int key, int action);

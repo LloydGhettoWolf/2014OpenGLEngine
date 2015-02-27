@@ -4,8 +4,8 @@
 #include "VertexArray.h"
 
 GLuint CreateGroundPlaneData(){
-	int width = 5;
-	int length = 5;
+	int width = 10;
+	int length = 10;
 	int numVertices = width * length;
 	CustomVertexNormUV* groundPlaneData = new CustomVertexNormUV[numVertices];
 
