@@ -93,15 +93,16 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 				memcpy(&vertices[vertex].vertexPoint, &thisMesh->mVertices[vertex], vecSize);
 				memcpy(&vertices[vertex].normal,      &thisMesh->mNormals[vertex], vecSize);
 				memcpy(&vertices[vertex].biTangent,   &thisMesh->mBitangents[vertex], vecSize);
+				memcpy(&vertices[vertex].tangent,     &thisMesh->mTangents[vertex], vecSize);
 				memcpy(&vertices[vertex].uv,          &thisMesh->mTextureCoords[0][vertex], texVecSize);
 			}
 
 			if (instances > 1){
-				newComp->m_vertexBuffer = CreateInstancedBumpmappedVertexArray(vertices, numVerts,
+				newComp->m_vertexBuffer = CreateInstancedBumpmappedVertexUVArray(vertices, numVerts,
 					indices, numFaces, instances, newComp->m_instancedDataBuffer);
 			}
 			else{
-				newComp->m_vertexBuffer = CreateBumpmappedVertexArray(vertices, numVerts, indices, numFaces);
+				newComp->m_vertexBuffer = CreateBumpmappedVertexUVArray(vertices, numVerts, indices, numFaces);
 			}
 			delete[] vertices;
 
@@ -312,9 +313,9 @@ void RenderInstancedStaticMesh(const StaticMesh& mesh,const vec3* positions){
 	
 	for (unsigned int meshNum = 0; meshNum < mesh.m_numMeshes; meshNum++){
 
-		if (mesh.m_meshData[meshNum]->m_hasTexture){
-			glBindTexture(GL_TEXTURE_2D, mesh.m_meshData[meshNum]->m_texture);
-		}
+		//if (mesh.m_meshData[meshNum]->m_hasTexture){
+			//glBindTexture(GL_TEXTURE_2D, mesh.m_meshData[meshNum]->m_texture);
+		//}
 
 		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_meshData[meshNum]->m_instancedDataBuffer);
@@ -330,9 +331,9 @@ void RenderInstancedStaticMesh(const StaticMesh& mesh,const vec3* positions){
 void  DestroyMesh(StaticMesh& mesh){
 	for (unsigned int meshNum = 0; meshNum < mesh.m_numMeshes; meshNum++){
 
-		if (mesh.m_meshData[meshNum]->m_hasTexture){
-			glDeleteTextures(1, &mesh.m_meshData[meshNum]->m_texture);
-		}
+		//if (mesh.m_meshData[meshNum]->m_hasTexture){
+		//	glDeleteTextures(1, &mesh.m_meshData[meshNum]->m_texture);
+		//}
 
 		glDeleteVertexArrays(1, &mesh.m_meshData[meshNum]->m_vertexBuffer);
 	}

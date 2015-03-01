@@ -6,11 +6,15 @@ uniform mat3 normalMatrix;
 
 in vec3 inCoords;
 in vec3 inNormals;
+in vec3 inTangents;
+in vec3 inBitangents;
 in vec2 inUVs;
 in vec3 inPositions;
 
 out vec3 worldPos;
 out vec3 normals;
+out vec3 tangents;
+out vec3 biTangents;
 out vec2 UVs;
 
 void main(){
@@ -24,8 +28,11 @@ void main(){
         position  = m * rotationMatrix * scaleMatrix * position;
         
         UVs = inUVs;
-        worldPos = position.xyz;
-        normals = normalMatrix * inNormals;
+        worldPos   = position.xyz;
+
+        normals    = normalMatrix * inNormals;
+		tangents   = normalMatrix * inTangents;
+		biTangents = normalMatrix * inBitangents;
 
 	gl_Position       = vpMatrix * position;
 }

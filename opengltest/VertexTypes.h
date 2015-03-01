@@ -28,6 +28,7 @@ struct CustomVertexNorm{
 struct CustomVertexNormBiTangentUV{
 	glm::vec3 vertexPoint;
 	glm::vec3 normal;
+	glm::vec3 tangent;
 	glm::vec3 biTangent;
 	glm::vec2 uv;
 };

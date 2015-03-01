@@ -7,7 +7,7 @@ GLuint CreateGroundPlaneData(){
 	int width = 10;
 	int length = 10;
 	int numVertices = width * length;
-	CustomVertexNormUV* groundPlaneData = new CustomVertexNormUV[numVertices];
+	CustomVertexNormBiTangentUV* groundPlaneData = new CustomVertexNormBiTangentUV[numVertices];
 
 	int halfWidth = width / 2;
 	int halfHeight = length / 2;
@@ -20,9 +20,11 @@ GLuint CreateGroundPlaneData(){
 			groundPlaneData[index].vertexPoint.x = (x - halfWidth) * 25.0f;
 			groundPlaneData[index].vertexPoint.y = -5.0f;
 			groundPlaneData[index].vertexPoint.z = (z - halfHeight) * 25.0f;
-			groundPlaneData[index].normal = vec3(0.0f, 1.0f, 0.0f);
-			groundPlaneData[index].uv.x = x * 0.025f;
-			groundPlaneData[index].uv.y = z * 0.025f;
+			groundPlaneData[index].normal	 = vec3(0.0f, 1.0f, 0.0f);
+			groundPlaneData[index].biTangent = vec3(1.0f, 0.0f, 0.0f);
+			groundPlaneData[index].tangent   = vec3(0.0f, 0.0f, -1.0f);
+			groundPlaneData[index].uv.x = x * 0.25f;
+			groundPlaneData[index].uv.y = z * 0.25f;
 		}
 	}
 
@@ -43,7 +45,7 @@ GLuint CreateGroundPlaneData(){
 		}
 	}
 
-	GLuint data = CreateVertexNormUVArray(groundPlaneData, numVertices, indices, numIndices / 3);
+	GLuint data = CreateBumpmappedVertexUVArray(groundPlaneData, numVertices, indices, numIndices / 3);
 	delete[] indices;
 	delete[] groundPlaneData;
 	return data;

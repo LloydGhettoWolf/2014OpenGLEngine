@@ -15,6 +15,7 @@
 StaticMesh teapotMesh;
 GLuint groundPlaneBuffer;
 vec3   positions[NUM_MESHES];
+GLuint			m_teaTexture,m_normalTexture;
 
 bool DeferredApp::Init(){
 
@@ -34,16 +35,16 @@ bool DeferredApp::Init(){
 		return false;
 	}
 
-	if (!InitStaticMesh(teapotMesh, "simpleTeapot.obj", "teapot\\", 64)){
+	if (!InitStaticMesh(teapotMesh, "teapot.obj", "teapot\\", 64, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace)){
 		cout << "couldn't load teapot mesh!" << endl;
 		return false;
 	}
 
 
-	if (!InitStaticMesh(m_cubeMesh, "cube.obj", "meshes\\", 1)){
-		cout << "couldn't load teapot mesh!" << endl;
-		return false;
-	}
+	//if (!InitStaticMesh(m_cubeMesh, "cube.obj", "meshes\\", 1)){
+		//cout << "couldn't load teapot mesh!" << endl;
+		//return false;
+	//}
 
 	m_camera = CreateCamera(vec3(0.0f, 0.0f, -40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(45.0f, APP_WIDTH / APP_HEIGHT, 3.0f, 500.0f);
@@ -95,6 +96,10 @@ bool DeferredApp::Init(){
 	m_material.diffuse = vec3(0.5f, 0.4f, 0.5f);
 	m_material.shininess = 64.0f;
 
+
+	m_teaTexture    = CreateTexture("Textures\\160.jpg", GL_LINEAR, GL_NEAREST);
+	m_normalTexture = CreateTexture("Textures\\160_norm.jpg", GL_LINEAR, GL_NEAREST);
+
 	//if (!InitGUI()){
 	//	return false;
 	//}
@@ -132,15 +137,10 @@ void DeferredApp::Run(){
 	string time = to_string(deltaTime);
 
 
-	
 	mat4x4 translationMatrix = rotation;
-
-
 	vec2 screenSize((float)APP_WIDTH, (float)APP_HEIGHT);
 	
-
 	m_deferredRenderer.SetUniformsFirstTime(screenSize, normalMatrix, translationMatrix);
-
 
 	lastFrame = currentFrame = glfwGetTime();
 
@@ -198,27 +198,39 @@ void DeferredApp::RenderDeferred(const vec3* teapotPositions,int numLights){
 void DeferredApp::ShutDown(){
 
 	DestroyMesh(teapotMesh);
-	DestroyMesh(m_cubeMesh);
+	//DestroyMesh(m_cubeMesh);
 	glDeleteVertexArrays(1, &groundPlaneBuffer);
 
 	glDeleteShader(m_cubemapShader.GetHandle());
 	glDeleteTextures(1, &m_cubeMap);
+
+	glDeleteTextures(1, &m_teaTexture);
 };
 
 void DeferredApp::RenderGeometry(GLint shaderHandle,mat4& viewProjection){
 	vec3 diff = vec3(0.4f, 0.4f, 0.4f);
 
 	mat4x4 scaleMatrix1, cubemapScaleMatrix, identity;
-	cubemapScaleMatrix = scale(scaleMatrix1, vec3(200.0f, 200.0f, 200.0f));
+	scaleMatrix1 = scale(scaleMatrix1, vec3(0.05f, 0.05f, 0.05f));
 	glUseProgram(shaderHandle);
 
-	GLint cameraUniform = glGetUniformLocation(shaderHandle,"vpMatrix");
+	GLint cameraUniform = glGetUniformLocation(shaderHandle, "vpMatrix");
 	GLint scaleUniform  = glGetUniformLocation(shaderHandle, "scaleMatrix");
 	GLint diffUniform   = glGetUniformLocation(shaderHandle, "materialDiffuse");
+	GLint texUniform	= glGetUniformLocation(shaderHandle, "myTexture");
+	GLint normalUniform = glGetUniformLocation(shaderHandle, "normalMap");
 
-	glUniformMatrix4fv(scaleUniform, 1, GL_FALSE, &identity[0][0]);
+	glUniformMatrix4fv(scaleUniform, 1, GL_FALSE, &scaleMatrix1[0][0]);
 	glUniformMatrix4fv(cameraUniform, 1, GL_FALSE, &viewProjection[0][0]);
 	glUniform3fv(diffUniform, 1, &diff[0]);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_teaTexture);
+	glUniform1i(texUniform,0);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_normalTexture);
+	glUniform1i(normalUniform, 1);
 
 	RenderInstancedStaticMesh(teapotMesh, &positions[0]);
 

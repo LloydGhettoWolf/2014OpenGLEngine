@@ -9,6 +9,8 @@ struct GBufferShaderUniforms{
 	GLint  scaleMatrixUniform;
 	GLint  normalMatrixUniform;
 	GLint  cameraMatrixUniform;
+	GLint  textureUniform;
+	GLint  normalMapUniform;
 	MaterialUniforms materialUniforms;
 };
 

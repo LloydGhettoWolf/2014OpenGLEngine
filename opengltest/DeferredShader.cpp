@@ -2,8 +2,8 @@
 #include "DeferredShader.h"
 
 bool DeferredShader::CreateGBufferShader(){
-	const int numAttribs = 3;
-	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inPositions" };
+	const int numAttribs = 6;
+	const char* attribs[numAttribs] = { "inCoords", "inNormals","inTangents","inBitangents","inUVs","inPositions" };
 	m_gBufferHandle = CreateShader("gBuffer.vp", "gBuffer.fp", attribs, numAttribs);
 
 	if (!m_gBufferHandle) return false;
@@ -12,6 +12,8 @@ bool DeferredShader::CreateGBufferShader(){
 	m_gBufferUniforms.normalMatrixUniform   = glGetUniformLocation(m_gBufferHandle, "normalMatrix");
 	m_gBufferUniforms.rotationMatrixUniform = glGetUniformLocation(m_gBufferHandle, "rotationMatrix");
 	m_gBufferUniforms.scaleMatrixUniform    = glGetUniformLocation(m_gBufferHandle, "scaleMatrix");
+
+	m_gBufferUniforms.textureUniform		= glGetUniformLocation(m_gBufferHandle, "myTexture");
 
 
 	return true;
