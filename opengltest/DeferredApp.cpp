@@ -12,6 +12,10 @@
 #include "GroundPlane.h"
 #include "CubeMap.h"
 
+StaticMesh teapotMesh;
+GLuint groundPlaneBuffer;
+vec3   positions[NUM_MESHES];
+
 bool DeferredApp::Init(){
 
 	StandardInit();
@@ -29,7 +33,7 @@ bool DeferredApp::Init(){
 		return false;
 	}
 
-	if (!InitStaticMesh(m_teapotMesh, "simpleTeapot.obj", "teapot\\", 64)){
+	if (!InitStaticMesh(teapotMesh, "simpleTeapot.obj", "teapot\\", 64)){
 		cout << "couldn't load teapot mesh!" << endl;
 		return false;
 	}
@@ -49,7 +53,7 @@ bool DeferredApp::Init(){
 
 	glfwSetWindowSizeCallback(MyResize);
 
-	m_groundPlaneBuffer = CreateGroundPlaneData();
+	groundPlaneBuffer = CreateGroundPlaneData();
 
 	if (!CreateGBuffer()){
 		return false;
@@ -136,7 +140,7 @@ void DeferredApp::Run(){
 	for (int potRow = 0; potRow < 8; potRow++){
 		for (int potCol = 0; potCol < 8; potCol++){
 			int index = potRow * 8 + potCol;
-			m_positions[index] = vec3(potCol * 15.0f - 60.0f, 0.0f, potRow * 10.0f - 40.0f);
+			positions[index] = vec3(potCol * 15.0f - 60.0f, 0.0f, potRow * 10.0f - 40.0f);
 		}
 	}
 
@@ -210,7 +214,7 @@ void DeferredApp::RenderDeferred(const vec3* teapotPositions){
 	
 	//geometry pass
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_gBuffer.fboObject);
-	RenderGBuffer();
+	RenderGBuffer(RenderGeometry);
 	RenderLights();
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
@@ -265,7 +269,7 @@ void DeferredApp::RenderLights(){
 
 		glUseProgram(m_deferredShader.GetNULLPassHandle());
 
-		float scale = 85.0f;//CalcSphereDistance(m_lights, light);
+		float scale = 85.0f;
 		worldMatrix = viewProjection * translate(identity, m_lights.position[light]) * glm::scale(identity, vec3(scale, scale, scale));
 		glUniformMatrix4fv(m_deferredShader.GetNULLWVPMatrix(), 1, false, &worldMatrix[0][0]);
 		RenderStaticMesh(m_sphereMesh);
@@ -326,11 +330,7 @@ void DeferredApp::RenderLights(){
 	glDisable(GL_STENCIL_TEST);
 }
 
-void DeferredApp::RenderGBuffer(){
-	vec3 diff = vec3(0.4f, 0.4f, 0.4f);
-
-	mat4x4 scaleMatrix1, cubemapScaleMatrix, identity;
-	cubemapScaleMatrix = scale(scaleMatrix1, vec3(200.0f, 200.0f, 200.0f));
+void DeferredApp::RenderGBuffer(void(*RenderFunc)(GLint,mat4&)){
 	
 	glDrawBuffer(GL_COLOR_ATTACHMENT4);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -346,22 +346,13 @@ void DeferredApp::RenderGBuffer(){
 	glDepthFunc(GL_LEQUAL);
 	glClearDepth(1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glUseProgram(m_deferredShader.GetGBufferHandle());
-	GBufferShaderUniforms gBufferUniforms = m_deferredShader.GetGBufferUniforms();
-	glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &identity[0][0]);
-	mat4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
-	glUniformMatrix4fv(gBufferUniforms.cameraMatrixUniform, 1, GL_FALSE, &viewProjection[0][0]);
-	RenderInstancedStaticMesh(m_teapotMesh, &m_positions[0]);
 
-	glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &identity[0][0]);
-	glUniform3fv(gBufferUniforms.materialUniforms.diffuseUniform, 1, &diff[0]);
-	glBindVertexArray(m_groundPlaneBuffer);
+	RenderGeometry(m_deferredShader.GetGBufferHandle(),m_camera.projectionMatrix * m_camera.viewMatrix);
 
-	glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
 	glDepthMask(GL_FALSE);
 	glUseProgram(0);
 }
+
 
 bool DeferredApp::CreateGBuffer(){
 	return CreateGBufferData(m_gBuffer);
@@ -378,10 +369,10 @@ float DeferredApp::CalcSphereDistance(const PointLightData& pLight, int index){
 
 void DeferredApp::ShutDown(){
 
-	DestroyMesh(m_teapotMesh);
+	DestroyMesh(teapotMesh);
 	DestroyMesh(m_sphereMesh);
 	DestroyMesh(m_cubeMesh);
-	glDeleteVertexArrays(1, &m_groundPlaneBuffer);
+	glDeleteVertexArrays(1, &groundPlaneBuffer);
 	
 	glDeleteShader(m_deferredShader.GetGBufferHandle());
 	glDeleteShader(m_deferredShader.GetQuadPassHandle());
@@ -391,3 +382,28 @@ void DeferredApp::ShutDown(){
 	glDeleteFramebuffers(1, &m_gBuffer.fboObject);
 	glDeleteTextures(1, &m_cubeMap);
 };
+
+void RenderGeometry(GLint shaderHandle,mat4& viewProjection){
+	vec3 diff = vec3(0.4f, 0.4f, 0.4f);
+
+	mat4x4 scaleMatrix1, cubemapScaleMatrix, identity;
+	cubemapScaleMatrix = scale(scaleMatrix1, vec3(200.0f, 200.0f, 200.0f));
+	glUseProgram(shaderHandle);
+
+	GLint cameraUniform = glGetUniformLocation(shaderHandle,"vpMatrix");
+	GLint scaleUniform  = glGetUniformLocation(shaderHandle, "scaleMatrix");
+	GLint diffUniform   = glGetUniformLocation(shaderHandle, "materialDiffuse");
+
+	glUniformMatrix4fv(scaleUniform, 1, GL_FALSE, &identity[0][0]);
+	glUniformMatrix4fv(cameraUniform, 1, GL_FALSE, &viewProjection[0][0]);
+	glUniform3fv(diffUniform, 1, &diff[0]);
+
+	RenderInstancedStaticMesh(teapotMesh, &positions[0]);
+
+	glUniformMatrix4fv(scaleUniform,1, GL_FALSE, &identity[0][0]);
+	//glUniform3fv(gBufferUniforms.materialUniforms.diffuseUniform, 1, &diff[0]);
+	glBindVertexArray(groundPlaneBuffer);
+
+	glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}

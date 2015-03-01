@@ -13,9 +13,6 @@ bool DeferredShader::CreateGBufferShader(){
 	m_gBufferUniforms.rotationMatrixUniform = glGetUniformLocation(m_gBufferHandle, "rotationMatrix");
 	m_gBufferUniforms.scaleMatrixUniform    = glGetUniformLocation(m_gBufferHandle, "scaleMatrix");
 
-	m_gBufferUniforms.materialUniforms.diffuseUniform  = glGetUniformLocation(m_gBufferHandle, "materialDiffuse");
-	m_gBufferUniforms.materialUniforms.ambientUniform  = glGetUniformLocation(m_gBufferHandle, "materialAmbient");
-	//m_gBufferUniforms.materialUniforms.specularUniform = glGetUniformLocation(m_gBufferHandle, "materialSpecular");
 
 	return true;
 }

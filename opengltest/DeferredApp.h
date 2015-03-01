@@ -15,6 +15,8 @@ struct PointLightData{
 	float expAtt[NUM_POINT_LIGHTS];
 };
 
+
+
 class DeferredApp : public App{
 public:
 
@@ -31,7 +33,7 @@ private:
 	bool CreateGBuffer();
 
 	void RenderDeferred(const vec3* teapotPositions);
-	void RenderGBuffer();
+	void RenderGBuffer(void (*RenderFunc)(GLint,mat4&));
 	void RenderLights();
 
 	float CalcSphereDistance(const PointLightData& pLight, int index);
@@ -39,14 +41,13 @@ private:
 	DeferredShader		  m_deferredShader;
 	CubemapShader		  m_cubemapShader;
 
-	StaticMesh            m_teapotMesh,m_sphereMesh, m_cubeMesh;
+	StaticMesh            m_sphereMesh, m_cubeMesh;
 
-	GLuint				  m_groundPlaneBuffer,m_cubeMap;
+	GLuint				  m_cubeMap;
 
 	GBufferData		m_gBuffer;
 	PointLightData  m_lights;
 	vec3            lightPos[NUM_POINT_LIGHTS];
-	vec3            m_positions[NUM_MESHES];
 	float           m_radii[NUM_POINT_LIGHTS];
 
 	Material       m_material;
@@ -55,3 +56,4 @@ private:
 	GLuint m_quadBuffer;
 };
 
+void RenderGeometry(GLint shaderHandle, mat4& viewProjection);
