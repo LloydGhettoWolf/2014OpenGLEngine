@@ -3,19 +3,10 @@
 #include "GBufferData.h"
 #include "DeferredShader.h"
 #include "CubemapShader.h"
+#include "DeferredRenderer.h"
 
 const int NUM_POINT_LIGHTS = 100;
 const int NUM_MESHES = 64;
-
-struct PointLightData{
-	vec3  position[NUM_POINT_LIGHTS];
-	vec3  color[NUM_POINT_LIGHTS];
-	float constantAtt[NUM_POINT_LIGHTS];
-	float linearAtt[NUM_POINT_LIGHTS];
-	float expAtt[NUM_POINT_LIGHTS];
-};
-
-
 
 class DeferredApp : public App{
 public:
@@ -30,20 +21,15 @@ public:
 private:
 	bool InitGUI();
 
-	bool CreateGBuffer();
+	void RenderDeferred(const vec3* teapotPositions,int numLights);
+	static void RenderGeometry(GLint shaderHandle, mat4& viewProjection);
+	
+	DeferredRenderer      m_deferredRenderer;
 
-	void RenderDeferred(const vec3* teapotPositions);
-	void RenderGBuffer(void (*RenderFunc)(GLint,mat4&));
-	void RenderLights();
-
-	float CalcSphereDistance(const PointLightData& pLight, int index);
-
-	DeferredShader		  m_deferredShader;
 	CubemapShader		  m_cubemapShader;
-
-	StaticMesh            m_sphereMesh, m_cubeMesh;
-
+	StaticMesh            m_cubeMesh;
 	GLuint				  m_cubeMap;
+
 
 	GBufferData		m_gBuffer;
 	PointLightData  m_lights;
@@ -56,4 +42,4 @@ private:
 	GLuint m_quadBuffer;
 };
 
-void RenderGeometry(GLint shaderHandle, mat4& viewProjection);
+

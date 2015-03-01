@@ -7,14 +7,6 @@
 
 const int NUM_POINT_LIGHTS = 100;
 
-struct PointLightData{
-	vec3  position[NUM_POINT_LIGHTS];
-	vec3  color[NUM_POINT_LIGHTS];
-	float constantAtt[NUM_POINT_LIGHTS];
-	float linearAtt[NUM_POINT_LIGHTS];
-	float expAtt[NUM_POINT_LIGHTS];
-};
-
 
 class TeapotApp : public App{
 public:

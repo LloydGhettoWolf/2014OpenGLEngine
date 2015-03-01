@@ -30,3 +30,20 @@ struct MaterialUniforms{
 	GLuint specularUniform;
 	GLuint shininessUniform;
 };
+
+struct PointLightData{
+	vec3  *position;
+	vec3  *color;
+	float *constantAtt;
+	float *linearAtt;
+	float *expAtt;
+
+	~PointLightData(){
+		delete [] position;
+		delete [] color;
+		delete [] constantAtt;
+		delete [] linearAtt;
+		delete [] expAtt;
+	}
+};
+

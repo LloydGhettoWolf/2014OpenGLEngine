@@ -1,18 +1,9 @@
 //DeferredRenderer.h
+#pragma once
 #include "GBufferData.h"
 #include "DeferredShader.h"
 #include "StaticMesh.h"
-
-const int NUM_POINT_LIGHTS = 100;
-
-struct PointLightData{
-	vec3  position[NUM_POINT_LIGHTS];
-	vec3  color[NUM_POINT_LIGHTS];
-	float constantAtt[NUM_POINT_LIGHTS];
-	float linearAtt[NUM_POINT_LIGHTS];
-	float expAtt[NUM_POINT_LIGHTS];
-};
-
+#include "LightsAndMaterials.h"
 
 class DeferredRenderer{
 
@@ -21,14 +12,18 @@ public:
 	DeferredRenderer(){};
 	~DeferredRenderer(){};
 
-	void RenderDeferred(const vec3* teapotPositions, void(*RenderFunc)(GLint, mat4&),GLint shaderHandle,mat4& viewProjection,
-							 vec3* lightPositions, vec3* lightColors, vec3* camPos);
+	bool Init();
+
+	void SetUniformsFirstTime(vec2& screenSize,mat3& normalMatrix,mat4& rotation);
+
+	void RenderDeferred(const vec3* teapotPositions, void(*RenderFunc)(GLint, mat4&),mat4& viewProjection,
+							 vec3* lightPositions, vec3* lightColors, vec3& camPos,int numLights);
 private:
 
 	bool CreateGBuffer();
 
-	void RenderGBuffer(void(*RenderFunc)(GLint, mat4&),GLint shaderHandle,mat4& viewProjection);
-	void RenderLights(mat4& viewProjection, vec3* lightPositions, vec3* lightColors, vec3* camPos);
+	void RenderGBuffer(void(*RenderFunc)(GLint, mat4&),mat4& viewProjection);
+	void RenderLights(mat4& viewProjection, vec3* lightPositions, vec3* lightColors, vec3& camPos,int numLights);
 
 	float CalcSphereDistance(const PointLightData& pLight, int index);
 
