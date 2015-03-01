@@ -91,6 +91,7 @@
     <ClCompile Include="CookTorrance.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="CubemapShader.cpp" />
+    <ClCompile Include="DeferredApp.cpp" />
     <ClCompile Include="DeferredShader.cpp" />
     <ClCompile Include="DepthBuffer.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -122,6 +123,7 @@
     <ClInclude Include="CookTorrance.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="CubemapShader.h" />
+    <ClInclude Include="DeferredApp.h" />
     <ClInclude Include="DeferredShader.h" />
     <ClInclude Include="Defines.h" />
     <ClInclude Include="DepthBuffer.h" />

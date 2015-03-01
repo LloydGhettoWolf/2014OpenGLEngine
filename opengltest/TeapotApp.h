@@ -1,15 +1,27 @@
 //TeapotApp.h
 #pragma once
 #include "MainApp.h"
-#include "GBufferData.h"
 #include "ForwardShader.h"
-#include "DeferredShader.h"
 #include "CubemapShader.h"
 #include "PointSprite.h"
-#include "ParticleSystem.h"
+
+const int NUM_POINT_LIGHTS = 100;
+
+struct PointLightData{
+	vec3  position[NUM_POINT_LIGHTS];
+	vec3  color[NUM_POINT_LIGHTS];
+	float constantAtt[NUM_POINT_LIGHTS];
+	float linearAtt[NUM_POINT_LIGHTS];
+	float expAtt[NUM_POINT_LIGHTS];
+};
+
 
 class TeapotApp : public App{
 public:
+
+	TeapotApp(){};
+	~TeapotApp(){ ShutDown(); }
+
 	bool Init();
 	void Run();
 	void ShutDown();
@@ -17,32 +29,22 @@ public:
 private:
 	bool InitGUI();
 
-	bool CreateGBuffer();
 
 	void RenderForward(const vec3* lightPositions, const vec3* teapotPositions);
-	void RenderDeferred(const vec3* teapotPositions);
 
-	float CalcSphereDistance(const PointLightData& pLight, int index);
 
 	ForwardShader		  m_teapotShader;
-	DeferredShader		  m_deferredShader;
 	CubemapShader		  m_cubemapShader;
 
-	StaticMesh            m_teapotMesh;
-	StaticMesh			  m_sphereMesh,m_cubeMesh;
+	StaticMesh            m_teapotMesh,m_cubeMesh;
 
-	GLuint				  m_groundPlaneBuffer;
-	GLuint				  m_cubeMap;
+	GLuint				  m_groundPlaneBuffer,m_cubeMap;
 
-	GBufferData		m_gBuffer;
 	PointLightData  m_lights;
 	vec3            lightPos[100];
 	float           m_radii[100];
 
 	Material       m_material;
-
-	//full screen quad
-	GLuint m_quadBuffer;
 
 	TwBar* myBar;
 };

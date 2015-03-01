@@ -126,6 +126,9 @@
     <ClCompile Include="ShadowApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DeferredApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainApp.h">
@@ -220,6 +223,9 @@
     </ClInclude>
     <ClInclude Include="ShadowShader.h">
       <Filter>Shaders\ShaderClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="DeferredApp.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

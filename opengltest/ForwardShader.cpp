@@ -36,21 +36,20 @@ bool ForwardShader::CreateForwardShader(bool withUVs){
 	return true;
 }
 
-void ForwardShader::SetUniforms(const mat4& projMatrix,const vec3& lightColors){
+void ForwardShader::SetUniforms(const mat4& projMatrix,const vec3& lightColors,int numLights){
 	glUseProgram(m_handle);
 		glUniformMatrix4fv(m_uniforms.perspectiveMatrixUniform, 1, GL_FALSE, &projMatrix[0][0]);
-		glUniform3fv(m_uniforms.lightColUniform, NUM_POINT_LIGHTS, &lightColors[0]);
+		glUniform3fv(m_uniforms.lightColUniform, numLights, &lightColors[0]);
 	glUseProgram(0);
 }
 
 void ForwardShader::UpdateUniforms(const mat4& worldMatrix,const mat3& normalMatrix,const mat4& viewMatrix,
-								   const vec3& pos,const vec3& lightPos,int instanced){
+									const vec3& pos, const vec3& lightPos, int numLights){
 	glUniformMatrix4fv(m_uniforms.worldMatrixUniform,  1, GL_FALSE, &worldMatrix[0][0]);
 	glUniformMatrix3fv(m_uniforms.normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
 	glUniformMatrix4fv(m_uniforms.cameraMatrixUniform, 1, GL_FALSE, &viewMatrix[0][0]);
 	glUniform3fv(m_uniforms.eyePosUniform, 1, &pos[0]);
-	glUniform3fv(m_uniforms.lightVecUniform, NUM_POINT_LIGHTS, &lightPos[0]);
-	glUniform1i(m_uniforms.instancedUniform, instanced);
+	glUniform3fv(m_uniforms.lightVecUniform, numLights, &lightPos[0]);
 }
 
 GLuint ForwardShader::m_handle = 0;
