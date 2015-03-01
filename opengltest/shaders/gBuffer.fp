@@ -12,7 +12,7 @@ layout(location = 3) out vec3 diffuseOut;
 
 void main(){
   worldPosOut  = worldPos;
-  normalsOut   = normals;
+  normalsOut   = normalize(normals);
   ambientOut   = materialAmbient;
   diffuseOut   = materialDiffuse;
 }

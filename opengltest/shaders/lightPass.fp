@@ -32,7 +32,7 @@ vec3 CalcPointLight(vec3 worldPos,vec3 normal,vec3 diffuse){
         vec3 lightDir   = lightPos-worldPos;
         float dist      = length(lightDir);
         vec3 lightNorm  = normalize(lightDir);
-        float Attenuation = 1.0 +  0.05 *  dist * dist;
+        float Attenuation = 1.0 +  0.2 + 0.02 *  dist * dist;
         Attenuation = 1.0/max(1.0, Attenuation);
     return ColorPoint(lightNorm,worldPos,normal,diffuse,Attenuation).xzy;
 }
@@ -41,9 +41,9 @@ vec4 ColorPoint(vec3 lightDir,vec3 worldPos,vec3 normal,vec3 diffuse,float Atten
         float diffFactor = Attenuation * max(dot(normal,lightDir),0.0);
         vec3 viewDir     = normalize(eyePos -worldPos);
         vec3 halfVec     = normalize((lightDir + viewDir) * 0.5);
-        float spec       = Attenuation * pow(max(dot(normal,halfVec),0.0),64.0f);
+        float spec       = Attenuation * pow(max(dot(normal,halfVec),0.0),256.0f);
         vec3 col = diffuse * lightColor * diffFactor;
-        col += spec * vec3(1.0,1.0,1.0);
+        col += spec * lightColor;
         col = clamp(col,0.0,1.0);
         return vec4(col,1.0);
 }

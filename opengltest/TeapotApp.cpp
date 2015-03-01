@@ -37,7 +37,7 @@ bool TeapotApp::Init(){
 	}
 	
 	
-	InitStaticMesh(m_teapotMesh, "buddha.obj",   "meshes\\",64);
+	InitStaticMesh(m_teapotMesh, "simpleTeapot.obj",   "teapot\\",64);
 	InitStaticMesh(m_sphereMesh, "sphere.obj",   "meshes\\", 1);
 	InitStaticMesh(m_cubeMesh,   "cube.obj",     "meshes\\", 1);
 
@@ -267,7 +267,6 @@ void TeapotApp::RenderDeferred(const vec3* teapotPositions){
 	vec3 diff = vec3(0.4f, 0.4f, 0.4f);
 
 	mat4x4 scaleMatrix1,cubemapScaleMatrix,identity;
-	scaleMatrix1 = scale(scaleMatrix1, vec3(0.5f, 0.5f, 0.5f));
 	cubemapScaleMatrix = scale(scaleMatrix1, vec3(200.0f, 200.0f, 200.0f));
 	//geometry pass
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_gBuffer.fboObject);
@@ -287,7 +286,7 @@ void TeapotApp::RenderDeferred(const vec3* teapotPositions){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glUseProgram(m_deferredShader.GetGBufferHandle());
 				GBufferShaderUniforms gBufferUniforms = m_deferredShader.GetGBufferUniforms();
-				glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &scaleMatrix1[0][0]);
+				glUniformMatrix4fv(gBufferUniforms.scaleMatrixUniform, 1, GL_FALSE, &identity[0][0]);
 				mat4 viewProjection = m_camera.projectionMatrix * m_camera.viewMatrix;
 				glUniformMatrix4fv(gBufferUniforms.cameraMatrixUniform, 1, GL_FALSE, &viewProjection[0][0]);
 				RenderInstancedStaticMesh(m_teapotMesh, &teapotPositions[0]);
