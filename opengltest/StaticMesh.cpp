@@ -86,7 +86,6 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 			CustomVertexNormBiTangentUV *vertices = new CustomVertexNormBiTangentUV[numVerts];
 
 			int vecSize = sizeof(float) * 3;
-			int texVecSize = sizeof(float) * 2;
 			for (unsigned int vertex = 0; vertex < numVerts; vertex++){
 				thisMesh->mTextureCoords[0][vertex].x = thisMesh->mTextureCoords[0][vertex].x;
 				thisMesh->mTextureCoords[0][vertex].y = thisMesh->mTextureCoords[0][vertex].y;
@@ -94,15 +93,15 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 				memcpy(&vertices[vertex].normal,      &thisMesh->mNormals[vertex], vecSize);
 				memcpy(&vertices[vertex].biTangent,   &thisMesh->mBitangents[vertex], vecSize);
 				memcpy(&vertices[vertex].tangent,     &thisMesh->mTangents[vertex], vecSize);
-				memcpy(&vertices[vertex].uv,          &thisMesh->mTextureCoords[0][vertex], texVecSize);
+				memcpy(&vertices[vertex].uv, &thisMesh->mTextureCoords[0][vertex], vecSize);
 			}
 
 			if (instances > 1){
-				newComp->m_vertexBuffer = CreateInstancedBumpmappedVertexUVArray(vertices, numVerts,
-					indices, numFaces, instances, newComp->m_instancedDataBuffer);
+				newComp->m_vertexBuffer = CreateVertexArray(vertices, numVerts, sizeof(CustomVertexNormBiTangentUV), 5, indices, numFaces);
+				CreateInstancedAttrib(5, newComp->m_vertexBuffer, newComp->m_instancedDataBuffer, instances);
 			}
 			else{
-				newComp->m_vertexBuffer = CreateBumpmappedVertexUVArray(vertices, numVerts, indices, numFaces);
+				newComp->m_vertexBuffer = CreateVertexArray(vertices, numVerts, sizeof(CustomVertexNormBiTangentUV), 5, indices, numFaces);
 			}
 			delete[] vertices;
 
@@ -112,20 +111,19 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 			CustomVertexNormUV *vertices = new CustomVertexNormUV[numVerts];
 			
 			int vecSize = sizeof(float) * 3;
-			int texVecSize = sizeof(float) * 2;
 			for (unsigned int vertex = 0; vertex < numVerts; vertex++){
 				thisMesh->mTextureCoords[0][vertex].x = -thisMesh->mTextureCoords[0][vertex].x;
 				thisMesh->mTextureCoords[0][vertex].y = -thisMesh->mTextureCoords[0][vertex].y;
 				memcpy(&vertices[vertex].vertexPoint, &thisMesh->mVertices[vertex], vecSize);
 				memcpy(&vertices[vertex].normal, &thisMesh->mNormals[vertex], vecSize);
-				memcpy(&vertices[vertex].uv, &thisMesh->mTextureCoords[0][vertex], texVecSize);
+				memcpy(&vertices[vertex].uv, &thisMesh->mTextureCoords[0][vertex], vecSize);
 			}
 
 			if (instances > 1){
-				newComp->m_vertexBuffer = CreateInstancedVertexNormUVArray(vertices, numVerts, 
-																		indices, numFaces,instances,newComp->m_instancedDataBuffer);
+				newComp->m_vertexBuffer = CreateVertexArray(vertices, numVerts, sizeof(CustomVertexNormUV), 3, indices, numFaces);
+				CreateInstancedAttrib(3, newComp->m_vertexBuffer, newComp->m_instancedDataBuffer, instances);
 			}else{
-				newComp->m_vertexBuffer = CreateVertexNormUVArray(vertices, numVerts, indices, numFaces);
+				newComp->m_vertexBuffer = CreateVertexArray(vertices, numVerts, sizeof(CustomVertexNormUV), 3, indices, numFaces);
 			}
 			delete[] vertices;
 		}else if(thisMesh->HasPositions() && thisMesh->HasNormals()){
@@ -139,11 +137,10 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 			}
 
 			if (instances > 1){
-				newComp->m_vertexBuffer = CreateInstancedVertexNormArray(vertices, numVerts,
-					indices, numFaces, instances, newComp->m_instancedDataBuffer);
+				newComp->m_vertexBuffer = CreateVertexArray(vertices, numVerts, sizeof(CustomVertexNorm), 2, indices, numFaces);
+				CreateInstancedAttrib(2, newComp->m_vertexBuffer, newComp->m_instancedDataBuffer, instances);
 			}else{
-				newComp->m_vertexBuffer = CreateVertexNormArray(vertices, numVerts,
-					indices, numFaces);
+				newComp->m_vertexBuffer = CreateVertexArray(vertices, numVerts, sizeof(CustomVertexNorm), 2, indices, numFaces);
 			}
 
 			delete[] vertices;
@@ -162,18 +159,23 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 		}
 
 
-		Material newMat;
-		GLuint	  newTex = NULL;
+		Material  newMat;
+		GLuint	  newTex = 0,newNormalMap = 0;
 
-		//load materials
-		newMat = LoadMaterials(scene,scene->mMaterials[thisMesh->mMaterialIndex]);
-		newTex = LoadTextures(mesh,scene,scene->mMaterials[thisMesh->mMaterialIndex],directory);
+		newMat		 = LoadMaterials(scene,scene->mMaterials[thisMesh->mMaterialIndex]);
+		newTex		 = LoadTextures(mesh,scene,scene->mMaterials[thisMesh->mMaterialIndex],directory,aiTextureType_DIFFUSE);
+		newNormalMap = LoadTextures(mesh, scene, scene->mMaterials[thisMesh->mMaterialIndex], directory, aiTextureType_HEIGHT);
 		
 		newComp->m_material = newMat;
 
 		if(newTex != 0){
 			newComp->m_hasTexture = true;
 			newComp->m_texture = newTex;
+		}
+
+		if (newNormalMap != 0){
+			newComp->m_hasNormalMap = true;
+			newComp->m_normalMap	= newNormalMap;
 		}
 
 		mesh.m_meshData.push_back(newComp);
@@ -270,14 +272,14 @@ Material LoadMaterials(const aiScene* scene,aiMaterial* material)
 	return mat;
 }
 
-GLuint LoadTextures(StaticMesh& mesh, const aiScene* scene,aiMaterial* material,const string& directory){
+GLuint LoadTextures(StaticMesh& mesh, const aiScene* scene,aiMaterial* material,const string& directory,aiTextureType type){
 		
 	int texIndex = 0;
 	aiString path;  // filename
 
 	std::vector<char*> texNames;
 
-	aiReturn texFound = material->GetTexture(aiTextureType_DIFFUSE, texIndex, &path, NULL, NULL, NULL,NULL,NULL);
+	aiReturn texFound = material->GetTexture(type, texIndex, &path, NULL, NULL, NULL,NULL,NULL);
 
 	GLuint texture = 0;
 	if (texFound == AI_SUCCESS){
@@ -295,13 +297,29 @@ GLuint LoadTextures(StaticMesh& mesh, const aiScene* scene,aiMaterial* material,
 	return texture;
 }
 
-void RenderStaticMesh(const StaticMesh& mesh)
+void RenderStaticMesh(const StaticMesh& mesh,GLint shaderHandle,int textureSlot)
 {
 	for (unsigned int meshNum = 0; meshNum < mesh.m_numMeshes; meshNum++){
 
 		if (mesh.m_meshData[meshNum]->m_hasTexture){
+			glActiveTexture(GL_TEXTURE0 + textureSlot);
 			glBindTexture(GL_TEXTURE_2D, mesh.m_meshData[meshNum]->m_texture);
 		}
+
+		if (mesh.m_meshData[meshNum]->m_hasNormalMap){
+			glActiveTexture(GL_TEXTURE0 + textureSlot + 1 );
+			glBindTexture(GL_TEXTURE_2D, mesh.m_meshData[meshNum]->m_normalMap);
+		}
+
+		GLint matUni = glGetUniformLocation(shaderHandle, "materialDiffuse");
+		glUniform3fv(matUni, 1, &(mesh.m_meshData[meshNum]->m_material.diffuse[0]));
+		matUni = glGetUniformLocation(shaderHandle, "materialSpecular");
+		glUniform3fv(matUni, 1, &(mesh.m_meshData[meshNum]->m_material.specular[0]));
+		matUni = glGetUniformLocation(shaderHandle, "materialAmbient");
+		glUniform3fv(matUni, 1, &(mesh.m_meshData[meshNum]->m_material.ambient[0]));
+		matUni = glGetUniformLocation(shaderHandle, "materialShininess");
+		glUniform1f(matUni,mesh.m_meshData[meshNum]->m_material.shininess);
+		
 
 		glBindVertexArray(mesh.m_meshData[meshNum]->m_vertexBuffer);
 		glDrawElements(GL_TRIANGLES, mesh.m_meshData[meshNum]->m_numFaces * 3, GL_UNSIGNED_INT, 0);
