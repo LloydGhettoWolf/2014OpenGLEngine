@@ -162,7 +162,7 @@ void ShadowApp::RenderShadow(){
 
 			m_shadowShader.UpdateDepthUniforms(m_worldMatrix,m_shadowCamera.viewMatrix);
 
-			RenderStaticMesh(m_teapotMesh);
+			RenderStaticMeshComponent(m_teapotMesh.m_meshData[0]);
 
 			m_shadowShader.UpdateDepthUniforms(identity, m_shadowCamera.viewMatrix);
 			glBindVertexArray(m_groundPlaneBuffer);
@@ -192,7 +192,7 @@ void ShadowApp::RenderMeshes(){
 
 		m_shadowMatrix = m_biasMatrix * m_shadowCamera.projectionMatrix * m_shadowCamera.viewMatrix * m_worldMatrix;
 
-		RenderStaticMesh(m_teapotMesh);
+		RenderStaticMeshComponent(m_teapotMesh.m_meshData[0]);
 
 		m_shadowMatrix = m_biasMatrix * m_shadowCamera.projectionMatrix * m_shadowCamera.viewMatrix;
 		glBindVertexArray(m_groundPlaneBuffer);
@@ -203,5 +203,5 @@ void ShadowApp::RenderMeshes(){
 }
 
 void ShadowApp::ShutDown(){
-	DestroyMesh(m_teapotMesh);
+	
 };

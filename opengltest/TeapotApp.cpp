@@ -205,7 +205,8 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 		glUniform3fv(teapotUniforms.lightColUniform,        1, &m_lights.color[0][0]);
 		glUniform1f(teapotUniforms.matUni.shininessUniform, m_material.shininess);
 
-		RenderInstancedStaticMesh(m_teapotMesh,&teapotPositions[0]);
+
+		RenderStaticMeshComponent(m_teapotMesh.m_meshData[0]);
 		
 		glUniformMatrix4fv(teapotUniforms.worldMatrixUniform, 1, GL_FALSE, &identity[0][0]);
 		glUniform1i(teapotUniforms.instancedUniform, 0);
@@ -220,7 +221,7 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 		glUniformMatrix4fv(m_cubemapShader.GetWVPMatrix(), 1, GL_FALSE, &(m_camera.projectionMatrix * m_camera.viewMatrix * translate(identity,m_camera.pos) )[0][0]);
 		glUniform1i(m_cubemapShader.GetSampler(), 0);
 		glCullFace(GL_FRONT);
-		RenderStaticMesh(m_cubeMesh);
+		RenderStaticMeshComponent(m_cubeMesh.m_meshData[0]);
 		glCullFace(GL_BACK);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	glUseProgram(0);
@@ -228,8 +229,6 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 
 void TeapotApp::ShutDown(){
 
-	DestroyMesh(m_teapotMesh);
-	DestroyMesh(m_cubeMesh);
 	glDeleteVertexArrays(1, &m_groundPlaneBuffer);
 
 	glDeleteShader(m_teapotShader.GetHandle());

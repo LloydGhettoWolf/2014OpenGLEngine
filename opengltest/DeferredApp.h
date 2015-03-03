@@ -21,7 +21,7 @@ public:
 private:
 	bool InitGUI();
 
-	void RenderDeferred(const vec3* teapotPositions,int numLights);
+	void RenderDeferred(int numLights);
 	static void RenderGeometry(GLint shaderHandle, mat4& viewProjection);
 	static void RenderCubemap(mat4& viewProjection, vec3& camPos);
 	

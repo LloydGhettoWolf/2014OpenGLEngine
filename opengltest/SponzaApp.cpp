@@ -123,7 +123,7 @@ void SponzaApp::Run(){
 
 		glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
 		glUniform3fv(eyePosUniform, 1, &m_camera.pos[0]);
-		RenderStaticMesh(m_sponzaMesh, shaderProg);
+		RenderStaticMeshComponent(m_sponzaMesh.m_meshData[0]);
 
 		glUseProgram(0);
 
@@ -144,7 +144,6 @@ void SponzaApp::Run(){
 };
 
 void SponzaApp::ShutDown(){
-	DestroyMesh(m_sponzaMesh);
 	glDeleteShader(m_lightingShader);
 
 	m_run = false;

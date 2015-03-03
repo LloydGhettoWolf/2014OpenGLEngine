@@ -39,9 +39,24 @@ bool DeferredApp::Init(){
 		return false;
 	}
 
-	if (!InitStaticMesh(teapotMesh, "teapot.obj", "teapot\\", 64, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace)){
+	if (!InitStaticMesh(teapotMesh, "teapot.obj", "teapot\\", aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace)){
 		cout << "couldn't load teapot mesh!" << endl;
 		return false;
+	}
+
+	vec3 movement[64];
+
+	for (int potRow = 0; potRow < 8; potRow++){
+		for (int potCol = 0; potCol < 8; potCol++){
+			int index = potRow * 8 + potCol;
+			positions[index] = vec3(potCol * 15.0f - 60.0f, 0.0f, potRow * 10.0f - 40.0f);
+		}
+	}
+
+	for (int meshNum = 0; meshNum < teapotMesh.m_numMeshes; ++meshNum){
+		CreateInstancedAttrib(5, teapotMesh.m_meshData[meshNum]->m_vertexBuffer, teapotMesh.m_meshData[meshNum]->m_instancedDataBuffer, 64);
+		glBindBuffer(GL_ARRAY_BUFFER, teapotMesh.m_meshData[meshNum]->m_instancedDataBuffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec3) * 64, positions);
 	}
 
 
@@ -128,14 +143,7 @@ void DeferredApp::Run(){
 	mat4x4 rotation = rotate(mat4x4(), 180.0f, vec3(0.0f, 1.0f, 0.0f));
 	mat3x3 normalMatrix = mat3x3(transpose(rotation));
 
-	vec3 movement[64];
-
-	for (int potRow = 0; potRow < 8; potRow++){
-		for (int potCol = 0; potCol < 8; potCol++){
-			int index = potRow * 8 + potCol;
-			positions[index] = vec3(potCol * 15.0f - 60.0f, 0.0f, potRow * 10.0f - 40.0f);
-		}
-	}
+	
 
 	string firstStr = "ms per frame: ";
 	string time = to_string(deltaTime);
@@ -169,7 +177,7 @@ void DeferredApp::Run(){
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		RenderDeferred(movement,NUM_POINT_LIGHTS);
+		RenderDeferred(NUM_POINT_LIGHTS);
 
 		time = to_string(deltaTime * 1000.0f);
 		//TwDraw();
@@ -190,9 +198,9 @@ void DeferredApp::Run(){
 };
 
 
-void DeferredApp::RenderDeferred(const vec3* teapotPositions,int numLights){
+void DeferredApp::RenderDeferred(int numLights){
 	
-	m_deferredRenderer.RenderDeferred(teapotPositions, m_camera.projectionMatrix * m_camera.viewMatrix, m_lights.position, m_lights.color,
+	m_deferredRenderer.RenderDeferred(m_camera.projectionMatrix * m_camera.viewMatrix, m_lights.position, m_lights.color,
 										m_camera.pos, numLights, RenderGeometry);
 
 	
@@ -201,8 +209,6 @@ void DeferredApp::RenderDeferred(const vec3* teapotPositions,int numLights){
 
 void DeferredApp::ShutDown(){
 
-	DestroyMesh(teapotMesh);
-	//DestroyMesh(m_cubeMesh);
 	glDeleteVertexArrays(1, &groundPlaneBuffer);
 
 	glDeleteShader(cubemapShader.GetHandle());
@@ -236,7 +242,8 @@ void DeferredApp::RenderGeometry(GLint shaderHandle,mat4& viewProjection){
 	glBindTexture(GL_TEXTURE_2D, m_normalTexture);
 	glUniform1i(normalUniform, 1);
 
-	RenderInstancedStaticMesh(teapotMesh, &positions[0]);
+	RenderInstancedStaticMeshComponent(teapotMesh.m_meshData[0],64);
+	RenderInstancedStaticMeshComponent(teapotMesh.m_meshData[1], 64);
 
 	glUniformMatrix4fv(scaleUniform,1, GL_FALSE, &identity[0][0]);
 	//glUniform3fv(gBufferUniforms.materialUniforms.diffuseUniform, 1, &diff[0]);
@@ -256,7 +263,7 @@ void DeferredApp::RenderCubemap(mat4& viewProjection,vec3& camPos){
 		glUniformMatrix4fv(cubemapShader.GetWVPMatrix(), 1, GL_FALSE, &(viewProjection * translate(identity, camPos))[0][0]);
 		glUniform1i(cubemapShader.GetSampler(), 0);
 		glCullFace(GL_FRONT);
-		RenderStaticMesh(cubeMesh);
+		RenderStaticMeshComponent(cubeMesh.m_meshData[0]);
 		glCullFace(GL_BACK);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	glUseProgram(0);

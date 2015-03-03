@@ -176,7 +176,7 @@ void ComparisonApp::Render(){
 		glUniform1f(teapotUniforms.solidMixUniform, solidMix1);
 
 
-		RenderStaticMesh(m_exampleMesh);
+		RenderStaticMeshComponent(m_exampleMesh.m_meshData[0]);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
@@ -195,7 +195,7 @@ void ComparisonApp::Render(){
 		glUniform1f(ctUniforms.fresnelUniform,   refractiveIndex);
 		glUniform1f(ctUniforms.kUniform,		 k);
 		glUniform1f(ctUniforms.roughnessUniform, roughness);
-		RenderStaticMesh(m_exampleMesh);
+		RenderStaticMeshComponent(m_exampleMesh.m_meshData[0]);
 		
 	glUseProgram(0);
 	
@@ -207,14 +207,13 @@ void ComparisonApp::Render(){
 		glUniformMatrix4fv(m_cubemapShader.GetWVPMatrix(), 1, GL_FALSE, &(m_camera.projectionMatrix * m_camera.viewMatrix * translate(identity, m_camera.pos))[0][0]);
 		glUniform1i(m_cubemapShader.GetSampler(), 0);
 		glCullFace(GL_FRONT);
-		RenderStaticMesh(m_cubeMesh);
+		RenderStaticMeshComponent(m_cubeMesh.m_meshData[0]);
 		glCullFace(GL_BACK);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	glUseProgram(0);
 }
 
 void ComparisonApp::ShutDown(){
-	DestroyMesh(m_exampleMesh);
 	glDeleteShader(m_modelShader.GetHandle());
 	glDeleteShader(m_cubemapShader.GetHandle());
 	glDeleteShader(m_ctShader.GetHandle());

@@ -1,6 +1,6 @@
 //StaticMesh.h - this class uses assimp to load models and is used to represent all the data in a mesh
 //through assimp's supported classes it can store many kinds of file type
-//last updata 05/11/2014 - changed from lat engine type to this one
+//last updata 03/03/2015 - changed from lat engine type to this one
 
 #pragma once
 
@@ -17,14 +17,10 @@ struct aiMatrix4x4;
 struct aiMaterial;
 
 struct MeshComponent{
-	GLuint          m_vertexBuffer	= 0;
-	GLuint          m_texture		= 0;
-	GLuint          m_normalMap		= 0;
-	GLuint          m_numFaces		= 0;
-	Material		m_material;
+	GLuint          m_vertexBuffer		  = 0;
+	GLuint          m_numFaces			  = 0;
 	GLuint			m_instancedDataBuffer = 0;
-	bool            m_hasTexture		  = false;
-	bool            m_hasNormalMap		  = false;
+	Material		m_material;
 };
 
 
@@ -35,23 +31,18 @@ struct StaticMesh{
 		glm::vec3					m_boundingBoxMax;
 		unsigned int				m_numMaterials;
 		unsigned int				m_numMeshes;
-		int							m_numInstances = 1;
 		std::map<string, GLuint>    m_textures;
+
+		~StaticMesh();
 };
  
 
 
-bool				InitStaticMesh(StaticMesh& newMesh, const string& fileName, const string& directory, int instances = 1,
+bool				InitStaticMesh(StaticMesh& newMesh, const string& fileName, const string& directory,
 									unsigned int flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals);
 
-void				RenderStaticMesh(const StaticMesh& mesh, GLint shaderHandle = 0,int textureSlot = 0);
+void				RenderStaticMeshComponent(const MeshComponent* comp);
 
-void				RenderInstancedStaticMesh(const StaticMesh& mesh,const vec3* positions);
+void				RenderInstancedStaticMeshComponent(const MeshComponent* comp, int numInstances);
 
-//support functions for use by Init();
-void				GetBoundingBox(glm::vec3& min, glm::vec3& max, const aiScene* scene);
-void				GetBoundingBoxForNode(const aiNode* node, glm::vec3& min, glm::vec3& max, aiMatrix4x4& trafo, const aiScene* scene);
-Material			LoadMaterials(const aiScene* scene, aiMaterial* materials);
-GLuint   			LoadTextures(StaticMesh& mesh, const aiScene* scene, aiMaterial* material,const string& directory,aiTextureType type);
-void				DestroyMesh(StaticMesh& mesh);
 

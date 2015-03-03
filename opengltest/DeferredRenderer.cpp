@@ -58,7 +58,7 @@ void DeferredRenderer::SetUniformsFirstTime(vec2& screenSize, mat3& normalMatrix
 
 }
 
-void DeferredRenderer::RenderDeferred(const vec3* teapotPositions, mat4& viewProjection, vec3* lightPositions, vec3* lightColors,
+void DeferredRenderer::RenderDeferred(mat4& viewProjection, vec3* lightPositions, vec3* lightColors,
 									 vec3& camPos, int numLights, void(*RenderFunc)(GLint, mat4&), void(*CubeMapFunc)(mat4&,vec3&)){
 
 	//geometry pass
@@ -131,7 +131,7 @@ void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,ve
 			float scale = 85.0f;
 			worldMatrix = viewProjection * glm::translate(identity, lightPositions[light]) * glm::scale(identity, vec3(scale, scale, scale));
 			glUniformMatrix4fv(m_deferredShader.GetNULLWVPMatrix(), 1, false, &worldMatrix[0][0]);
-			RenderStaticMesh(m_sphereMesh);
+			RenderStaticMeshComponent(m_sphereMesh.m_meshData[0]);
 
 		glUseProgram(0);
 
@@ -169,7 +169,7 @@ void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,ve
 			glUniform3fv(lightPassUniforms.lightPosUniform, 1, &lightPositions[light][0]);
 			glUniform3fv(lightPassUniforms.lightColUniform, 1, &lightColors[light][0]);
 			glUniform3fv(lightPassUniforms.eyePosUniform, 1, &(camPos[0]));
-			RenderStaticMesh(m_sphereMesh);
+			RenderStaticMeshComponent(m_sphereMesh.m_meshData[0]);
 
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, 0);

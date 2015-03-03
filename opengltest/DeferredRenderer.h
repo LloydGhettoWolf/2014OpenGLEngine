@@ -16,7 +16,7 @@ public:
 
 	void SetUniformsFirstTime(vec2& screenSize,mat3& normalMatrix,mat4& rotation);
 
-	void RenderDeferred(const vec3* teapotPositions,mat4& viewProjection, vec3* lightPositions, vec3* lightColors, 
+	void RenderDeferred(mat4& viewProjection, vec3* lightPositions, vec3* lightColors, 
 						vec3& camPos, int numLights, void(*RenderFunc)(GLint, mat4&), void(*CubeMapFunc)(mat4&,vec3&) = NULL);
 private:
 
