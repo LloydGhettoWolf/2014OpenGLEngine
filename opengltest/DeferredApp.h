@@ -23,15 +23,10 @@ private:
 
 	void RenderDeferred(const vec3* teapotPositions,int numLights);
 	static void RenderGeometry(GLint shaderHandle, mat4& viewProjection);
+	static void RenderCubemap(mat4& viewProjection, vec3& camPos);
 	
 	DeferredRenderer      m_deferredRenderer;
 
-	CubemapShader		  m_cubemapShader;
-	StaticMesh            m_cubeMesh;
-	GLuint				  m_cubeMap;
-
-
-	GBufferData		m_gBuffer;
 	PointLightData  m_lights;
 	vec3            lightPos[NUM_POINT_LIGHTS];
 	float           m_radii[NUM_POINT_LIGHTS];

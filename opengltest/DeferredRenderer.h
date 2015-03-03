@@ -16,8 +16,8 @@ public:
 
 	void SetUniformsFirstTime(vec2& screenSize,mat3& normalMatrix,mat4& rotation);
 
-	void RenderDeferred(const vec3* teapotPositions, void(*RenderFunc)(GLint, mat4&),mat4& viewProjection,
-							 vec3* lightPositions, vec3* lightColors, vec3& camPos,int numLights);
+	void RenderDeferred(const vec3* teapotPositions,mat4& viewProjection, vec3* lightPositions, vec3* lightColors, 
+						vec3& camPos, int numLights, void(*RenderFunc)(GLint, mat4&), void(*CubeMapFunc)(mat4&,vec3&) = NULL);
 private:
 
 	bool CreateGBuffer();
@@ -30,7 +30,7 @@ private:
 	DeferredShader		  m_deferredShader;
 	StaticMesh            m_sphereMesh;
 
-	GBufferData		m_gBuffer;
+	GBufferData			  m_gBuffer;
 
 	//full screen quad
 	GLuint m_quadBuffer;

@@ -1,4 +1,5 @@
 #include "DeferredRenderer.h"
+#include "CubeMap.h"
 #include <gtc\matrix_transform.hpp>
 #include <gtc\matrix_inverse.hpp>
 #include <iostream>
@@ -57,16 +58,27 @@ void DeferredRenderer::SetUniformsFirstTime(vec2& screenSize, mat3& normalMatrix
 
 }
 
-void DeferredRenderer::RenderDeferred(const vec3* teapotPositions, void(*RenderFunc)(GLint, mat4&), mat4& viewProjection,
-									 vec3* lightPositions, vec3* lightColors, vec3& camPos,int numLights){
+void DeferredRenderer::RenderDeferred(const vec3* teapotPositions, mat4& viewProjection, vec3* lightPositions, vec3* lightColors,
+									 vec3& camPos, int numLights, void(*RenderFunc)(GLint, mat4&), void(*CubeMapFunc)(mat4&,vec3&)){
 
 	//geometry pass
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_gBuffer.fboObject);
 	RenderGBuffer(RenderFunc,viewProjection);
+
+	mat4 identity;
+
+	if (CubeMapFunc != NULL){
+		//cubemap - set the last render target to render to
+		glDrawBuffer(GL_COLOR_ATTACHMENT4);
+		CubeMapFunc(viewProjection,camPos);
+	}
+	
+
+	//render the lit scene above it
 	RenderLights(viewProjection,lightPositions,lightColors,camPos,numLights);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-
+	//render to screen
 	QuadPassShaderUniforms uniforms = m_deferredShader.GetQuadPassUniforms();
 
 	glUseProgram(m_deferredShader.GetQuadPassHandle());
@@ -96,13 +108,13 @@ void DeferredRenderer::RenderDeferred(const vec3* teapotPositions, void(*RenderF
 
 	glUseProgram(0);
 
+
 }
 
 void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,vec3* lightColors,vec3& camPos,int numLights){
 
 	mat4 worldMatrix, identity;
 	MaterialUniforms matuni;
-
 	for (int light = 0; light < numLights; light++){
 		glDrawBuffer(GL_NONE);
 		glEnable(GL_DEPTH_TEST);
@@ -121,58 +133,58 @@ void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,ve
 			glUniformMatrix4fv(m_deferredShader.GetNULLWVPMatrix(), 1, false, &worldMatrix[0][0]);
 			RenderStaticMesh(m_sphereMesh);
 
-			glUseProgram(0);
+		glUseProgram(0);
 
-			//lighting pass
-			glDisable(GL_DEPTH_TEST);
-			glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-			glEnable(GL_BLEND);
-			glBlendEquation(GL_FUNC_ADD);
-			glBlendFunc(GL_ONE, GL_ONE);
-			glEnable(GL_CULL_FACE);
-			glCullFace(GL_FRONT);
-			glDrawBuffer(GL_COLOR_ATTACHMENT4);
+		//lighting pass
+		glDisable(GL_DEPTH_TEST);
+		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_ONE, GL_ONE);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+		glDrawBuffer(GL_COLOR_ATTACHMENT4);
 
 		glUseProgram(m_deferredShader.GetLightPassHandle());
-		LightPassShaderUniforms lightPassUniforms = m_deferredShader.GetLightPassUniforms();
+			LightPassShaderUniforms lightPassUniforms = m_deferredShader.GetLightPassUniforms();
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[0]);
-		glUniform1i(lightPassUniforms.posTextureUniform, 0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[0]);
+			glUniform1i(lightPassUniforms.posTextureUniform, 0);
 
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[1]);
-		glUniform1i(lightPassUniforms.normTextureUniform, 1);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[1]);
+			glUniform1i(lightPassUniforms.normTextureUniform, 1);
 
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[2]);
-		glUniform1i(lightPassUniforms.ambTextureUniform, 2);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[2]);
+			glUniform1i(lightPassUniforms.ambTextureUniform, 2);
 
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[3]);
-		glUniform1i(lightPassUniforms.diffTextureUniform, 3);
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[3]);
+			glUniform1i(lightPassUniforms.diffTextureUniform, 3);
 
-		worldMatrix = translate(identity, lightPositions[light]) * glm::scale(identity, vec3(scale, scale, scale));
-		glUniformMatrix4fv(lightPassUniforms.wvpMatrixUniform, 1, GL_FALSE, &(viewProjection * worldMatrix)[0][0]);
-		glUniform3fv(lightPassUniforms.lightPosUniform, 1, &lightPositions[light][0]);
-		glUniform3fv(lightPassUniforms.lightColUniform, 1, &lightColors[light][0]);
-		glUniform3fv(lightPassUniforms.eyePosUniform, 1, &(camPos[0]));
-		RenderStaticMesh(m_sphereMesh);
+			worldMatrix = translate(identity, lightPositions[light]) * glm::scale(identity, vec3(scale, scale, scale));
+			glUniformMatrix4fv(lightPassUniforms.wvpMatrixUniform, 1, GL_FALSE, &(viewProjection * worldMatrix)[0][0]);
+			glUniform3fv(lightPassUniforms.lightPosUniform, 1, &lightPositions[light][0]);
+			glUniform3fv(lightPassUniforms.lightColUniform, 1, &lightColors[light][0]);
+			glUniform3fv(lightPassUniforms.eyePosUniform, 1, &(camPos[0]));
+			RenderStaticMesh(m_sphereMesh);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, 0);
 
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, 0);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, 0);
 
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, 0);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, 0);
 
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, 0);
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(GL_TEXTURE_2D, 0);
 
-		glDisable(GL_BLEND);
-		glCullFace(GL_BACK);
+			glDisable(GL_BLEND);
+			glCullFace(GL_BACK);
 	}
 	glDisable(GL_STENCIL_TEST);
 }

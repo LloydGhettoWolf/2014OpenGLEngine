@@ -15,7 +15,11 @@
 StaticMesh teapotMesh;
 GLuint groundPlaneBuffer;
 vec3   positions[NUM_MESHES];
-GLuint			m_teaTexture,m_normalTexture;
+GLuint	m_teaTexture,m_normalTexture;
+
+CubemapShader		  cubemapShader;
+StaticMesh            cubeMesh;
+GLuint				  cubeMap;
 
 bool DeferredApp::Init(){
 
@@ -30,7 +34,7 @@ bool DeferredApp::Init(){
 	}
 
 
-	if (!m_cubemapShader.CreateCubemapShader()){
+	if (!cubemapShader.CreateCubemapShader()){
 		cout << "failed to load shader!" << endl;
 		return false;
 	}
@@ -41,10 +45,10 @@ bool DeferredApp::Init(){
 	}
 
 
-	//if (!InitStaticMesh(m_cubeMesh, "cube.obj", "meshes\\", 1)){
-		//cout << "couldn't load teapot mesh!" << endl;
-		//return false;
-	//}
+	if (!InitStaticMesh(cubeMesh, "cube.obj", "meshes\\", 1)){
+		cout << "couldn't load teapot mesh!" << endl;
+		return false;
+	}
 
 	m_camera = CreateCamera(vec3(0.0f, 0.0f, -40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(45.0f, APP_WIDTH / APP_HEIGHT, 3.0f, 500.0f);
@@ -84,13 +88,13 @@ bool DeferredApp::Init(){
 
 	//cubemap
 	std::vector<string> cubemapFilenames;
-	cubemapFilenames.push_back("CubeMaps\\Park\\posx.jpg");
-	cubemapFilenames.push_back("CubeMaps\\Park\\negx.jpg");
-	cubemapFilenames.push_back("CubeMaps\\Park\\posy.jpg");
-	cubemapFilenames.push_back("CubeMaps\\Park\\negy.jpg");
-	cubemapFilenames.push_back("CubeMaps\\Park\\posz.jpg");
-	cubemapFilenames.push_back("CubeMaps\\Park\\negz.jpg");
-	m_cubeMap = CreateCubeMap(cubemapFilenames);
+	cubemapFilenames.push_back("CubeMaps\\Pylons\\posx.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Pylons\\negx.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Pylons\\posy.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Pylons\\negy.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Pylons\\posz.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Pylons\\negz.jpg");
+	cubeMap = CreateCubeMap(cubemapFilenames);
 
 	m_material.ambient = vec3(0.1f, 0.1f, 0.1f);
 	m_material.diffuse = vec3(0.5f, 0.4f, 0.5f);
@@ -174,7 +178,7 @@ void DeferredApp::Run(){
 
 		ReadMouse();
 		ReadKeys();
-		MoveCameraForward(m_camera, deltaTime * m_moveForwardAmount);
+		MoveCameraForward(m_camera, deltaTime      * m_moveForwardAmount);
 		MoveCameraVertically(m_camera, deltaTime *  m_moveUpAmount);
 		MoveCameraHorizontally(m_camera, deltaTime *  m_moveSidewaysAmount);
 
@@ -188,8 +192,8 @@ void DeferredApp::Run(){
 
 void DeferredApp::RenderDeferred(const vec3* teapotPositions,int numLights){
 	
-	m_deferredRenderer.RenderDeferred(teapotPositions, RenderGeometry, m_camera.projectionMatrix * m_camera.viewMatrix, m_lights.position, m_lights.color,
-									m_camera.pos,numLights);
+	m_deferredRenderer.RenderDeferred(teapotPositions, m_camera.projectionMatrix * m_camera.viewMatrix, m_lights.position, m_lights.color,
+										m_camera.pos, numLights, RenderGeometry);
 
 	
 }
@@ -201,8 +205,8 @@ void DeferredApp::ShutDown(){
 	//DestroyMesh(m_cubeMesh);
 	glDeleteVertexArrays(1, &groundPlaneBuffer);
 
-	glDeleteShader(m_cubemapShader.GetHandle());
-	glDeleteTextures(1, &m_cubeMap);
+	glDeleteShader(cubemapShader.GetHandle());
+	glDeleteTextures(1, &cubeMap);
 
 	glDeleteTextures(1, &m_teaTexture);
 };
@@ -240,4 +244,20 @@ void DeferredApp::RenderGeometry(GLint shaderHandle,mat4& viewProjection){
 
 	glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+}
+
+void DeferredApp::RenderCubemap(mat4& viewProjection,vec3& camPos){
+
+	mat4 identity;
+
+	glUseProgram(cubemapShader.GetHandle());
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
+		glUniformMatrix4fv(cubemapShader.GetWVPMatrix(), 1, GL_FALSE, &(viewProjection * translate(identity, camPos))[0][0]);
+		glUniform1i(cubemapShader.GetSampler(), 0);
+		glCullFace(GL_FRONT);
+		RenderStaticMesh(cubeMesh);
+		glCullFace(GL_BACK);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glUseProgram(0);
 }
