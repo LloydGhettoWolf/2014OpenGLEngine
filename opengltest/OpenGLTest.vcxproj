@@ -95,7 +95,6 @@
     <ClCompile Include="DeferredRenderer.cpp" />
     <ClCompile Include="DeferredShader.cpp" />
     <ClCompile Include="DepthBuffer.cpp" />
-    <ClCompile Include="Font.cpp" />
     <ClCompile Include="ForwardShader.cpp" />
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="GBufferData.cpp" />
@@ -129,7 +128,6 @@
     <ClInclude Include="DeferredShader.h" />
     <ClInclude Include="Defines.h" />
     <ClInclude Include="DepthBuffer.h" />
-    <ClInclude Include="Font.h" />
     <ClInclude Include="ForwardShader.h" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="GBufferData.h" />

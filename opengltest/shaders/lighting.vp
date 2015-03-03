@@ -1,28 +1,25 @@
-#version 330
-const int numLights = 5;
+//directional Lighting
+#version 400
+
 uniform mat4 perspectiveMatrix;
 uniform mat4 rotationMatrix;
 uniform mat4 scaleMatrix;
 uniform mat3 normalMatrix;
 uniform mat4 cameraMatrix;
-uniform vec3 lightVector[numLights];
 uniform vec3 eyePos;
 
 in vec3 inCoords;
 in vec3 inNormals;
 in vec2 inUVs;
+
 out vec3 norm;
-out vec3 lightVec[numLights];
-out vec3 eyeVec;
 out vec2 UVs;
+out vec3 eyeVec;
 
 void main(){
         vec4 position     = vec4(inCoords,1.0);
         norm              = normalize(normalMatrix * inNormals);
         eyeVec            = normalize(eyePos-position.xyz);
-        for(int light = 0; light < numLights; light++){
-                lightVec[light]  = lightVector[light]-position.xyz;
-        }
-        //UVs               = inUVs;
+        UVs               = inUVs;
 	gl_Position       = perspectiveMatrix * cameraMatrix * position;
 }

@@ -23,8 +23,8 @@ GLuint CreateGroundPlaneData(){
 			groundPlaneData[index].normal	 = vec3(0.0f, 1.0f, 0.0f);
 			groundPlaneData[index].biTangent = vec3(1.0f, 0.0f, 0.0f);
 			groundPlaneData[index].tangent   = vec3(0.0f, 0.0f, -1.0f);
-			groundPlaneData[index].uv.x = x * 0.25f;
-			groundPlaneData[index].uv.y = z * 0.25f;
+			groundPlaneData[index].uv.x = x * 0.5f;
+			groundPlaneData[index].uv.y = z * 0.5f;
 		}
 	}
 
@@ -45,7 +45,8 @@ GLuint CreateGroundPlaneData(){
 		}
 	}
 
-	GLuint data = CreateBumpmappedVertexUVArray(groundPlaneData, numVertices, indices, numIndices / 3);
+	GLuint data = CreateVertexArray(groundPlaneData, numVertices, sizeof(CustomVertexNormBiTangentUV), 5, indices, numIndices / 3);
+	
 	delete[] indices;
 	delete[] groundPlaneData;
 	return data;

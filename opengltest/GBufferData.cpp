@@ -32,6 +32,12 @@ bool CreateGBufferData(GBufferData& data){
 					NULL);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, data.depthTexture, 0);
 
+	//experiment
+	//glGetInternalformativ(GL_RENDERBUFFER, GL_DEPTH_STENCIL_NV, GL_RENDERBUFFER_INTERNAL_FORMAT, 1, (GLint*)&type);
+	//glRenderbufferStorage(GL_RENDERBUFFER,type,APP_WIDTH,APP_HEIGHT);
+	//glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL, GL_RENDERBUFFER, 0);
+
+
 	// final
 	glGenTextures(1, &data.finalTexture);
 	glBindTexture(GL_TEXTURE_2D, data.finalTexture);

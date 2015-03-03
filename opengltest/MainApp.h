@@ -11,7 +11,6 @@
 
 #include "Camera.h"
 #include "StaticMesh.h"
-#include "Font.h"
 #include "Defines.h"
 
 class App{

@@ -21,10 +21,9 @@ bool SponzaApp::Init(){
 		return false;
 	}
 
-	glfwOpenWindowHint(GLFW_VERSION_MAJOR, 3);
-	glfwOpenWindowHint(GLFW_VERSION_MINOR, 3);
+	glfwOpenWindowHint(GLFW_VERSION_MAJOR, 4);
+	glfwOpenWindowHint(GLFW_VERSION_MINOR, 0);
 
-	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 4);
 
 	if (!glfwOpenWindow(APP_WIDTH, APP_HEIGHT, 8, 8, 8, 8, 32, 32, GLFW_WINDOW)){
 		std::cout << "cant create window" << std::endl;
@@ -58,8 +57,7 @@ bool SponzaApp::Init(){
 
 	m_lightingShader = CreateLightingShader();
 
-	char* directory = "sponza\\";
-	InitStaticMesh(m_sponzaMesh, "sponza.obj",directory);
+	InitStaticMesh(m_sponzaMesh, "san-miguel.obj", "meshes\\san\ miguel\\");
 
 	m_camera = CreateCamera(vec3(0.0f, 2.0f, 0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f);
@@ -77,19 +75,21 @@ void SponzaApp::Run(){
 
 	MaterialUniforms matUni;
 
-	GLint cameraMatrixUniform = glGetUniformLocation(shaderProg, "cameraMatrix");
+	GLint cameraMatrixUniform      = glGetUniformLocation(shaderProg, "cameraMatrix");
 	GLint perspectiveMatrixUniform = glGetUniformLocation(shaderProg, "perspectiveMatrix");
-	GLint textureUniform = glGetUniformLocation(shaderProg, "tex");
-	GLint eyePosUniform = glGetUniformLocation(shaderProg, "eyePos");
-	GLint lightVecUniform = glGetUniformLocation(shaderProg, "lightVector");
-	GLint normalMatrixUniform = glGetUniformLocation(shaderProg, "normalMatrix");
-	matUni.diffuseUniform = glGetUniformLocation(shaderProg, "materialDiffuse");
-	matUni.ambientUniform = glGetUniformLocation(shaderProg, "materialAmbient");
-	matUni.specularUniform = glGetUniformLocation(shaderProg, "materialSpecular");
-	matUni.shininessUniform = glGetUniformLocation(shaderProg, "shininess");
-	GLint scaleUniform = glGetUniformLocation(shaderProg, "scaleMatrix");
+	GLint textureUniform           = glGetUniformLocation(shaderProg, "tex");
+	GLint eyePosUniform            = glGetUniformLocation(shaderProg, "eyePos");
+	GLint normalMatrixUniform      = glGetUniformLocation(shaderProg, "normalMatrix");
+	matUni.diffuseUniform          = glGetUniformLocation(shaderProg, "materialDiffuse");
+	matUni.ambientUniform          = glGetUniformLocation(shaderProg, "materialAmbient");
+	matUni.specularUniform         = glGetUniformLocation(shaderProg, "materialSpecular");
+	matUni.shininessUniform        = glGetUniformLocation(shaderProg, "shininess");
+	GLint scaleUniform             = glGetUniformLocation(shaderProg, "scaleMatrix");
+	GLint lightDir                 = glGetUniformLocation(shaderProg, "lightDir");
+	GLint lightCol				   = glGetUniformLocation(shaderProg, "lightCol");
 
-	vec3 lightVec(0.0f, -0.5f, 0.7f);
+	vec3 lightVec(1.0f, -1.0f, 1.0f);
+	vec3 lightColVec(1.0f, 1.0f, 1.0f);
 	mat4x4 rotation = rotate(mat4x4(), glm::radians(180.0f), vec3(0.0f, 1.0f, 0.0f));
 	mat3x3 normalMatrix = mat3x3(transpose(rotation));
 	mat4x4 scaleMatrix;
@@ -103,7 +103,8 @@ void SponzaApp::Run(){
 	glUseProgram(shaderProg);
 	glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
 	glUniformMatrix3fv(normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
-	glUniform3fv(lightVecUniform, 1, &lightVec[0]);
+	glUniform3fv(lightDir, 1, &lightVec[0]);
+	glUniform3fv(lightCol, 1, &lightColVec[0]);
 	glUniformMatrix4fv(scaleUniform, 1, GL_FALSE, &scaleMatrix[0][0]);
 	glUniform1i(textureUniform, 0);
 	glUseProgram(0);
@@ -122,7 +123,7 @@ void SponzaApp::Run(){
 
 		glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
 		glUniform3fv(eyePosUniform, 1, &m_camera.pos[0]);
-		RenderStaticMesh(m_sponzaMesh);
+		RenderStaticMesh(m_sponzaMesh, shaderProg);
 
 		glUseProgram(0);
 
