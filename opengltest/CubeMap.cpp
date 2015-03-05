@@ -13,10 +13,8 @@ GLuint CreateCubeMap(const std::vector<std::string>& fileNames){
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
 
 	for (int face = 0; face < 6; face++){
-		unsigned int width, height, bytes;
-		GLubyte* data = ReadImage(fileNames[face], bytes, width, height);
-
-		GLint format;
+		unsigned int width, height, bytes,format;
+		GLubyte* data = ReadImage(fileNames[face], bytes, width, height,format);
 
 		switch (bytes)
 		{

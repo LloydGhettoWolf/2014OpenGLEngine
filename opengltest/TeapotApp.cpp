@@ -31,12 +31,12 @@ bool TeapotApp::Init(){
 		return false;
 	}
 	
-	if (!InitStaticMesh(m_teapotMesh, "simpleTeapot.obj", "teapot\\", 64)){
+	if (!InitStaticMesh(m_teapotMesh, "simpleTeapot.obj", "teapot\\")){
 		cout << "couldn't load teapot mesh!" << endl;
 		return false;
 	}
 
-	if (!InitStaticMesh(m_cubeMesh, "cube.obj", "meshes\\", 1)){
+	if (!InitStaticMesh(m_cubeMesh, "cube.obj", "meshes\\")){
 		cout << "couldn't load teapot mesh!" << endl;
 		return false;
 	}

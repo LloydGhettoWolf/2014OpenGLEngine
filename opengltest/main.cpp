@@ -1,5 +1,6 @@
 #include "MainApp.h"
 //#include "ShadowApp.h"
+#include "SponzaApp.h"
 #include "DeferredApp.h"
 #include <iostream>
 

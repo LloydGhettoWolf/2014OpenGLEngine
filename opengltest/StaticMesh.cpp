@@ -4,10 +4,10 @@
 
 //last update 05/11/2014 - made non OOP
 
-#include <aiScene.h>
-#include <aiMesh.h>
-#include <assimp.hpp>
-#include <assimp.h>
+#include <assimp\scene.h>
+#include <assimp\mesh.h>
+#include <assimp\Importer.hpp>
+#include <assimp\vector3.h>
 #include <fstream>
 #include <iostream>
 #include "StaticMesh.h"
@@ -17,8 +17,9 @@
 //support functions for use by Init();
 void				GetBoundingBox(glm::vec3& min, glm::vec3& max, const aiScene* scene);
 void				GetBoundingBoxForNode(const aiNode* node, glm::vec3& min, glm::vec3& max, aiMatrix4x4& trafo, const aiScene* scene);
-Material			LoadMaterials(const aiScene* scene, aiMaterial* materials);
-GLuint   			LoadTextures(StaticMesh& mesh, const aiScene* scene, aiMaterial* material, const string& directory, aiTextureType type);
+
+Material			LoadMaterial(aiMaterial* materials);
+GLuint   			LoadTexture(aiMaterial* material, const string& directory, aiTextureType type);
 
 
 bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& directory,unsigned int flags){
@@ -144,16 +145,33 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 			delete[] vertices;
 		}
 
-		mesh.m_meshData.push_back(newComp);
+		newComp->m_materialIndex = thisMesh->mMaterialIndex;
+
+		mesh.m_meshData.push_back(*newComp);
 	}
 
+	//loadTextures and materials
+	int numMaterials = scene->mNumMaterials;
+	for (int material = 0; material < scene->mNumMaterials; ++material){
+		aiMaterial* mat = scene->mMaterials[material];
+		MaterialInfo info;
+		info.m_texture   = LoadTexture(mat,directory,aiTextureType_DIFFUSE);
+		info.m_normalMap = LoadTexture(mat, directory,aiTextureType_HEIGHT);
+		info.m_specMap   = LoadTexture(mat, directory, aiTextureType_SPECULAR);
+		info.m_alphaMap  = LoadTexture(mat, directory, aiTextureType_OPACITY);
+		info.m_material  = LoadMaterial(mat);
+
+		mesh.m_materialData.push_back(info);
+	}
+
+	
 	return true;
 }
 
 
 void GetBoundingBox(glm::vec3& min,glm::vec3& max,const aiScene* scene){
 	aiMatrix4x4 trafo;
-    aiIdentityMatrix4(&trafo);
+    //IdentityMatrix4(&trafo);
 
     min.x = min.y = min.z =  1e10f;
     max.x = max.y = max.z = -1e10f;
@@ -165,15 +183,15 @@ void GetBoundingBoxForNode(const aiNode* node,glm::vec3& min,glm::vec3& max,aiMa
 	aiMatrix4x4 prev;
 
 	prev = trafo;
-	aiMultiplyMatrix4(&trafo,&node->mTransformation);
+	trafo *= node->mTransformation;
 
 	for (unsigned int n = 0; n < node->mNumMeshes; ++n) {
         const struct aiMesh* mesh = scene->mMeshes[node->mMeshes[n]];
             
 		for (unsigned int t = 0; t < mesh->mNumVertices; ++t) {
 
-                struct aiVector3D tmp = mesh->mVertices[t];
-                aiTransformVecByMatrix4(&tmp,&trafo);
+                auto tmp = mesh->mVertices[t];
+                tmp *= trafo;
 
                 min.x = glm::min(min.x,tmp.x);
                 min.y = glm::min(min.y,tmp.y);
@@ -189,10 +207,12 @@ void GetBoundingBoxForNode(const aiNode* node,glm::vec3& min,glm::vec3& max,aiMa
         GetBoundingBoxForNode(node->mChildren[n],min,max,trafo,scene);
     }
 
+
+
     trafo = prev;
 }
 
-Material LoadMaterials(const aiScene* scene,aiMaterial* material)
+Material LoadMaterial(aiMaterial* material)
 {
 	Material mat;
 
@@ -222,16 +242,16 @@ Material LoadMaterials(const aiScene* scene,aiMaterial* material)
    aiColor4D shininess;
 
    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_SHININESS, &shininess)){
-		memcpy(&mat.shininess, &shininess, sizeof(shininess));
+		memcpy(&mat.shininess, &shininess, sizeof(float));
 	}
 	else{
-		memcpy(&mat.shininess, &shininess, sizeof(shininess));
+		memcpy(&mat.shininess, &shininess, sizeof(float));
 	}
 
 	return mat;
 }
 
-GLuint LoadTextures(StaticMesh& mesh, const aiScene* scene,aiMaterial* material,const string& directory,aiTextureType type){
+GLuint LoadTexture(aiMaterial* material,const string& directory,aiTextureType type){
 		
 	int texIndex = 0;
 	aiString path;  // filename
@@ -241,37 +261,42 @@ GLuint LoadTextures(StaticMesh& mesh, const aiScene* scene,aiMaterial* material,
 	aiReturn texFound = material->GetTexture(type, texIndex, &path, NULL, NULL, NULL,NULL,NULL);
 
 	GLuint texture = 0;
+
 	if (texFound == AI_SUCCESS){
-
-		map<string,GLuint>::iterator it = mesh.m_textures.find(path.data);
-
-		if (it == mesh.m_textures.end()){
-			texture = CreateTexture(directory + path.data, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-			mesh.m_textures[path.data] = texture;
-		}else{
-			texture = it->second;
-		}
+		texture = CreateTexture(directory + path.data, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
 	}
 	
 	return texture;
 }
 
-void RenderStaticMeshComponent(const MeshComponent* comp){
-	glBindVertexArray(comp->m_vertexBuffer);
-	glDrawElements(GL_TRIANGLES, comp->m_numFaces * 3, GL_UNSIGNED_INT, 0);
+void RenderStaticMeshComponent(const MeshComponent& comp){
+	glBindVertexArray(comp.m_vertexBuffer);
+	glDrawElements(GL_TRIANGLES, comp.m_numFaces * 3, GL_UNSIGNED_INT, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
-void RenderInstancedStaticMeshComponent(const MeshComponent* comp,int numInstances){
-	glBindVertexArray(comp->m_vertexBuffer);
-	glDrawElementsInstanced(GL_TRIANGLES, comp->m_numFaces * 3,GL_UNSIGNED_INT, 0, numInstances);
+void RenderInstancedStaticMeshComponent(const MeshComponent& comp,int numInstances){
+	glBindVertexArray(comp.m_vertexBuffer);
+	glDrawElementsInstanced(GL_TRIANGLES, comp.m_numFaces * 3,GL_UNSIGNED_INT, 0, numInstances);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
 StaticMesh::~StaticMesh(){
-	for (unsigned int meshNum = 0; meshNum < m_numMeshes; meshNum++){
-		glDeleteVertexArrays(1, &m_meshData[meshNum]->m_vertexBuffer);
+	for (int meshNum = 0; meshNum < m_numMeshes; meshNum++){
+		glDeleteVertexArrays(1, &m_meshData[meshNum].m_vertexBuffer);
+	}
+
+	int length = m_materialData.size();
+
+	for (int texture = 0; texture < length; ++texture){
+
+		GLint num = m_materialData[texture].m_texture;
+		if (m_materialData[texture].m_texture)
+			glDeleteTextures(1, &(m_materialData[texture].m_texture));
+
+		if (m_materialData[texture].m_normalMap)
+			glDeleteTextures(1, &(m_materialData[texture].m_normalMap));
 	}
 }

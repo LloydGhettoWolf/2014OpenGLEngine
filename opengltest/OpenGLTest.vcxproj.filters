@@ -319,5 +319,11 @@
     <None Include="shaders\shadow.vp">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\lightingSponza.fp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\lightingSponza.vp">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -27,7 +27,7 @@ bool ShadowApp::Init(){
 		return false;
 	}
 
-	InitStaticMesh(m_teapotMesh, "buddha.obj", "meshes\\", 1);
+	InitStaticMesh(m_teapotMesh, "buddha.obj", "meshes\\");
 
 	m_centerOffset = (m_teapotMesh.m_boundingBoxMax.y - m_teapotMesh.m_boundingBoxMin.y) / 2.0f;
 

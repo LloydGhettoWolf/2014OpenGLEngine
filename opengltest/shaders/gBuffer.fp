@@ -1,4 +1,4 @@
-#version 330
+#version 400
 uniform vec3 materialDiffuse;
 uniform vec3 materialAmbient;
 uniform sampler2D myTexture;
@@ -18,11 +18,11 @@ layout(location = 3) out vec3 diffuseOut;
 void main(){
   worldPosOut  = worldPos;
 
-  mat3 TBN = mat3(tangents[0],biTangents[0],normals[0],
-				  tangents[1],biTangents[1],normals[1],
-				  tangents[2],biTangents[2],normals[2]);
+  mat3 TBN = mat3(tangents,biTangents,normals);
 
-  vec3 normalMapNormal = texture(normalMap,UVs).xyz;
+  vec3 normalMapNormal =  texture2D(normalMap,UVs).xyz; 
+  normalMapNormal = 2.0 * normalMapNormal - 1.0;
+  normalize(TBN * normalMapNormal);
 
   normalsOut   = normalize(TBN * normalMapNormal);
   ambientOut   = materialAmbient;

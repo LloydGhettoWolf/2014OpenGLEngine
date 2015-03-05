@@ -4,45 +4,49 @@
 
 #pragma once
 
-#include <map>
-#include <aiPostProcess.h>
-#include <aiMaterial.h>
+#include <assimp\postprocess.h>
+#include <assimp\material.h>
 #include "Texture.h"
 #include "Shader.h"
 #include "LightsAndMaterials.h"
 
 struct aiScene;
 struct aiNode;
-struct aiMatrix4x4;
 struct aiMaterial;
+
+struct MaterialInfo{
+	GLuint  		m_texture   = 0;
+	GLuint          m_normalMap = 0;
+	GLuint          m_specMap   = 0;
+	GLuint          m_alphaMap = 0;
+	Material        m_material;
+};
 
 struct MeshComponent{
 	GLuint          m_vertexBuffer		  = 0;
 	GLuint          m_numFaces			  = 0;
 	GLuint			m_instancedDataBuffer = 0;
-	Material		m_material;
+	int             m_materialIndex		  = 0;
 };
-
 
 struct StaticMesh{
 
-		std::vector<MeshComponent*> m_meshData;
+		std::vector<MeshComponent>  m_meshData;
+		std::vector<MaterialInfo>	m_materialData;
 		glm::vec3					m_boundingBoxMin;
 		glm::vec3					m_boundingBoxMax;
 		unsigned int				m_numMaterials;
 		unsigned int				m_numMeshes;
-		std::map<string, GLuint>    m_textures;
 
 		~StaticMesh();
 };
  
-
-
 bool				InitStaticMesh(StaticMesh& newMesh, const string& fileName, const string& directory,
 									unsigned int flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals);
 
-void				RenderStaticMeshComponent(const MeshComponent* comp);
+void				RenderStaticMeshComponent(const MeshComponent& comp);
 
-void				RenderInstancedStaticMeshComponent(const MeshComponent* comp, int numInstances);
+void				RenderInstancedStaticMeshComponent(const MeshComponent& comp, int numInstances);
+
 
 

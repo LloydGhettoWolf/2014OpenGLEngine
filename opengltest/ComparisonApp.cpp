@@ -59,8 +59,8 @@ bool ComparisonApp::Init(){
 		return false;
 	}
 
-	InitStaticMesh(m_exampleMesh, "buddha.obj", "meshes\\", 1);
-	InitStaticMesh(m_cubeMesh, "cube.obj", "meshes\\", 1);
+	InitStaticMesh(m_exampleMesh, "buddha.obj", "meshes\\");
+	InitStaticMesh(m_cubeMesh, "cube.obj", "meshes\\");
 
 	m_centerOffset = (m_exampleMesh.m_boundingBoxMax.y - m_exampleMesh.m_boundingBoxMin.y)/2.0f;
 

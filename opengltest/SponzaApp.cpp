@@ -45,7 +45,7 @@ bool SponzaApp::Init(){
 	glDepthFunc(GL_LEQUAL);
 	glClearDepth(1.0f);
 
-	glEnable(GL_DEPTH_CLAMP);
+	//glEnable(GL_DEPTH_CLAMP);
 
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
@@ -57,10 +57,11 @@ bool SponzaApp::Init(){
 
 	m_lightingShader = CreateLightingShader();
 
-	InitStaticMesh(m_sponzaMesh, "san-miguel.obj", "meshes\\san\ miguel\\");
+	InitStaticMesh(m_sponzaMesh, "sponza.obj", "meshes\\sponza_obj\\", aiProcess_Triangulate | aiProcess_CalcTangentSpace);
+
 
 	m_camera = CreateCamera(vec3(0.0f, 2.0f, 0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f);
+	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 2000.0f);
 
 	return true;
 }
@@ -78,22 +79,27 @@ void SponzaApp::Run(){
 	GLint cameraMatrixUniform      = glGetUniformLocation(shaderProg, "cameraMatrix");
 	GLint perspectiveMatrixUniform = glGetUniformLocation(shaderProg, "perspectiveMatrix");
 	GLint textureUniform           = glGetUniformLocation(shaderProg, "tex");
+	GLint normalUniform			   = glGetUniformLocation(shaderProg, "bumpMap");
+	GLint specMapUniform		   = glGetUniformLocation(shaderProg, "specMap");
+	GLint alphaMapUniform		   = glGetUniformLocation(shaderProg, "alphaMap");
 	GLint eyePosUniform            = glGetUniformLocation(shaderProg, "eyePos");
-	GLint normalMatrixUniform      = glGetUniformLocation(shaderProg, "normalMatrix");
 	matUni.diffuseUniform          = glGetUniformLocation(shaderProg, "materialDiffuse");
 	matUni.ambientUniform          = glGetUniformLocation(shaderProg, "materialAmbient");
 	matUni.specularUniform         = glGetUniformLocation(shaderProg, "materialSpecular");
-	matUni.shininessUniform        = glGetUniformLocation(shaderProg, "shininess");
+	matUni.shininessUniform        = glGetUniformLocation(shaderProg, "materialShininess");
 	GLint scaleUniform             = glGetUniformLocation(shaderProg, "scaleMatrix");
 	GLint lightDir                 = glGetUniformLocation(shaderProg, "lightDir");
 	GLint lightCol				   = glGetUniformLocation(shaderProg, "lightCol");
+	GLint usesNormalMap            = glGetUniformLocation(shaderProg, "useNormalMap");
+	GLint usesAlphaMap			   = glGetUniformLocation(shaderProg, "useAlphaMap");
 
-	vec3 lightVec(1.0f, -1.0f, 1.0f);
+	vec3 lightVec(1.0f, -0.5f, 0.0f);
 	vec3 lightColVec(1.0f, 1.0f, 1.0f);
-	mat4x4 rotation = rotate(mat4x4(), glm::radians(180.0f), vec3(0.0f, 1.0f, 0.0f));
-	mat3x3 normalMatrix = mat3x3(transpose(rotation));
-	mat4x4 scaleMatrix;
-	scaleMatrix = scale(scaleMatrix, vec3(32.0f, 16.0f, 32.0f));
+
+	mat4 rotation     = rotate(mat4(), glm::radians(180.0f), vec3(0.0f, 1.0f, 0.0f));
+	mat3 normalMatrix = mat3x3(transpose(rotation));
+	mat4 scaleMatrix;
+	scaleMatrix = scale(scaleMatrix, vec3(0.3f, 0.3f, 0.3f));
 
 	Material myMaterial;
 
@@ -102,11 +108,13 @@ void SponzaApp::Run(){
 
 	glUseProgram(shaderProg);
 	glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
-	glUniformMatrix3fv(normalMatrixUniform, 1, GL_FALSE, &normalMatrix[0][0]);
 	glUniform3fv(lightDir, 1, &lightVec[0]);
 	glUniform3fv(lightCol, 1, &lightColVec[0]);
 	glUniformMatrix4fv(scaleUniform, 1, GL_FALSE, &scaleMatrix[0][0]);
 	glUniform1i(textureUniform, 0);
+	glUniform1i(normalUniform, 1);
+	glUniform1i(specMapUniform, 2);
+	glUniform1i(alphaMapUniform, 3);
 	glUseProgram(0);
 
 
@@ -118,12 +126,46 @@ void SponzaApp::Run(){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(shaderProg);
 
-		glActiveTexture(GL_TEXTURE0);
-		glUniform1i(textureUniform, 0);
 
 		glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
 		glUniform3fv(eyePosUniform, 1, &m_camera.pos[0]);
-		RenderStaticMeshComponent(m_sponzaMesh.m_meshData[0]);
+
+		for (int mesh = 0; mesh < m_sponzaMesh.m_numMeshes; ++mesh){
+			int materialIndex = m_sponzaMesh.m_meshData[mesh].m_materialIndex;
+			MaterialInfo mat = m_sponzaMesh.m_materialData[materialIndex];
+
+			glUniform3fv(matUni.diffuseUniform,  1, &mat.m_material.diffuse[0]);
+			glUniform3fv(matUni.specularUniform, 1, &mat.m_material.specular[0]);
+			glUniform3fv(matUni.ambientUniform,  1, &mat.m_material.ambient[0]);
+			glUniform1f(matUni.shininessUniform, mat.m_material.shininess);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, mat.m_texture);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, mat.m_normalMap);
+
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, mat.m_specMap);
+
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(GL_TEXTURE_2D, mat.m_alphaMap);
+
+			if (mat.m_normalMap != 0){
+				glUniform1i(usesNormalMap, 1);
+			}else{
+				glUniform1i(usesNormalMap, 0);
+			}
+
+			if (mat.m_alphaMap != 0){
+				glUniform1i(usesAlphaMap, 1);
+			}
+			else{
+				glUniform1i(usesAlphaMap, 0);
+			}
+
+			RenderStaticMeshComponent(m_sponzaMesh.m_meshData[mesh]);
+		}
 
 		glUseProgram(0);
 
@@ -151,8 +193,8 @@ void SponzaApp::ShutDown(){
 
 GLuint SponzaApp::CreateLightingShader(){
 
-	const int numAttribs = 3;
-	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inUVs" };
+	const int numAttribs = 5;
+	const char* attribs[numAttribs] = { "inCoords", "inNormals","inTangents","inBitangents","inUVs" };
 
-	return CreateShader("lighting.vp", "lighting.fp", attribs, numAttribs);
+	return CreateShader("lightingSponza.vp", "lightingSponza.fp", attribs, numAttribs);
 }

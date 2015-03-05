@@ -54,13 +54,13 @@ bool DeferredApp::Init(){
 	}
 
 	for (int meshNum = 0; meshNum < teapotMesh.m_numMeshes; ++meshNum){
-		CreateInstancedAttrib(5, teapotMesh.m_meshData[meshNum]->m_vertexBuffer, teapotMesh.m_meshData[meshNum]->m_instancedDataBuffer, 64);
-		glBindBuffer(GL_ARRAY_BUFFER, teapotMesh.m_meshData[meshNum]->m_instancedDataBuffer);
+		CreateInstancedAttrib(5, teapotMesh.m_meshData[meshNum].m_vertexBuffer, teapotMesh.m_meshData[meshNum].m_instancedDataBuffer, 64);
+		glBindBuffer(GL_ARRAY_BUFFER, teapotMesh.m_meshData[meshNum].m_instancedDataBuffer);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec3) * 64, positions);
 	}
 
 
-	if (!InitStaticMesh(cubeMesh, "cube.obj", "meshes\\", 1)){
+	if (!InitStaticMesh(cubeMesh, "cube.obj", "meshes\\")){
 		cout << "couldn't load teapot mesh!" << endl;
 		return false;
 	}
@@ -201,7 +201,7 @@ void DeferredApp::Run(){
 void DeferredApp::RenderDeferred(int numLights){
 	
 	m_deferredRenderer.RenderDeferred(m_camera.projectionMatrix * m_camera.viewMatrix, m_lights.position, m_lights.color,
-										m_camera.pos, numLights, RenderGeometry);
+										m_camera.pos, numLights, RenderGeometry,RenderCubemap);
 
 	
 }

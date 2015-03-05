@@ -39,7 +39,7 @@ vec3 CalcPointLight(vec3 worldPos,vec3 normal,vec3 diffuse){
 
 vec4 ColorPoint(vec3 lightDir,vec3 worldPos,vec3 normal,vec3 diffuse,float Attenuation){
         float diffFactor = Attenuation * max(dot(normal,lightDir),0.0);
-        vec3 viewDir     = normalize(eyePos -worldPos);
+        vec3 viewDir     = normalize(eyePos - worldPos);
         vec3 halfVec     = normalize((lightDir + viewDir) * 0.5);
         float spec       = Attenuation * pow(max(dot(normal,halfVec),0.0),256.0f);
         vec3 col = diffuse * lightColor * diffFactor;

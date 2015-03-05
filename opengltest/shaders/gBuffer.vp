@@ -1,4 +1,4 @@
-#version 330
+#version 400
 uniform mat4 vpMatrix;
 uniform mat4 rotationMatrix;
 uniform mat4 scaleMatrix;

@@ -16,7 +16,7 @@ bool DeferredRenderer::Init(){
 		return false;
 	}
 
-	if (!InitStaticMesh(m_sphereMesh, "sphere.obj", "meshes\\", 1)){
+	if (!InitStaticMesh(m_sphereMesh, "sphere.obj", "meshes\\")){
 		cout << "couldn't load sphere mesh!" << endl;
 		return false;
 	}

@@ -19,7 +19,7 @@ void main(){
     vec3  normalizedLight = normalize(lightVec);
     vec3  halfVec = normalize((normalizedLight+normalize(eyeVec)));
     
-    float spec   = pow(max(dot(halfVec,norm),0.0),shininess);
+    float spec   = pow(max(dot(halfVec,norm),0.0),64);
     float diff   = max(dot(normal,normalizedLight),0.0);
 
     vec3  diffContribution = diff * materialDiffuse;
