@@ -2,7 +2,6 @@ uniform mat4 worldMatrix;
 uniform mat4 cameraMatrix;
 uniform mat4 perspectiveMatrix;
 
-
 in vec3 inCoords;
 
 void main(){

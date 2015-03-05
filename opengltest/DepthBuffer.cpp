@@ -12,6 +12,7 @@ bool CreateDepthTextureBasic(GLuint& depthFBO, GLuint& depthTexture){
 
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, APP_WIDTH, APP_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);

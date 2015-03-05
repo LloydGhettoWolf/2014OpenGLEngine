@@ -3,3 +3,4 @@
 #include <gl\glew.h>
 
 bool CreateDepthTextureBasic(GLuint& depthFBO, GLuint& depthTexture);
+

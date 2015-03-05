@@ -192,6 +192,11 @@ void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,ve
 void DeferredRenderer::RenderGBuffer(void(*RenderFunc)(GLint, mat4&),mat4& viewProjection){
 
 	glDrawBuffer(GL_COLOR_ATTACHMENT4);
+	glClearDepth(1.0f);
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0,
 							 GL_COLOR_ATTACHMENT1,
@@ -200,11 +205,6 @@ void DeferredRenderer::RenderGBuffer(void(*RenderFunc)(GLint, mat4&),mat4& viewP
 
 	glDrawBuffers(NUM_MRT, DrawBuffers);
 
-	glDepthMask(GL_TRUE);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	glClearDepth(1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	RenderFunc(m_deferredShader.GetGBufferHandle(), viewProjection);
 

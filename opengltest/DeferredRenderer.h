@@ -3,7 +3,8 @@
 #include "GBufferData.h"
 #include "DeferredShader.h"
 #include "StaticMesh.h"
-#include "LightsAndMaterials.h"
+
+
 
 class DeferredRenderer{
 
@@ -27,8 +28,8 @@ private:
 
 	float CalcSphereDistance(const PointLightData& pLight, int index);
 
-	DeferredShader		  m_deferredShader;
-	StaticMesh            m_sphereMesh;
+	DeferredShader					m_deferredShader;
+	StaticMesh			            m_sphereMesh;
 
 	GBufferData			  m_gBuffer;
 

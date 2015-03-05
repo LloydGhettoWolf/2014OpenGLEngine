@@ -25,10 +25,10 @@ private:
 	void RenderForward(const vec3* lightPositions, const vec3* teapotPositions);
 
 
-	ForwardShader		  m_teapotShader;
-	CubemapShader		  m_cubemapShader;
+	ForwardShader				m_teapotShader;
+	CubemapShader				m_cubemapShader;
 
-	StaticMesh            m_teapotMesh,m_cubeMesh;
+	StaticMesh				    m_teapotMesh,m_cubeMesh;
 
 	GLuint				  m_groundPlaneBuffer,m_cubeMap;
 

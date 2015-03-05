@@ -81,7 +81,7 @@ void App::ReadMouse(){
 		if (TwResult){
 			TwMouseButton(TW_MOUSE_PRESSED, TW_MOUSE_RIGHT);
 		}else{
-			MoveCameraCustom(m_camera, m_camera.pos + (float)(prevY - y) * 0.5f * m_camera.lookVec);
+			MoveCameraCustom(m_camera, m_camera.pos + (float)(prevY - y) * 0.05f * m_camera.lookVec);
 		}
 	}
 
@@ -90,7 +90,7 @@ void App::ReadMouse(){
 			TwMouseButton(TW_MOUSE_PRESSED, TW_MOUSE_MIDDLE);
 		}else{
 			vec3 displacement = (prevY - y) * 0.5f * m_camera.upVec +
-				(prevX - x) * -0.5f * m_camera.rightVec;
+				(prevX - x) * -0.05f * m_camera.rightVec;
 			MoveCameraCustom(m_camera, m_camera.pos + displacement);
 		}
 	}

@@ -8,7 +8,7 @@ App* app;
 
 int main(int argc, char** argv){
 
-	app = new DeferredApp();
+	app = new SponzaApp();
 
 	if (!app->Init()){
 		std::cout << "init failed!" << endl;
