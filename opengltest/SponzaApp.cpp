@@ -8,6 +8,7 @@
 #include <math.h>
 #include <time.h>
 #include <IL\il.h>
+#include "CubeMap.h"
 #include "Shader.h"
 #include "VertexArray.h"
 #include "Texture.h"
@@ -59,9 +60,41 @@ bool SponzaApp::Init(){
 
 	InitStaticMesh(m_sponzaMesh, "sponza.obj", "meshes\\sponza_obj\\", aiProcess_Triangulate | aiProcess_CalcTangentSpace);
 
+	if (!cubemapShader.CreateCubemapShader()){
+		cout << "failed to load shader!" << endl;
+		return false;
+	}
 
-	m_camera = CreateCamera(vec3(0.0f, 2.0f, 0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 2000.0f);
+	if (!m_shadowShader.CreateShadowShader()){
+		cout << "failed to load shader!" << endl;
+		return false;
+	}
+
+	if (!InitStaticMesh(cubeMesh, "cube.obj", "meshes\\")){
+		cout << "couldn't load teapot mesh!" << endl;
+		return false;
+	}
+
+	std::vector<string> cubemapFilenames;
+	cubemapFilenames.push_back("CubeMaps\\Square\\posx.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Square\\negx.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Square\\posy.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Square\\negy.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Square\\posz.jpg");
+	cubemapFilenames.push_back("CubeMaps\\Square\\negz.jpg");
+	cubeMap = CreateCubeMap(cubemapFilenames);
+
+	m_lightPos = vec3(0.0f, 200.0f, 0.0f);
+
+	m_camera                  = CreateCamera(vec3(5.0f, 2.0f, 0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f));
+	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f);
+
+	m_shadowCamera                  = CreateCamera(vec3(50.0f, 100.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	m_shadowCamera.projectionMatrix = glm::ortho(-65.0f, 65.0f, -65.0f, 65.0f, -350.0f, 350.0f);
+
+	if (!CreateDepthTextureBasic(m_fbo, m_depthTexture)){
+		return false;
+	}
 
 	return true;
 }
@@ -92,6 +125,8 @@ void SponzaApp::Run(){
 	GLint lightCol				   = glGetUniformLocation(shaderProg, "lightCol");
 	GLint usesNormalMap            = glGetUniformLocation(shaderProg, "useNormalMap");
 	GLint usesAlphaMap			   = glGetUniformLocation(shaderProg, "useAlphaMap");
+	GLint shadowMapUniform		   = glGetUniformLocation(shaderProg, "shadowTexture");
+	GLint depthMatrix			   = glGetUniformLocation(shaderProg, "depthPerspectiveMatrix");
 
 	vec3 lightVec(1.0f, -0.5f, 0.0f);
 	vec3 lightColVec(1.0f, 1.0f, 1.0f);
@@ -99,36 +134,57 @@ void SponzaApp::Run(){
 	mat4 rotation     = rotate(mat4(), glm::radians(180.0f), vec3(0.0f, 1.0f, 0.0f));
 	mat3 normalMatrix = mat3x3(transpose(rotation));
 	mat4 scaleMatrix;
-	scaleMatrix = scale(scaleMatrix, vec3(0.3f, 0.3f, 0.3f));
+	scaleMatrix = scale(scaleMatrix, vec3(0.03f, 0.03f, 0.03f));
+	mat4 identity;
 
 	Material myMaterial;
 
 	string firstStr = "ms per frame: ";
 	string time = to_string(deltaTime);
 
+	glm::mat4 biasMatrix(
+		0.5, 0.0, 0.0, 0.0,
+		0.0, 0.5, 0.0, 0.0,
+		0.0, 0.0, 0.5, 0.0,
+		0.5, 0.5, 0.5, 1.0
+	);
+
+	mat4 depthPersp = biasMatrix * m_shadowCamera.projectionMatrix * m_shadowCamera.viewMatrix;
+
 	glUseProgram(shaderProg);
-	glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
-	glUniform3fv(lightDir, 1, &lightVec[0]);
-	glUniform3fv(lightCol, 1, &lightColVec[0]);
-	glUniformMatrix4fv(scaleUniform, 1, GL_FALSE, &scaleMatrix[0][0]);
-	glUniform1i(textureUniform, 0);
-	glUniform1i(normalUniform, 1);
-	glUniform1i(specMapUniform, 2);
-	glUniform1i(alphaMapUniform, 3);
+		glUniformMatrix4fv(depthMatrix, 1, GL_FALSE, &depthPersp[0][0]);
+		glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, &m_camera.projectionMatrix[0][0]);
+		glUniform3fv(lightDir, 1, &lightVec[0]);
+		glUniform3fv(lightCol, 1, &lightColVec[0]);
+		glUniformMatrix4fv(scaleUniform, 1, GL_FALSE, &scaleMatrix[0][0]);
+		glUniform1i(textureUniform, 0);
+		glUniform1i(normalUniform, 1);
+		glUniform1i(specMapUniform, 2);
+		glUniform1i(alphaMapUniform, 3);
+		glUniform1i(shadowMapUniform, 4);
 	glUseProgram(0);
 
 
+
 	currentFrame = glfwGetTime();
+
+	m_shadowShader.SetDepthUniforms(m_shadowCamera.projectionMatrix);
 
 	do{
 		deltaTime = currentFrame - lastFrame;
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		RenderShadow();
+		
 		glUseProgram(shaderProg);
 
 
 		glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, &m_camera.viewMatrix[0][0]);
 		glUniform3fv(eyePosUniform, 1, &m_camera.pos[0]);
+
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, m_depthTexture);
 
 		for (int mesh = 0; mesh < m_sponzaMesh.m_numMeshes; ++mesh){
 			int materialIndex = m_sponzaMesh.m_meshData[mesh].m_materialIndex;
@@ -151,6 +207,7 @@ void SponzaApp::Run(){
 			glActiveTexture(GL_TEXTURE3);
 			glBindTexture(GL_TEXTURE_2D, mat.m_alphaMap);
 
+
 			if (mat.m_normalMap != 0){
 				glUniform1i(usesNormalMap, 1);
 			}else{
@@ -165,8 +222,21 @@ void SponzaApp::Run(){
 			}
 
 			RenderStaticMeshComponent(m_sponzaMesh.m_meshData[mesh]);
+
 		}
 
+		glUseProgram(0);
+
+
+		glUseProgram(cubemapShader.GetHandle());
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
+			glUniformMatrix4fv(cubemapShader.GetWVPMatrix(), 1, GL_FALSE, &(m_camera.projectionMatrix * m_camera.viewMatrix * translate(identity, m_camera.pos))[0][0]);
+			glUniform1i(cubemapShader.GetSampler(), 0);
+			glCullFace(GL_FRONT);
+			RenderStaticMeshComponent(cubeMesh.m_meshData[0]);
+			glCullFace(GL_BACK);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		glUseProgram(0);
 
 		time = to_string(deltaTime * 1000.0f);
@@ -197,4 +267,28 @@ GLuint SponzaApp::CreateLightingShader(){
 	const char* attribs[numAttribs] = { "inCoords", "inNormals","inTangents","inBitangents","inUVs" };
 
 	return CreateShader("lightingSponza.vp", "lightingSponza.fp", attribs, numAttribs);
+}
+
+void SponzaApp::RenderShadow(){
+	mat4 scaleMatrix;
+	scaleMatrix = scale(scaleMatrix, vec3(0.03f, 0.03f, 0.03f));
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+
+	glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+
+	glCullFace(GL_FRONT);
+	glUseProgram(m_shadowShader.GetDepthHandle());
+		DepthShaderUniforms shadowUniforms = m_shadowShader.GetDepthUniforms();
+
+		m_shadowShader.UpdateDepthUniforms(scaleMatrix, m_shadowCamera.viewMatrix);
+
+		
+		for (int mesh = 0; mesh < m_sponzaMesh.m_numMeshes; ++mesh){
+			
+			RenderStaticMeshComponent(m_sponzaMesh.m_meshData[mesh]);
+		}
+
+	glUseProgram(0);
+	glCullFace(GL_BACK);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
