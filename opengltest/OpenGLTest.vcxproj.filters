@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
@@ -28,38 +24,17 @@
     <Filter Include="Shaders\ShaderClasses">
       <UniqueIdentifier>{bc3c36b9-0709-49b0-811c-e9918dd18aeb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Core">
-      <UniqueIdentifier>{8c225179-d7bb-4615-8df9-b973512e6940}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Renderable Objects">
-      <UniqueIdentifier>{b06d03e4-d749-4d91-9291-edc66a465744}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Core">
       <UniqueIdentifier>{6f2af7ba-1aa3-430c-b102-dec1f4a7fa40}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Renderable Objects">
       <UniqueIdentifier>{1fdc3f40-7bd5-4ddc-b0f1-6f579f2bc1b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Apps">
+      <UniqueIdentifier>{4a461670-c170-401a-a46b-6dfd33773e25}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MainApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SponzaApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TeapotApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GBufferData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CubemapShader.cpp">
       <Filter>Shaders\ShaderClasses</Filter>
     </ClCompile>
@@ -75,42 +50,6 @@
     <ClCompile Include="PointSpriteShader.cpp">
       <Filter>Shaders\ShaderClasses</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Frustum.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexArray.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="StaticMesh.cpp">
-      <Filter>Source Files\Renderable Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="PointSprite.cpp">
-      <Filter>Source Files\Renderable Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleSystem.cpp">
-      <Filter>Source Files\Renderable Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="GroundPlane.cpp">
-      <Filter>Source Files\Renderable Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="DepthBuffer.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="CubeMap.cpp">
-      <Filter>Source Files\Renderable Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="ComparisonApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ComparisonShader.cpp">
       <Filter>Shaders\ShaderClasses</Filter>
     </ClCompile>
@@ -120,33 +59,72 @@
     <ClCompile Include="ShadowShader.cpp">
       <Filter>Shaders\ShaderClasses</Filter>
     </ClCompile>
-    <ClCompile Include="ShadowApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DeferredApp.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Header Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="DeferredRenderer.cpp">
-      <Filter>Source Files\Core</Filter>
+      <Filter>Header Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthBuffer.cpp">
+      <Filter>Header Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Frustum.cpp">
+      <Filter>Header Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Header Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexArray.cpp">
+      <Filter>Header Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeMap.cpp">
+      <Filter>Header Files\Renderable Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="GroundPlane.cpp">
+      <Filter>Header Files\Renderable Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>Header Files\Renderable Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="PointSprite.cpp">
+      <Filter>Header Files\Renderable Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticMesh.cpp">
+      <Filter>Header Files\Renderable Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComparisonApp.cpp">
+      <Filter>Header Files\Apps</Filter>
+    </ClCompile>
+    <ClCompile Include="DeferredApp.cpp">
+      <Filter>Header Files\Apps</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp.cpp">
+      <Filter>Header Files\Apps</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleApp.cpp">
+      <Filter>Header Files\Apps</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowApp.cpp">
+      <Filter>Header Files\Apps</Filter>
+    </ClCompile>
+    <ClCompile Include="SponzaApp.cpp">
+      <Filter>Header Files\Apps</Filter>
+    </ClCompile>
+    <ClCompile Include="TeapotApp.cpp">
+      <Filter>Header Files\Apps</Filter>
+    </ClCompile>
+    <ClCompile Include="GBufferData.cpp">
+      <Filter>Header Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Header Files\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MainApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SponzaApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TeapotApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GBufferData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Defines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CubemapShader.h">
@@ -159,9 +137,6 @@
       <Filter>Shaders\ShaderClasses</Filter>
     </ClInclude>
     <ClInclude Include="ParticleShader.h">
-      <Filter>Shaders\ShaderClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
       <Filter>Shaders\ShaderClasses</Filter>
     </ClInclude>
     <ClInclude Include="PointSpriteShader.h">
@@ -206,25 +181,43 @@
     <ClInclude Include="GroundPlane.h">
       <Filter>Header Files\Renderable Objects</Filter>
     </ClInclude>
-    <ClInclude Include="ComparisonApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ComparisonShader.h">
       <Filter>Shaders\ShaderClasses</Filter>
     </ClInclude>
     <ClInclude Include="CookTorrance.h">
       <Filter>Shaders\ShaderClasses</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ShadowShader.h">
       <Filter>Shaders\ShaderClasses</Filter>
     </ClInclude>
-    <ClInclude Include="DeferredApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DeferredRenderer.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ComparisonApp.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="DeferredApp.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleApp.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowApp.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="SponzaApp.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="TeapotApp.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="GBufferData.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
@@ -239,12 +232,6 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\depth.vp">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\font.fp">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\font.vp">
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\gBuffer.fp">

@@ -159,8 +159,6 @@
     <None Include="shaders\cubeMap.vp" />
     <None Include="shaders\depth.fp" />
     <None Include="shaders\depth.vp" />
-    <None Include="shaders\font.fp" />
-    <None Include="shaders\font.vp" />
     <None Include="shaders\gBuffer.fp" />
     <None Include="shaders\gBuffer.vp" />
     <None Include="shaders\instancedLighting.fp" />
