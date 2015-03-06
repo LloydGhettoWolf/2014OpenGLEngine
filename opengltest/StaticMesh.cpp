@@ -298,5 +298,11 @@ StaticMesh::~StaticMesh(){
 
 		if (m_materialData[texture].m_normalMap)
 			glDeleteTextures(1, &(m_materialData[texture].m_normalMap));
+
+		if (m_materialData[texture].m_specMap)
+			glDeleteTextures(1, &(m_materialData[texture].m_specMap));
+
+		if (m_materialData[texture].m_alphaMap)
+			glDeleteTextures(1, &(m_materialData[texture].m_alphaMap));
 	}
 }

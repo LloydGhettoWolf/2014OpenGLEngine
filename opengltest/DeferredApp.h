@@ -33,10 +33,10 @@ private:
 
 	Material       m_material;
 
-	StaticMesh m_teapotMesh;
-	GLuint     m_groundPlaneBuffer;
-	vec3       m_positions[NUM_MESHES];
-	GLuint	   m_teaTexture, m_normalTexture;
+	StaticMesh		m_teapotMesh;
+	GLuint			m_groundPlaneBuffer;
+	vec3			m_positions[NUM_MESHES];
+	GLuint			m_teaTexture, m_normalTexture;
 
 	CubemapShader		  cubemapShader;
 	StaticMesh            cubeMesh;

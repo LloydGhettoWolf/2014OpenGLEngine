@@ -10,7 +10,7 @@ class DeferredRenderer{
 public:
 
 	DeferredRenderer(){};
-	~DeferredRenderer(){};
+	~DeferredRenderer(){ glDeleteBuffers(1, &m_quadBuffer); }
 
 	bool Init();
 

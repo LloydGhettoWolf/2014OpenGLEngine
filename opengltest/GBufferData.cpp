@@ -4,6 +4,13 @@
 #include "DepthBuffer.h"
 #include "Defines.h"
 
+GBufferData::~GBufferData(){
+	glDeleteTextures(NUM_MRT, textures);
+	glDeleteTextures(1, &depthTexture);
+	glDeleteTextures(1, &finalTexture);
+	glDeleteFramebuffers(1, &fboObject);
+}
+
 bool CreateGBufferData(GBufferData& data){
 	GLenum format, type;
 

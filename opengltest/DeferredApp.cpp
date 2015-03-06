@@ -202,10 +202,9 @@ void DeferredApp::ShutDown(){
 
 	glDeleteVertexArrays(1, &m_groundPlaneBuffer);
 
-	glDeleteShader(cubemapShader.GetHandle());
 	glDeleteTextures(1, &cubeMap);
-
 	glDeleteTextures(1, &m_teaTexture);
+	glDeleteTextures(1, &m_normalTexture);
 };
 
 void DeferredApp::RenderGeometry(){

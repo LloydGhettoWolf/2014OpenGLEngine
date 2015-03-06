@@ -10,6 +10,8 @@ struct GBufferData{
 	GLuint  textures[NUM_MRT];
 	GLuint  depthTexture;
 	GLuint  finalTexture;
+
+	~GBufferData();
 };
 
 bool CreateGBufferData(GBufferData& data);
