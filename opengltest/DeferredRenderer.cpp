@@ -58,25 +58,33 @@ void DeferredRenderer::SetUniformsFirstTime(vec2& screenSize, mat3& normalMatrix
 
 }
 
-void DeferredRenderer::RenderDeferred(mat4& viewProjection, vec3* lightPositions, vec3* lightColors,
-									 vec3& camPos, int numLights, void(*RenderFunc)(GLint, mat4&), void(*CubeMapFunc)(mat4&,vec3&)){
-
-	//geometry pass
+void DeferredRenderer::BindFBO(){
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_gBuffer.fboObject);
-	RenderGBuffer(RenderFunc,viewProjection);
+}
 
-	mat4 identity;
-
-	if (CubeMapFunc != NULL){
-		//cubemap - set the last render target to render to
-		glDrawBuffer(GL_COLOR_ATTACHMENT4);
-		CubeMapFunc(viewProjection,camPos);
-	}
-	
-
-	//render the lit scene above it
-	RenderLights(viewProjection,lightPositions,lightColors,camPos,numLights);
+void DeferredRenderer::UnbindFBO(){
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void DeferredRenderer::PrepareGeometry(){
+	glDrawBuffer(GL_COLOR_ATTACHMENT4);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0,
+		GL_COLOR_ATTACHMENT1,
+		GL_COLOR_ATTACHMENT2,
+		GL_COLOR_ATTACHMENT3 };
+
+	glDrawBuffers(NUM_MRT, DrawBuffers);
+
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glClearDepth(1.0f);
+
+}
+
+void DeferredRenderer::PresentToScreen(){
+
 
 	//render to screen
 	QuadPassShaderUniforms uniforms = m_deferredShader.GetQuadPassUniforms();
@@ -113,6 +121,7 @@ void DeferredRenderer::RenderDeferred(mat4& viewProjection, vec3* lightPositions
 
 void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,vec3* lightColors,vec3& camPos,int numLights){
 
+	glDepthMask(GL_FALSE);
 	mat4 worldMatrix, identity;
 	MaterialUniforms matuni;
 	for (int light = 0; light < numLights; light++){
@@ -189,28 +198,6 @@ void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,ve
 	glDisable(GL_STENCIL_TEST);
 }
 
-void DeferredRenderer::RenderGBuffer(void(*RenderFunc)(GLint, mat4&),mat4& viewProjection){
-
-	glDrawBuffer(GL_COLOR_ATTACHMENT4);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0,
-							 GL_COLOR_ATTACHMENT1,
-							 GL_COLOR_ATTACHMENT2,
-							 GL_COLOR_ATTACHMENT3 };
-
-	glDrawBuffers(NUM_MRT, DrawBuffers);
-
-	glDepthMask(GL_TRUE);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	glClearDepth(1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	RenderFunc(m_deferredShader.GetGBufferHandle(), viewProjection);
-
-	glDepthMask(GL_FALSE);
-	glUseProgram(0);
-}
 
 bool DeferredRenderer::CreateGBuffer(){
 	return CreateGBufferData(m_gBuffer);

@@ -22,16 +22,25 @@ private:
 	bool InitGUI();
 
 	void RenderDeferred(int numLights);
-	static void RenderGeometry(GLint shaderHandle, mat4& viewProjection);
-	static void RenderCubemap(mat4& viewProjection, vec3& camPos);
+	void RenderGeometry();
+	void RenderCubemap();
 	
 	DeferredRenderer      m_deferredRenderer;
 
 	PointLightData  m_lights;
-	vec3            lightPos[NUM_POINT_LIGHTS];
+	vec3            m_lightPos[NUM_POINT_LIGHTS];
 	float           m_radii[NUM_POINT_LIGHTS];
 
 	Material       m_material;
+
+	StaticMesh m_teapotMesh;
+	GLuint     m_groundPlaneBuffer;
+	vec3       m_positions[NUM_MESHES];
+	GLuint	   m_teaTexture, m_normalTexture;
+
+	CubemapShader		  cubemapShader;
+	StaticMesh            cubeMesh;
+	GLuint				  cubeMap;
 
 	//full screen quad
 	GLuint m_quadBuffer;

@@ -16,15 +16,17 @@ public:
 
 	void SetUniformsFirstTime(vec2& screenSize,mat3& normalMatrix,mat4& rotation);
 
-	void RenderDeferred(mat4& viewProjection, vec3* lightPositions, vec3* lightColors, 
-						vec3& camPos, int numLights, void(*RenderFunc)(GLint, mat4&), void(*CubeMapFunc)(mat4&,vec3&) = NULL);
+	void PresentToScreen();
+
+	void DeferredRenderer::BindFBO();
+	void DeferredRenderer::UnbindFBO();
+	void DeferredRenderer::PrepareGeometry();
+
+	GLint GetGBufferShaderHandle()const { return m_deferredShader.GetGBufferHandle(); }
+	void RenderLights(mat4& viewProjection, vec3* lightPositions, vec3* lightColors, vec3& camPos, int numLights);
 private:
 
 	bool CreateGBuffer();
-
-	void RenderGBuffer(void(*RenderFunc)(GLint, mat4&),mat4& viewProjection);
-	void RenderLights(mat4& viewProjection, vec3* lightPositions, vec3* lightColors, vec3& camPos,int numLights);
-
 	float CalcSphereDistance(const PointLightData& pLight, int index);
 
 	DeferredShader		  m_deferredShader;
