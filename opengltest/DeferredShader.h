@@ -48,6 +48,7 @@ private:
 	bool CreateNULLShader();
 public:
 	DeferredShader(){};
+	~DeferredShader();
 	bool CreateDeferredShader();
 	static GLuint GetGBufferHandle()  { return m_gBufferHandle; }
 	static GLuint GetLightPassHandle(){ return m_lightPassHandle; }

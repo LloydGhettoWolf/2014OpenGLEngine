@@ -1,6 +1,13 @@
 //DeferredShader.cpp
 #include "DeferredShader.h"
 
+DeferredShader::~DeferredShader(){
+	glDeleteShader(m_gBufferHandle);
+	glDeleteShader(m_lightPassHandle);
+	glDeleteShader(m_nullPassHandle);
+	glDeleteShader(m_quadPassHandle);
+}
+
 bool DeferredShader::CreateGBufferShader(){
 	const int numAttribs = 6;
 	const char* attribs[numAttribs] = { "inCoords", "inNormals","inTangents","inBitangents","inUVs","inPositions" };
