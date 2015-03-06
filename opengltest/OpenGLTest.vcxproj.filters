@@ -122,6 +122,9 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Header Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="DeferredSponza.cpp">
+      <Filter>Header Files\Apps</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Defines.h">
@@ -220,6 +223,9 @@
     <ClInclude Include="Shader.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="DeferredSponza.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\cubeMap.fp">
@@ -307,10 +313,16 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\lightingSponza.fp">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\lightingShaders</Filter>
     </None>
     <None Include="shaders\lightingSponza.vp">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\lightingShaders</Filter>
+    </None>
+    <None Include="shaders\gBufferSponza.fp">
+      <Filter>Shaders\DeferredShaders</Filter>
+    </None>
+    <None Include="shaders\gBufferSponza.vp">
+      <Filter>Shaders\DeferredShaders</Filter>
     </None>
   </ItemGroup>
 </Project>

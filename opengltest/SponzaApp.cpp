@@ -17,48 +17,16 @@
 
 bool SponzaApp::Init(){
 
-	if (glfwInit() != GL_TRUE){
-		std::cout << "glfw failed!" << std::endl;
-		return false;
-	}
-
-	glfwOpenWindowHint(GLFW_VERSION_MAJOR, 4);
-	glfwOpenWindowHint(GLFW_VERSION_MINOR, 0);
-
-
-	if (!glfwOpenWindow(APP_WIDTH, APP_HEIGHT, 8, 8, 8, 8, 32, 32, GLFW_WINDOW)){
-		std::cout << "cant create window" << std::endl;
-		glfwTerminate();
-		return false;
-	}
-
-	glfwSetKeyCallback(KeyCallback);
-
-	if (glewInit() != GLEW_OK){
-		std::cout << "glew failed!" << std::endl;
-		return false;
-	}
-
-	ilInit();
-
-	//Depth states
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	glClearDepth(1.0f);
-
-	//glEnable(GL_DEPTH_CLAMP);
-
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-
-	glEnable(GL_TEXTURE_2D);
+	StandardInit();
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	m_lightingShader = CreateLightingShader();
 
-	InitStaticMesh(m_sponzaMesh, "sponza.obj", "meshes\\sponza_obj\\", aiProcess_Triangulate | aiProcess_CalcTangentSpace);
+	if (!InitStaticMesh(m_sponzaMesh, "sponza.obj", "meshes\\sponza_obj\\", aiProcess_Triangulate | aiProcess_CalcTangentSpace)){
+		cout << "cant open sponza mesh!" << endl;
+		return false;
+	}
 
 	if (!cubemapShader.CreateCubemapShader()){
 		cout << "failed to load shader!" << endl;

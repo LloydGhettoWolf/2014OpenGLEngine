@@ -23,7 +23,7 @@ bool CreateGBufferData(GBufferData& data){
 
 	for (int renderTarget = 0; renderTarget < NUM_MRT; renderTarget++){
 		glBindTexture(GL_TEXTURE_2D, data.textures[renderTarget]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F,APP_WIDTH, APP_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F,APP_WIDTH, APP_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + renderTarget, GL_TEXTURE_2D,
 							data.textures[renderTarget], 0);
 

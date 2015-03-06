@@ -8,23 +8,27 @@ DeferredShader::~DeferredShader(){
 	glDeleteShader(m_quadPassHandle);
 }
 
+
 bool DeferredShader::CreateGBufferShader(){
-	const int numAttribs = 6;
-	const char* attribs[numAttribs] = { "inCoords", "inNormals","inTangents","inBitangents","inUVs","inPositions" };
+	const int numAttribs = 5;
+	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inTangents", "inBitangents", "inUVs" };
 	m_gBufferHandle = CreateShader("gBuffer.vp", "gBuffer.fp", attribs, numAttribs);
 
 	if (!m_gBufferHandle) return false;
-	
-	m_gBufferUniforms.cameraMatrixUniform   = glGetUniformLocation(m_gBufferHandle, "vpMatrix");
-	m_gBufferUniforms.normalMatrixUniform   = glGetUniformLocation(m_gBufferHandle, "normalMatrix");
+
+	m_gBufferUniforms.cameraMatrixUniform = glGetUniformLocation(m_gBufferHandle, "vpMatrix");
+	m_gBufferUniforms.normalMatrixUniform = glGetUniformLocation(m_gBufferHandle, "normalMatrix");
 	m_gBufferUniforms.rotationMatrixUniform = glGetUniformLocation(m_gBufferHandle, "rotationMatrix");
-	m_gBufferUniforms.scaleMatrixUniform    = glGetUniformLocation(m_gBufferHandle, "scaleMatrix");
+	m_gBufferUniforms.scaleMatrixUniform = glGetUniformLocation(m_gBufferHandle, "scaleMatrix");
 
-	m_gBufferUniforms.textureUniform		= glGetUniformLocation(m_gBufferHandle, "myTexture");
-
+	m_gBufferUniforms.textureUniform = glGetUniformLocation(m_gBufferHandle, "myTexture");
+	m_gBufferUniforms.specularMapUniform = glGetUniformLocation(m_gBufferHandle, "specularMap");
+	m_gBufferUniforms.alphaMapUniform = glGetUniformLocation(m_gBufferHandle, "alphaMap");
+	m_gBufferUniforms.normalMapUniform = glGetUniformLocation(m_gBufferHandle, "normalMap");
 
 	return true;
 }
+
 
 bool DeferredShader::CreateLightPassShader(){
 	const int numAttribs = 1;
@@ -36,6 +40,7 @@ bool DeferredShader::CreateLightPassShader(){
 	m_lightPassUniforms.diffTextureUniform = glGetUniformLocation(m_lightPassHandle, "diffuse");
 	m_lightPassUniforms.normTextureUniform = glGetUniformLocation(m_lightPassHandle, "normal");
 	m_lightPassUniforms.posTextureUniform  = glGetUniformLocation(m_lightPassHandle, "position");
+	m_lightPassUniforms.ambTextureUniform  = glGetUniformLocation(m_lightPassHandle, "ambient");
 	m_lightPassUniforms.screenSizeUniform  = glGetUniformLocation(m_lightPassHandle, "screenSize");
 	m_lightPassUniforms.lightPosUniform    = glGetUniformLocation(m_lightPassHandle, "lightPos");
 	m_lightPassUniforms.lightColUniform    = glGetUniformLocation(m_lightPassHandle, "lightColor");
@@ -52,7 +57,7 @@ bool DeferredShader::CreateQuadPassShader(){
 
 	if (!m_quadPassHandle) return false;
 
-	m_quadPassUniforms.ambTextureUniform = glGetUniformLocation(m_quadPassHandle, "ambient");
+	m_quadPassUniforms.ambTextureUniform = glGetUniformLocation(m_quadPassHandle, "amb");
 	m_quadPassUniforms.screenSizeUniform = glGetUniformLocation(m_quadPassHandle, "screenSize");
 	m_quadPassUniforms.bufferUniform     = glGetUniformLocation(m_quadPassHandle, "buff");
 
@@ -75,8 +80,10 @@ bool DeferredShader::CreateDeferredShader(){
 	if (!CreateQuadPassShader())
 		return false;
 
+	
 	if (!CreateGBufferShader())
 		return false;
+	
 
 	if (!CreateLightPassShader())
 		return false;

@@ -1,14 +1,14 @@
 #include "MainApp.h"
 //#include "ShadowApp.h"
-#include "SponzaApp.h"
-#include "DeferredApp.h"
+#include "DeferredSponza.h"
+//#include "DeferredApp.h"
 #include <iostream>
 
 App* app;
 
 int main(int argc, char** argv){
 
-	app = new DeferredApp();
+	app = new DeferredSponza();
 
 	if (!app->Init()){
 		std::cout << "init failed!" << endl;

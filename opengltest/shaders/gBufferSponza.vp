@@ -9,7 +9,6 @@ in vec3 inNormals;
 in vec3 inTangents;
 in vec3 inBitangents;
 in vec2 inUVs;
-in vec3 inPositions;
 
 out vec3 worldPos;
 out vec3 normals;
@@ -20,10 +19,6 @@ out vec2 UVs;
 void main(){
         vec4 position     =  vec4(inCoords,1.0);
 
-        mat4 m = mat4(1.0,0.0,0.0,0.0,
-				      0.0,1.0,0.0,0.0,
-				      0.0,0.0,1.0,0.0,
-					  inPositions.x,inPositions.y,inPositions.z,1.0);
 
         position  =   scaleMatrix * position;
         
