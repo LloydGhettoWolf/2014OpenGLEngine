@@ -116,8 +116,8 @@ bool DeferredApp::Init(){
 	m_material.shininess = 64.0f;
 
 
-	m_teaTexture    = CreateTexture("Textures\\160.jpg", GL_LINEAR, GL_NEAREST);
-	m_normalTexture = CreateTexture("Textures\\160_norm.jpg", GL_LINEAR, GL_NEAREST);
+	m_teaTexture    = CreateTexture("Textures\\160.jpg", GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+	m_normalTexture = CreateTexture("Textures\\160_norm.jpg", GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
 
 	//if (!InitGUI()){
 	//	return false;
