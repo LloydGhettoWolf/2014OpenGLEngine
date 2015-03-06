@@ -14,7 +14,7 @@ public:
 	CubemapShader(){};
 	bool CreateCubemapShader();
 	GLint GetWVPMatrix()const { return m_WVPMatrixUniform; }
-	GLint GetSampler()const { return m_WVPMatrixUniform; }
+	GLint GetSampler()const { return m_samplerUniform; }
 
 	static GLuint GetHandle() { return m_cubemapHandle; }
 };

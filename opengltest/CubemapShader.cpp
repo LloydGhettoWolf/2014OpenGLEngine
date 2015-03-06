@@ -9,7 +9,7 @@ bool CubemapShader::CreateCubemapShader(){
 	if (!m_cubemapHandle) return false;
 
 	m_WVPMatrixUniform = glGetUniformLocation(m_cubemapHandle, "wvpMatrix");
-	m_samplerUniform   = glGetUniformLocation(m_cubemapHandle, "cubeSampler");
+	m_samplerUniform   = glGetUniformLocation(m_cubemapHandle, "sampler");
 
 	return true;
 }
