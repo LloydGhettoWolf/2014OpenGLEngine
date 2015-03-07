@@ -7,7 +7,7 @@ uniform vec2      screenSize;
 uniform vec3      lightColor;
 uniform vec3      lightPos;
 uniform vec3      eyePos;
-out vec4 color;
+out vec4          color;
 
 vec2 CalcCoord();
 vec3 CalcPointLight(vec3 worldPos,vec3 normal,vec3 diff,float spec);
@@ -15,9 +15,9 @@ vec4 ColorPoint(vec3 lightDir,vec3 worldPos,vec3 normal,vec3 lightCol,float Atte
 
 void main(){
         vec2 texCoord = CalcCoord();
-        vec3 worldPos = texture2D(position,texCoord).xyz;
+        vec3 worldPos = texture(position,texCoord).xyz;
         vec3 norm     = normalize(texture2D(normal,texCoord).xyz * 2.0 - 1.0);
-        vec4 diff     = texture2D(diffuse,texCoord);
+        vec4 diff     = texture(diffuse,texCoord);
         vec3 result   = CalcPointLight(worldPos,norm,diff.xyz,diff.w);
         color =       vec4(result,1.0);
 }
@@ -40,8 +40,7 @@ vec4 ColorPoint(vec3 lightDir,vec3 worldPos,vec3 normal,vec3 diffuse,float Atten
         vec3 viewDir     = normalize(eyePos - worldPos);
         vec3 halfVec     = normalize((lightDir + viewDir) * 0.5);
         float specFactor = spec * pow(max(dot(normal,halfVec),0.0),256.0f);
-        vec3 col = diffuse * lightColor * diffFactor;
-        col += (specFactor * lightColor);
+        vec3 col = lightColor * ((diffuse * diffFactor) + specFactor);
         col = clamp(Attenuation * col,0.0,1.0);
         return vec4(col,1.0);
 }

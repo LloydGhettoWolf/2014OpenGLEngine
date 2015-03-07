@@ -1,3 +1,6 @@
+#version 400
+uniform sampler2D myTexture;
+uniform sampler2D normalMap;
 uniform sampler2D specularMap;
 uniform sampler2D alphaMap;
 
@@ -12,12 +15,11 @@ in vec2 UVs;
 
 layout(location = 0) out vec4 worldPosOut;
 layout(location = 1) out vec4 normalsOut;
-layout(location = 2) out vec4 ambientOut;
-layout(location = 3) out vec4 diffuseOut;
+layout(location = 2) out vec4 diffuseOut;
 
 void main(){
 	
-  if(useAlphaMap &&  texture2D(alphaMap,UVs).r < 0.2){
+  if(useAlphaMap &&  texture(alphaMap,UVs).r < 0.2){
 		discard;
   }
 
@@ -26,14 +28,13 @@ void main(){
   if(useNormalMap){
 	  mat3 TBN = mat3(tangents,biTangents,normals);
 
-	  vec3 normalMapNormal =  texture2D(normalMap,UVs).xyz; 
+	  vec3 normalMapNormal =  texture(normalMap,UVs).xyz; 
 	  normalMapNormal = 2.0 * normalMapNormal - 1.0;
 	  normalsOut.xyz   = (normalize(TBN * normalMapNormal) + 1.0) * 0.5;
   }else{
-	  normalsOut.xyz = normals;
+	  normalsOut.xyz = (normals + 1.0) * 0.5;
   }
 
-  diffuseOut.xyz   = texture(myTexture,UVs).xyz;
-  ambientOut.xyz   = materialAmbient.xyz * diffuseOut.xyz;
-  diffuseOut.w     = texture(specularMap,UVs).x;
+  diffuseOut.xyz     = texture(myTexture,UVs).xyz;
+  diffuseOut.w       = texture(specularMap,UVs).x;
 }

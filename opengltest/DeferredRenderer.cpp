@@ -124,6 +124,7 @@ void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,ve
 	glDepthMask(GL_FALSE);
 	mat4 worldMatrix, identity;
 	MaterialUniforms matuni;
+
 	for (int light = 0; light < numLights; light++){
 		glDrawBuffer(GL_NONE);
 		glEnable(GL_DEPTH_TEST);
@@ -167,12 +168,9 @@ void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,ve
 
 			glActiveTexture(GL_TEXTURE2);
 			glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[2]);
-			glUniform1i(lightPassUniforms.ambTextureUniform, 2);
+			glUniform1i(lightPassUniforms.diffTextureUniform, 2);
 
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, m_gBuffer.textures[3]);
-			glUniform1i(lightPassUniforms.diffTextureUniform, 3);
-
+			
 			worldMatrix = translate(identity, lightPositions[light]) * glm::scale(identity, vec3(scale, scale, scale));
 			glUniformMatrix4fv(lightPassUniforms.wvpMatrixUniform, 1, GL_FALSE, &(viewProjection * worldMatrix)[0][0]);
 			glUniform3fv(lightPassUniforms.lightPosUniform, 1, &lightPositions[light][0]);
@@ -189,8 +187,6 @@ void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,ve
 			glActiveTexture(GL_TEXTURE2);
 			glBindTexture(GL_TEXTURE_2D, 0);
 
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, 0);
 
 			glDisable(GL_BLEND);
 			glCullFace(GL_BACK);

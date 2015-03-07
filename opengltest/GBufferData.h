@@ -2,7 +2,7 @@
 #pragma once
 #include <gl\glew.h>
 
-const int NUM_MRT = 4;
+const int NUM_MRT = 3;
 
 
 struct GBufferData{

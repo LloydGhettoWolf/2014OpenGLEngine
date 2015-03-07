@@ -324,5 +324,11 @@
     <None Include="shaders\gBufferSponza.vp">
       <Filter>Shaders\DeferredShaders</Filter>
     </None>
+    <None Include="shaders\sponzaLightPass.fp">
+      <Filter>Shaders\DeferredShaders</Filter>
+    </None>
+    <None Include="shaders\sponzaLightPass.vp">
+      <Filter>Shaders\DeferredShaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

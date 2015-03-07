@@ -184,6 +184,8 @@
     <None Include="shaders\quadPass.vp" />
     <None Include="shaders\shadow.fp" />
     <None Include="shaders\shadow.vp" />
+    <None Include="shaders\sponzaLightPass.fp" />
+    <None Include="shaders\sponzaLightPass.vp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

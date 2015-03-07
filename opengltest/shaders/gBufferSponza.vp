@@ -9,6 +9,7 @@ in vec3 inNormals;
 in vec3 inTangents;
 in vec3 inBitangents;
 in vec2 inUVs;
+in vec3 inPositions;
 
 out vec3 worldPos;
 out vec3 normals;

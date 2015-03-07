@@ -24,7 +24,7 @@ void main(){
   normalMapNormal = 2.0 * normalMapNormal - 1.0;
   normalize(TBN * normalMapNormal);
 
-  normalsOut   = normalize(TBN * normalMapNormal);
+  normalsOut   = normalize((TBN * normalMapNormal + 1.0) * 0.5);
   ambientOut   = materialAmbient;
   diffuseOut   = texture(myTexture,UVs).xyz;
 }

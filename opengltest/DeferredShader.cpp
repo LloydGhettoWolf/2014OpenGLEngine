@@ -10,21 +10,21 @@ DeferredShader::~DeferredShader(){
 
 
 bool DeferredShader::CreateGBufferShader(){
-	const int numAttribs = 5;
-	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inTangents", "inBitangents", "inUVs" };
-	m_gBufferHandle = CreateShader("gBuffer.vp", "gBuffer.fp", attribs, numAttribs);
+	const int numAttribs = 6;
+	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inTangents", "inBitangents", "inUVs","inPositions" };
+	m_gBufferHandle = CreateShader("gBufferSponza.vp", "gBufferSponza.fp", attribs, numAttribs);
 
 	if (!m_gBufferHandle) return false;
 
-	m_gBufferUniforms.cameraMatrixUniform = glGetUniformLocation(m_gBufferHandle, "vpMatrix");
-	m_gBufferUniforms.normalMatrixUniform = glGetUniformLocation(m_gBufferHandle, "normalMatrix");
+	m_gBufferUniforms.cameraMatrixUniform   = glGetUniformLocation(m_gBufferHandle, "vpMatrix");
+	m_gBufferUniforms.normalMatrixUniform   = glGetUniformLocation(m_gBufferHandle, "normalMatrix");
 	m_gBufferUniforms.rotationMatrixUniform = glGetUniformLocation(m_gBufferHandle, "rotationMatrix");
-	m_gBufferUniforms.scaleMatrixUniform = glGetUniformLocation(m_gBufferHandle, "scaleMatrix");
+	m_gBufferUniforms.scaleMatrixUniform    = glGetUniformLocation(m_gBufferHandle, "scaleMatrix");
 
-	m_gBufferUniforms.textureUniform = glGetUniformLocation(m_gBufferHandle, "myTexture");
-	m_gBufferUniforms.specularMapUniform = glGetUniformLocation(m_gBufferHandle, "specularMap");
-	m_gBufferUniforms.alphaMapUniform = glGetUniformLocation(m_gBufferHandle, "alphaMap");
-	m_gBufferUniforms.normalMapUniform = glGetUniformLocation(m_gBufferHandle, "normalMap");
+	m_gBufferUniforms.textureUniform        = glGetUniformLocation(m_gBufferHandle, "myTexture");
+	m_gBufferUniforms.specularMapUniform    = glGetUniformLocation(m_gBufferHandle, "specMap");
+	m_gBufferUniforms.alphaMapUniform       = glGetUniformLocation(m_gBufferHandle, "alphaMap");
+	m_gBufferUniforms.normalMapUniform      = glGetUniformLocation(m_gBufferHandle, "normalMap");
 
 	return true;
 }
@@ -57,9 +57,9 @@ bool DeferredShader::CreateQuadPassShader(){
 
 	if (!m_quadPassHandle) return false;
 
-	m_quadPassUniforms.ambTextureUniform = glGetUniformLocation(m_quadPassHandle, "amb");
 	m_quadPassUniforms.screenSizeUniform = glGetUniformLocation(m_quadPassHandle, "screenSize");
 	m_quadPassUniforms.bufferUniform     = glGetUniformLocation(m_quadPassHandle, "buff");
+	m_quadPassUniforms.ambTextureUniform = glGetUniformLocation(m_quadPassHandle, "diff");
 
 	return true;
 }
