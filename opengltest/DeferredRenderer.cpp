@@ -16,7 +16,7 @@ bool DeferredRenderer::Init(){
 		return false;
 	}
 
-	if (!InitStaticMesh(m_sphereMesh, "sphere.obj", "meshes\\")){
+	if (!InitStaticMesh(m_sphereMesh, "sphere.obj", "meshes\\sphere\\")){
 		cout << "couldn't load sphere mesh!" << endl;
 		return false;
 	}
@@ -119,11 +119,15 @@ void DeferredRenderer::PresentToScreen(){
 
 }
 
-void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,vec3* lightColors,vec3& camPos,int numLights){
+void DeferredRenderer::RenderLights(mat4& viewProjection,PointLightData& lightData,vec3& camPos,int numLights){
 
 	glDepthMask(GL_FALSE);
 	mat4 worldMatrix, identity;
 	MaterialUniforms matuni;
+
+	vec3*		 lightPositions = lightData.position;
+	vec3*		 lightColors    = lightData.color;
+	Attenuation* attenuation    = lightData.attData;
 
 	for (int light = 0; light < numLights; light++){
 		glDrawBuffer(GL_NONE);
@@ -138,7 +142,7 @@ void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,ve
 
 		glUseProgram(m_deferredShader.GetNULLPassHandle());
 
-			float scale = 85.0f;
+			float scale = CalcSphereDistance(lightData, light);
 			worldMatrix = viewProjection * glm::translate(identity, lightPositions[light]) * glm::scale(identity, vec3(scale, scale, scale));
 			glUniformMatrix4fv(m_deferredShader.GetNULLWVPMatrix(), 1, false, &worldMatrix[0][0]);
 			RenderStaticMeshComponent(m_sphereMesh.m_meshData[0]);
@@ -173,9 +177,14 @@ void DeferredRenderer::RenderLights(mat4& viewProjection,vec3* lightPositions,ve
 			
 			worldMatrix = translate(identity, lightPositions[light]) * glm::scale(identity, vec3(scale, scale, scale));
 			glUniformMatrix4fv(lightPassUniforms.wvpMatrixUniform, 1, GL_FALSE, &(viewProjection * worldMatrix)[0][0]);
+
 			glUniform3fv(lightPassUniforms.lightPosUniform, 1, &lightPositions[light][0]);
 			glUniform3fv(lightPassUniforms.lightColUniform, 1, &lightColors[light][0]);
 			glUniform3fv(lightPassUniforms.eyePosUniform, 1, &(camPos[0]));
+
+			glUniform1f(lightPassUniforms.constAtt,  attenuation[light].constantAtt);
+			glUniform1f(lightPassUniforms.linearAtt, attenuation[light].linearAtt);
+			glUniform1f(lightPassUniforms.expAtt,    attenuation[light].expAtt);
 			RenderStaticMeshComponent(m_sphereMesh.m_meshData[0]);
 
 			glActiveTexture(GL_TEXTURE0);
@@ -202,8 +211,8 @@ bool DeferredRenderer::CreateGBuffer(){
 float DeferredRenderer::CalcSphereDistance(const PointLightData& pLight, int index){
 	float maxChan = std::max(std::max(pLight.color[index].r, pLight.color[index].g), pLight.color[index].b);
 
-	float ret = (-pLight.linearAtt[index] + sqrtf(pLight.linearAtt[index] * pLight.linearAtt[index]
-		- 4.0f *pLight.expAtt[index] * (pLight.expAtt[index] - 256.0f * maxChan))) / (2.0f*pLight.expAtt[index]);
+	float ret = (-pLight.attData[index].linearAtt + sqrtf(pLight.attData[index].linearAtt * pLight.attData[index].linearAtt
+		- 4.0f *pLight.attData[index].expAtt * (pLight.attData[index].expAtt - 256.0f * maxChan))) / (2.0f*pLight.attData[index].expAtt);
 
 	return ret;
 }

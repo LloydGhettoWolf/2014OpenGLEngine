@@ -3,10 +3,16 @@
 uniform sampler2D normal;
 uniform sampler2D position;
 uniform sampler2D diffuse;
+
 uniform vec2      screenSize;
 uniform vec3      lightColor;
 uniform vec3      lightPos;
 uniform vec3      eyePos;
+
+uniform float     constAtt;
+uniform float     linearAtt;
+uniform float     expAtt;
+
 out vec4          color;
 
 vec2 CalcCoord();
@@ -30,7 +36,7 @@ vec3 CalcPointLight(vec3 worldPos,vec3 normal,vec3 diffuse,float spec){
         vec3 lightDir   = lightPos-worldPos;
         float dist      = length(lightDir);
         vec3 lightNorm  = normalize(lightDir);
-        float Attenuation = 1.0 +  0.2 + 0.02 *  dist * dist;
+        float Attenuation = constAtt +  linearAtt * dist +  expAtt *  dist * dist;
         Attenuation = 1.0/max(1.0, Attenuation);
     return ColorPoint(lightNorm,worldPos,normal,diffuse,Attenuation,spec).xzy;
 }

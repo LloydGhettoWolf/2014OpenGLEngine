@@ -50,9 +50,9 @@ bool TeapotApp::Init(){
 
 	
 	for (int light = 0; light < NUM_POINT_LIGHTS; light++){
-		m_lights.constantAtt[light] = 0.0f;
-		m_lights.linearAtt[light] = 0.0f;
-		m_lights.expAtt[light] = 0.7f;
+		m_lights.attData[light].constantAtt = 1.0f;
+		m_lights.attData[light].linearAtt   = 0.1f;
+		m_lights.attData[light].expAtt      = 0.01f;
 
 
 		float randomX = (float)(rand() % 120) - 60.0f;

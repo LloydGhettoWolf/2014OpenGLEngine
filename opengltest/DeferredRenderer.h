@@ -23,7 +23,7 @@ public:
 	void DeferredRenderer::PrepareGeometry();
 
 	GLint GetGBufferShaderHandle()const { return m_deferredShader.GetGBufferHandle(); }
-	void RenderLights(mat4& viewProjection, vec3* lightPositions, vec3* lightColors, vec3& camPos, int numLights);
+	void RenderLights(mat4& viewProjection, PointLightData& lightData, vec3& camPos, int numLights);
 private:
 
 	bool CreateGBuffer();

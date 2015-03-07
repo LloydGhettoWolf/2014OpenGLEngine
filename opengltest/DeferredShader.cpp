@@ -46,6 +46,9 @@ bool DeferredShader::CreateLightPassShader(){
 	m_lightPassUniforms.lightColUniform    = glGetUniformLocation(m_lightPassHandle, "lightColor");
 	m_lightPassUniforms.wvpMatrixUniform   = glGetUniformLocation(m_lightPassHandle, "mvpMatrix");
 	m_lightPassUniforms.eyePosUniform	   = glGetUniformLocation(m_lightPassHandle, "eyePos");
+	m_lightPassUniforms.constAtt		   = glGetUniformLocation(m_lightPassHandle, "constAtt");
+	m_lightPassUniforms.linearAtt		   = glGetUniformLocation(m_lightPassHandle, "linearAtt");
+	m_lightPassUniforms.expAtt			   = glGetUniformLocation(m_lightPassHandle, "expAtt");
 
 	return true;
 }

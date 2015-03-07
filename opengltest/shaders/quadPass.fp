@@ -9,7 +9,7 @@ vec2 CalcCoord();
 void main(){
   vec2 texCoords = CalcCoord();
   color = texture2D(buff,texCoords);
-  color += 0.1 * texture2D(diff,texCoords);
+  color += 0.05 * texture2D(diff,texCoords);
 }
 
 vec2 CalcCoord(){

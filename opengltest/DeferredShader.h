@@ -26,6 +26,9 @@ struct LightPassShaderUniforms{
 	GLint lightColUniform;
 	GLint wvpMatrixUniform;
 	GLint eyePosUniform;
+	GLint constAtt;
+	GLint linearAtt;
+	GLint expAtt;
 };
 
 struct QuadPassShaderUniforms{

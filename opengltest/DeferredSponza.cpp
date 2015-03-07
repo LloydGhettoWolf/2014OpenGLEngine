@@ -50,14 +50,12 @@ bool DeferredSponza::Init(){
 
 	m_lights.position		= new vec3[NUM_POINT_LIGHTS];
 	m_lights.color			= new vec3[NUM_POINT_LIGHTS];
-	m_lights.constantAtt	= new float[NUM_POINT_LIGHTS];
-	m_lights.expAtt			= new float[NUM_POINT_LIGHTS];
-	m_lights.linearAtt		= new float[NUM_POINT_LIGHTS];
+	m_lights.attData		= new Attenuation[NUM_POINT_LIGHTS];
 
 	for (int light = 0; light < NUM_POINT_LIGHTS; light++){
-		m_lights.constantAtt[light] = 0.0f;
-		m_lights.linearAtt[light] = 0.0f;
-		m_lights.expAtt[light] = 0.7f;
+		m_lights.attData[light].constantAtt = 1.0f;
+		m_lights.attData[light].linearAtt   = 0.1f;
+		m_lights.attData[light].expAtt      = 0.01f;
 
 
 		float randomX = (float)(rand() % 400) - 200.0f;
@@ -72,7 +70,7 @@ bool DeferredSponza::Init(){
 
 		m_lights.color[light] = vec3(randomR, randomG, randomB);
 
-		m_radii[light] = (float)(rand() % 10);
+		m_radii[light] = (float)(rand() % 30);
 	}
 
 
@@ -169,7 +167,7 @@ void DeferredSponza::RenderDeferred(int numLights){
 	m_deferredRenderer.PrepareGeometry();
 	RenderSponza();
 	//RenderCubemap();
-	m_deferredRenderer.RenderLights(m_camera.projectionMatrix * m_camera.viewMatrix, m_lights.position, m_lights.color, m_camera.pos, NUM_POINT_LIGHTS);
+	m_deferredRenderer.RenderLights(m_camera.projectionMatrix * m_camera.viewMatrix, m_lights, m_camera.pos, NUM_POINT_LIGHTS);
 	m_deferredRenderer.UnbindFBO();
 	m_deferredRenderer.PresentToScreen();
 }

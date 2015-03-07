@@ -31,19 +31,21 @@ struct MaterialUniforms{
 	GLuint shininessUniform;
 };
 
+struct Attenuation{
+	float constantAtt;
+	float linearAtt;
+	float expAtt;
+};
+
 struct PointLightData{
 	vec3  *position;
 	vec3  *color;
-	float *constantAtt;
-	float *linearAtt;
-	float *expAtt;
+	Attenuation *attData;
 
 	~PointLightData(){
 		delete [] position;
 		delete [] color;
-		delete [] constantAtt;
-		delete [] linearAtt;
-		delete [] expAtt;
+		delete [] attData;
 	}
 };
 
