@@ -6,6 +6,7 @@
 
 #include <assimp\postprocess.h>
 #include <assimp\material.h>
+#include "BoundingBox.h"
 #include "Texture.h"
 #include "Shader.h"
 #include "LightsAndMaterials.h"
@@ -27,17 +28,16 @@ struct MeshComponent{
 	GLuint          m_numFaces			  = 0;
 	GLuint			m_instancedDataBuffer = 0;
 	int             m_materialIndex		  = 0;
+	BoundingBox		m_boundingBox;
 };
 
 struct StaticMesh{
 
 		std::vector<MeshComponent>  m_meshData;
 		std::vector<MaterialInfo>	m_materialData;
-		glm::vec3					m_boundingBoxMin;
-		glm::vec3					m_boundingBoxMax;
 		unsigned int				m_numMaterials;
 		unsigned int				m_numMeshes;
-
+		BoundingBox					m_boundingBox;
 		~StaticMesh();
 };
  
