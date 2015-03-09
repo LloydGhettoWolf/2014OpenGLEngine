@@ -3,7 +3,7 @@
 #include <gtc\matrix_transform.hpp>
 #include <gtx\rotate_vector.hpp>
 
-Camera CreateCamera(vec3& pos, vec3& focusPoint, vec3& upVec){
+Camera CreateCamera(vec3& pos, vec3& focusPoint, vec3& upVec, float nearZ, float farZ, float width, float height,float fov){
 	vec3 lookVec = focusPoint - pos;
 	lookVec = normalize(lookVec);
 
@@ -18,6 +18,14 @@ Camera CreateCamera(vec3& pos, vec3& focusPoint, vec3& upVec){
 	newCam.pos = pos;
 	newCam.viewMatrix = glm::lookAt(pos, focusPoint, upVec);
 	newCam.heading = lookVec;
+
+	newCam.farZ   = farZ;
+	newCam.nearZ  = nearZ;
+	newCam.width  = width;
+	newCam.height = height;
+
+	newCam.projectionMatrix = glm::perspective(fov, width/height, nearZ, farZ);
+
 	return newCam;
 }
 

@@ -11,8 +11,9 @@ struct Camera{
 	vec3 rightVec;
 	vec3 pos;
 
-	float xRotation = 3.14129f/4.0f;
 	float yRotation = -3.14129f/4.0f;
+
+	float nearZ, farZ, width, height;
 
 	mat4x4 viewMatrix,projectionMatrix;
 
@@ -20,7 +21,7 @@ struct Camera{
 	Camera(){};
 };
 
-Camera CreateCamera(vec3& pos,vec3& focusPoint,vec3& upVec);
+Camera CreateCamera(vec3& pos, vec3& focusPoint, vec3& upVec,float nearZ,float farZ,float width,float height,float fov);
 void   MoveCameraForward(Camera& cam, float amount);
 void   MoveCameraHorizontally(Camera& cam,float amount);
 void   MoveCameraVertically(Camera& cam, float amount);

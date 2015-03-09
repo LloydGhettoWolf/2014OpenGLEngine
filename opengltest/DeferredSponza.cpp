@@ -44,9 +44,7 @@ bool DeferredSponza::Init(){
 		return false;
 	}
 
-	m_camera = CreateCamera(vec3(5.0f, 2.0f, 0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_camera.projectionMatrix = glm::perspective(30.0f, APP_WIDTH / APP_HEIGHT, 1.0f, 2000.0f);
-
+	m_camera = CreateCamera(vec3(5.0f, 2.0f, 0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f),1.0f,2000.0f,APP_WIDTH,APP_HEIGHT,45.0f);
 
 	m_lights.position		= new vec3[NUM_POINT_LIGHTS];
 	m_lights.color			= new vec3[NUM_POINT_LIGHTS];

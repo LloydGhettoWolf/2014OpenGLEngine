@@ -31,15 +31,13 @@ bool ShadowApp::Init(){
 
 	m_centerOffset = (m_teapotMesh.m_boundingBox.GetMax().y - m_teapotMesh.m_boundingBox.GetMin().y) / 2.0f;
 
-	m_camera = CreateCamera(vec3(0.0f, 0.0f, -40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_camera.projectionMatrix = glm::perspective(45.0f, APP_WIDTH / APP_HEIGHT, 3.0f, 500.0f);
+	m_camera = CreateCamera(vec3(0.0f, 0.0f, -40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f),3.0f,500.0f,APP_WIDTH,APP_HEIGHT,45.0f);
 
 	m_lightPos = vec3(60.0f, 30.0f, 10.0f);
 	m_lightDir = vec3(1.0f, -1.0f, 0.0f);
 
 
-	m_shadowCamera = CreateCamera(m_lightPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_shadowCamera.projectionMatrix = glm::perspective(30.0f, APP_WIDTH / APP_HEIGHT, 5.0f, 350.0f);
+	m_shadowCamera = CreateCamera(m_lightPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f),5.0f,350.0f,APP_WIDTH,APP_HEIGHT,45.0f);
 
 	m_groundPlaneBuffer = CreateGroundPlaneData();
 

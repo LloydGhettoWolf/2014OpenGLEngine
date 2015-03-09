@@ -54,10 +54,9 @@ bool SponzaApp::Init(){
 
 	m_lightPos = vec3(0.0f, 200.0f, 0.0f);
 
-	m_camera                  = CreateCamera(vec3(5.0f, 2.0f, 0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f);
+	m_camera                  = CreateCamera(vec3(5.0f, 2.0f, 0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f),1.0f,1000.0f,APP_WIDTH,APP_HEIGHT,45.0f);
 
-	m_shadowCamera                  = CreateCamera(vec3(50.0f, 100.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	m_shadowCamera                  = CreateCamera(vec3(50.0f, 100.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f),0.0f,0.0f,0.0f,0.0f,0.0f);
 	m_shadowCamera.projectionMatrix = glm::ortho(-65.0f, 65.0f, -65.0f, 65.0f, -350.0f, 350.0f);
 
 	if (!CreateDepthTextureBasic(m_fbo, m_depthTexture)){

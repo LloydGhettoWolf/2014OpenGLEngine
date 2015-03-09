@@ -41,8 +41,7 @@ bool TeapotApp::Init(){
 		return false;
 	}
 
-	m_camera = CreateCamera(vec3(0.0f,0.0f,-40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_camera.projectionMatrix = glm::perspective(45.0f, APP_WIDTH / APP_HEIGHT, 3.0f, 500.0f);
+	m_camera = CreateCamera(vec3(0.0f,0.0f,-40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f),3.0f,500.0f,APP_WIDTH,APP_HEIGHT,45.0f);
 
 
 	m_groundPlaneBuffer = CreateGroundPlaneData();
@@ -60,13 +59,13 @@ bool TeapotApp::Init(){
 
 		lightPos[light] = vec3(randomX, randomY, randomZ);
 
-		float randomR = (float)(rand() % 100)/100.0;
-		float randomG = (float)(rand() % 100)/100.0;
-		float randomB = (float)(rand() % 100)/100.0;
+		float randomR = (float)(rand() % 100)/100.0f;
+		float randomG = (float)(rand() % 100)/100.0f;
+		float randomB = (float)(rand() % 100)/100.0f;
 
 		m_lights.color[light] = vec3(randomR,randomG,randomB);
 
-		m_radii[light] = (float)(rand() % 20) -10.0;
+		m_radii[light] = (float)(rand() % 20) -10.0f;
 	}
 
 
