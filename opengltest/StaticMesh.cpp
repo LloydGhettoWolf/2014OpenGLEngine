@@ -43,18 +43,21 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 		return false;
 	}
 
-	GetBoundingBox(mesh.m_boundingBoxMin,mesh.m_boundingBoxMax,scene);
+	vec3 min, max;
+	GetBoundingBox(min,max,scene);
 
 	float biggestDifferenceAxis = 0.0f;
-	biggestDifferenceAxis = mesh.m_boundingBoxMax.x - mesh.m_boundingBoxMin.x; 
+	biggestDifferenceAxis = max.x - min.x;
 
-	if(mesh.m_boundingBoxMax.y - mesh.m_boundingBoxMin.y > biggestDifferenceAxis ){
-		biggestDifferenceAxis = mesh.m_boundingBoxMax.y - mesh.m_boundingBoxMin.y;
+	if (max.y - min.y > biggestDifferenceAxis){
+		biggestDifferenceAxis = max.y - min.y;
 	}
 
-	if (mesh.m_boundingBoxMax.z - mesh.m_boundingBoxMin.z > biggestDifferenceAxis){
-		biggestDifferenceAxis = mesh.m_boundingBoxMax.z - mesh.m_boundingBoxMin.z;
+	if (max.z - min.z > biggestDifferenceAxis){
+		biggestDifferenceAxis = max.z - min.z;
 	}
+
+	mesh.m_boundingBox = BoundingBox(min, max);
 
 	std::cout<<"number of meshes in Init: "<< scene->mNumMeshes << std::endl;
 
@@ -171,8 +174,7 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 
 void GetBoundingBox(glm::vec3& min,glm::vec3& max,const aiScene* scene){
 	aiMatrix4x4 trafo;
-    //IdentityMatrix4(&trafo);
-
+   
     min.x = min.y = min.z =  1e10f;
     max.x = max.y = max.z = -1e10f;
     GetBoundingBoxForNode(scene->mRootNode,min,max,trafo,scene);
