@@ -61,7 +61,6 @@ bool DeferredApp::Init(){
 	m_camera = CreateCamera(vec3(0.0f, 0.0f, -40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(45.0f, APP_WIDTH / APP_HEIGHT, 3.0f, 500.0f);
 
-	glfwSetWindowSizeCallback(MyResize);
 
 	m_groundPlaneBuffer = CreateGroundPlaneData();
 

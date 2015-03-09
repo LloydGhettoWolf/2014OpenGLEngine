@@ -24,10 +24,10 @@ int main(int argc, char** argv){
 	return 0;
 }
 
-void GLFWCALL MyResize(int width, int height){
+void GLFWCALL MyResize(float fov,int width, int height,float nearZ,float farZ){
 	float aspect = (float)width / (float)height;
 
-	app->Resize(aspect,width,height);
+	app->Resize(fov,aspect,width,height,nearZ,farZ);
 }
 
 

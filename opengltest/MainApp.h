@@ -12,6 +12,7 @@
 #include "Camera.h"
 #include "StaticMesh.h"
 #include "Defines.h"
+#include "Frustum.h"
 
 class App{
 public:
@@ -26,7 +27,7 @@ public:
 	void ReadMouse();
 	void ReadKeys();
 
-	void Resize(float aspect, int width, int height);
+	void Resize(float fov, float aspect, int width, int height, float nearZ, float farZ);
 
 	static int			  lastKeyPress;
 	static int			  lastKeyAction;
@@ -47,9 +48,11 @@ protected:
 
 	float				  m_windowWidth, m_windowHeight;
 
+	Frustum               m_frustum;
+
 };
 
 void GLFWCALL KeyCallback(int key, int action);
-void GLFWCALL MyResize(int width, int height);
+void GLFWCALL MyResize(float fov, int width, int height, float nearZ, float farZ);
 
 float RandomFloat(float high,float low);

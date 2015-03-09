@@ -12,6 +12,8 @@
 #include "GroundPlane.h"
 #include "CubeMap.h"
 
+void CalcSphereDistance(const PointLightData& pLight, int index);
+
 
 bool DeferredSponza::Init(){
 
@@ -43,14 +45,15 @@ bool DeferredSponza::Init(){
 	}
 
 	m_camera = CreateCamera(vec3(5.0f, 2.0f, 0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_camera.projectionMatrix = glm::perspective(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f);
+	m_camera.projectionMatrix = glm::perspective(30.0f, APP_WIDTH / APP_HEIGHT, 1.0f, 1000.0f);
 
-	glfwSetWindowSizeCallback(MyResize);
+
 
 
 	m_lights.position		= new vec3[NUM_POINT_LIGHTS];
 	m_lights.color			= new vec3[NUM_POINT_LIGHTS];
 	m_lights.attData		= new Attenuation[NUM_POINT_LIGHTS];
+	m_lights.effectiveDist  = new float[NUM_POINT_LIGHTS];
 
 	for (int light = 0; light < NUM_POINT_LIGHTS; light++){
 		m_lights.attData[light].constantAtt = 1.0f;
@@ -58,8 +61,8 @@ bool DeferredSponza::Init(){
 		m_lights.attData[light].expAtt      = 0.01f;
 
 
-		float randomX = (float)(rand() % 400) - 200.0f;
-		float randomZ = (float)(rand() % 150) - 75.0f;
+		float randomX = (float)(rand() % 600) - 300.5f;
+		float randomZ = (float)(rand() % 300) - 150.0f;
 		float randomY = (float)(rand() % 100);
 
 		m_lightPos[light] = vec3(randomX, randomY, randomZ);
@@ -70,7 +73,9 @@ bool DeferredSponza::Init(){
 
 		m_lights.color[light] = vec3(randomR, randomG, randomB);
 
-		m_radii[light] = (float)(rand() % 30);
+		m_radii[light] = (float)(rand() % 10);
+
+		CalcSphereDistance(m_lights, light);
 	}
 
 
@@ -85,10 +90,8 @@ bool DeferredSponza::Init(){
 	cubeMap = CreateCubeMap(cubemapFilenames);
 
 
-
-
 	//if (!InitGUI()){
-	//	return false;
+		//return false;
 	//}
 
 	return true;
@@ -97,7 +100,11 @@ bool DeferredSponza::Init(){
 bool DeferredSponza::InitGUI(){
 	TwInit(TW_OPENGL, NULL);
 	TwWindowSize(APP_WIDTH, APP_HEIGHT);
-
+	FPSGUI = TwNewBar("FPSBar");
+	TwAddVarRO(FPSGUI, "MsPerFrame", TW_TYPE_FLOAT,&m_time,"");
+	TwAddVarRO(FPSGUI, "num visible lights", TW_TYPE_INT32, &m_numVisibleLights, "");
+	TwAddVarRO(FPSGUI, "num visible meshes", TW_TYPE_INT32, &m_numVisibleMeshes, "");
+	TwAddVarRO(FPSGUI, "pos", TW_TYPE_FLOAT, &m_camera.pos.x, "");
 	return true;
 }
 
@@ -107,11 +114,8 @@ void DeferredSponza::Run(){
 	float currentFrame = 0.0f;
 	float deltaTime = 0.0f;
 
-
-
 	//get time display
-	string firstStr = "ms per frame: ";
-	string time = to_string(deltaTime);
+	m_time = deltaTime;
 
 	//set up initial transforms
 	mat4x4 translationMatrix = rotate(mat4x4(), 180.0f, vec3(0.0f, 1.0f, 0.0f));
@@ -124,26 +128,41 @@ void DeferredSponza::Run(){
 
 	float rotationAmount = 0.0f;
 
+	vector<int> visibleLights;
+	visibleLights.reserve(NUM_POINT_LIGHTS);
+
 	do{
 		float cosAmount = cosf(rotationAmount);
 		float sinAmount = sinf(rotationAmount);
 
 		rotationAmount += 0.05f;
 
+		Extract(m_frustum, m_camera.pos, m_camera.viewMatrix, m_camera.projectionMatrix);
 
 		for (int light = 0; light < NUM_POINT_LIGHTS; light++){
 			m_lights.position[light].x = m_lightPos[light].x + m_radii[light] * cosAmount;
 			m_lights.position[light].z = m_lightPos[light].z + m_radii[light] * sinAmount;
 
 			m_lights.position[light].y = m_lightPos[light].y;
+
+			vec4 testPos =  vec4(m_lights.position[light],1.0);
+
+
+			if (TestSphere(m_frustum, m_lights.position[light], m_lights.effectiveDist[light])){
+				visibleLights.push_back(light);
+			}
 		}
 
 
 		deltaTime = currentFrame - lastFrame;
 
+
 		RenderDeferred(NUM_POINT_LIGHTS);
 
-		time = to_string(deltaTime * 1000.0f);
+		m_time = deltaTime * 1000.0f;
+		m_numVisibleLights = visibleLights.size();
+
+		//TwDraw();
 
 		glfwSwapBuffers();
 
@@ -155,6 +174,8 @@ void DeferredSponza::Run(){
 
 		lastFrame = currentFrame;
 		currentFrame = glfwGetTime();
+
+		visibleLights.clear();
 	} while (m_run);
 
 	ShutDown();
@@ -203,7 +224,7 @@ void DeferredSponza::RenderSponza(){
 	
 	
 	mat4 scaleMatrix;
-	scaleMatrix = scale(scaleMatrix, vec3(0.15f, 0.15f, 0.15f));
+	scaleMatrix = scale(scaleMatrix, vec3(0.2f, 0.2f, 0.2f));
 
 	glUseProgram(shaderProg);
 		glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, &(m_camera.projectionMatrix * m_camera.viewMatrix)[0][0]);
@@ -216,8 +237,15 @@ void DeferredSponza::RenderSponza(){
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	m_numVisibleMeshes = 0;
 
 	for (int mesh = 0; mesh < m_sponzaMesh.m_numMeshes; ++mesh){
+
+
+		//if (TestBox(m_frustum, m_sponzaMesh.m_meshData[mesh].)
+		
+		m_numVisibleMeshes++;
+
 		int materialIndex = m_sponzaMesh.m_meshData[mesh].m_materialIndex;
 		MaterialInfo mat = m_sponzaMesh.m_materialData[materialIndex];
 
@@ -272,4 +300,13 @@ void DeferredSponza::RenderCubemap(){
 	glCullFace(GL_BACK);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	glUseProgram(0);
+}
+
+void CalcSphereDistance(const PointLightData& pLight, int index){
+	float maxChan = std::max(std::max(pLight.color[index].r, pLight.color[index].g), pLight.color[index].b);
+
+	float ret = (-pLight.attData[index].linearAtt + sqrtf(pLight.attData[index].linearAtt * pLight.attData[index].linearAtt
+		- 4.0f *pLight.attData[index].expAtt * (pLight.attData[index].expAtt - 256.0f * maxChan))) / (2.0f*pLight.attData[index].expAtt);
+
+	pLight.effectiveDist[index] = ret;
 }

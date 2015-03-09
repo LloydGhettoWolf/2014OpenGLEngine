@@ -78,7 +78,7 @@ bool TestBox(const Frustum& frustum,const BoundingBox& bbox,mat4x4& proj) {
 		int iPtIn = 1;
 
 		for(int corner = 0; corner < 8; ++corner){
-			vec4 thisCorner = proj * bbox.tCorners[corner];
+			vec4 thisCorner = proj * vec4(bbox.tCorners[corner],1.0f);
 
 			float side =	plane[0] * thisCorner.x +
 							plane[1] * thisCorner.y +

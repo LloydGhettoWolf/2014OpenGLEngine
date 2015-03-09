@@ -45,10 +45,7 @@ bool App::StandardInit(){
 
 	glEnable(GL_TEXTURE_2D);
 
-	m_camera = CreateCamera(vec3(0.0f, 5.0f, -20.0f), vec3(0.0f, 5.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_camera.projectionMatrix = glm::perspective(45.0f, APP_WIDTH / APP_HEIGHT, 3.0f, 500.0f);
-
-	glfwSetWindowSizeCallback(MyResize);
+	
 }
 
 void App::ReadMouse(){
@@ -127,9 +124,9 @@ void App::ReadKeys(){
 	
 }
 
-void App::Resize(float aspect,int width,int height){
+void App::Resize(float fov, float aspect,int width,int height,float nearZ,float farZ){
 	glViewport(0, 0, width, height);
-	m_camera.projectionMatrix = glm::perspective(45.0f,aspect, 3.0f, 500.0f);
+	m_camera.projectionMatrix = glm::perspective(fov,aspect,nearZ, farZ);
 	glfwSetWindowSize(width,height);
 	TwWindowSize(width, height);
 
