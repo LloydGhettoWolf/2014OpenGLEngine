@@ -41,11 +41,13 @@ struct PointLightData{
 	vec3  *position;
 	vec3  *color;
 	Attenuation *attData;
+	float* effectiveDist;
 
 	~PointLightData(){
 		delete [] position;
 		delete [] color;
 		delete [] attData;
+		delete [] effectiveDist;
 	}
 };
 

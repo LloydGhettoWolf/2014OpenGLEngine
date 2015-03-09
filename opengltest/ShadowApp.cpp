@@ -29,7 +29,7 @@ bool ShadowApp::Init(){
 
 	InitStaticMesh(m_teapotMesh, "buddha.obj", "meshes\\");
 
-	m_centerOffset = (m_teapotMesh.m_boundingBoxMax.y - m_teapotMesh.m_boundingBoxMin.y) / 2.0f;
+	m_centerOffset = (m_teapotMesh.m_boundingBox.GetMax().y - m_teapotMesh.m_boundingBox.GetMin().y) / 2.0f;
 
 	m_camera = CreateCamera(vec3(0.0f, 0.0f, -40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_camera.projectionMatrix = glm::perspective(45.0f, APP_WIDTH / APP_HEIGHT, 3.0f, 500.0f);
@@ -40,8 +40,6 @@ bool ShadowApp::Init(){
 
 	m_shadowCamera = CreateCamera(m_lightPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	m_shadowCamera.projectionMatrix = glm::perspective(30.0f, APP_WIDTH / APP_HEIGHT, 5.0f, 350.0f);
-
-	glfwSetWindowSizeCallback(MyResize);
 
 	m_groundPlaneBuffer = CreateGroundPlaneData();
 
