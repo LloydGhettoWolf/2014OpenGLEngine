@@ -45,9 +45,7 @@ bool DeferredSponza::Init(){
 	}
 
 	m_camera = CreateCamera(vec3(5.0f, 2.0f, 0.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f));
-	m_camera.projectionMatrix = glm::perspective(30.0f, APP_WIDTH / APP_HEIGHT, 1.0f, 1000.0f);
-
-
+	m_camera.projectionMatrix = glm::perspective(30.0f, APP_WIDTH / APP_HEIGHT, 1.0f, 2000.0f);
 
 
 	m_lights.position		= new vec3[NUM_POINT_LIGHTS];
@@ -57,23 +55,23 @@ bool DeferredSponza::Init(){
 
 	for (int light = 0; light < NUM_POINT_LIGHTS; light++){
 		m_lights.attData[light].constantAtt = 1.0f;
-		m_lights.attData[light].linearAtt   = 0.1f;
-		m_lights.attData[light].expAtt      = 0.01f;
+		m_lights.attData[light].linearAtt   = 0.05f;
+		m_lights.attData[light].expAtt      = 0.005f;
 
 
-		float randomX = (float)(rand() % 600) - 300.5f;
-		float randomZ = (float)(rand() % 300) - 150.0f;
-		float randomY = (float)(rand() % 100);
+		float randomX = (float)(rand() % 1800) - 900.0f;
+		float randomZ = (float)(rand() % 800)  - 400.0f;
+		float randomY = (float)(rand() % 600);
 
 		m_lightPos[light] = vec3(randomX, randomY, randomZ);
 
-		float randomR = (float)(rand() % 100) / 100.0;
-		float randomG = (float)(rand() % 100) / 100.0;
-		float randomB = (float)(rand() % 100) / 100.0;
+		float randomR = (float)(rand() % 100) / 100.0f;
+		float randomG = (float)(rand() % 100) / 100.0f;
+		float randomB = (float)(rand() % 100) / 100.0f;
 
 		m_lights.color[light] = vec3(randomR, randomG, randomB);
 
-		m_radii[light] = (float)(rand() % 10);
+		m_radii[light] = (float)(rand() % 50);
 
 		CalcSphereDistance(m_lights, light);
 	}
@@ -90,9 +88,9 @@ bool DeferredSponza::Init(){
 	cubeMap = CreateCubeMap(cubemapFilenames);
 
 
-	//if (!InitGUI()){
-		//return false;
-	//}
+	if (!InitGUI()){
+		return false;
+	}
 
 	return true;
 }
@@ -103,8 +101,7 @@ bool DeferredSponza::InitGUI(){
 	FPSGUI = TwNewBar("FPSBar");
 	TwAddVarRO(FPSGUI, "MsPerFrame", TW_TYPE_FLOAT,&m_time,"");
 	TwAddVarRO(FPSGUI, "num visible lights", TW_TYPE_INT32, &m_numVisibleLights, "");
-	TwAddVarRO(FPSGUI, "num visible meshes", TW_TYPE_INT32, &m_numVisibleMeshes, "");
-	TwAddVarRO(FPSGUI, "pos", TW_TYPE_FLOAT, &m_camera.pos.x, "");
+	TwAddVarRO(FPSGUI, "pos", TW_TYPE_FLOAT, &m_camera.pos.z, "");
 	return true;
 }
 
@@ -162,7 +159,7 @@ void DeferredSponza::Run(){
 		m_time = deltaTime * 1000.0f;
 		m_numVisibleLights = visibleLights.size();
 
-		//TwDraw();
+		TwDraw();
 
 		glfwSwapBuffers();
 
@@ -224,7 +221,7 @@ void DeferredSponza::RenderSponza(){
 	
 	
 	mat4 scaleMatrix;
-	scaleMatrix = scale(scaleMatrix, vec3(0.2f, 0.2f, 0.2f));
+	scaleMatrix = scale(scaleMatrix, vec3(0.7f, 0.7f, 0.7f));
 
 	glUseProgram(shaderProg);
 		glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, &(m_camera.projectionMatrix * m_camera.viewMatrix)[0][0]);
@@ -237,14 +234,9 @@ void DeferredSponza::RenderSponza(){
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	m_numVisibleMeshes = 0;
 
-	for (int mesh = 0; mesh < m_sponzaMesh.m_numMeshes; ++mesh){
+	for (unsigned int mesh = 0; mesh < m_sponzaMesh.m_numMeshes; ++mesh){
 
-
-		//if (TestBox(m_frustum, m_sponzaMesh.m_meshData[mesh].)
-		
-		m_numVisibleMeshes++;
 
 		int materialIndex = m_sponzaMesh.m_meshData[mesh].m_materialIndex;
 		MaterialInfo mat = m_sponzaMesh.m_materialData[materialIndex];
