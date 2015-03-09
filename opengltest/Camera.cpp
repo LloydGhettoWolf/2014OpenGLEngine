@@ -1,6 +1,7 @@
 //Camera.cpp
 #include "Camera.h"
 #include <gtc\matrix_transform.hpp>
+#include <gtx\rotate_vector.hpp>
 
 Camera CreateCamera(vec3& pos, vec3& focusPoint, vec3& upVec){
 	vec3 lookVec = focusPoint - pos;
@@ -49,14 +50,7 @@ void   MoveCameraTrackPoint(Camera& cam, vec3& pos,vec3& focus){
 }
 
 void ComboRotate(Camera& cam,float amountX, float amountY){
-	cam.xRotation += glm::radians(amountX);
 	cam.yRotation += glm::radians(-amountY);
-
-	if (cam.xRotation < 0.0f)
-		cam.xRotation += (2.0f *  3.14129f);
-
-	if (cam.xRotation > (2.0f *  3.14129f))
-		cam.xRotation -= (2.0f *  3.14129f);
 
 	if (cam.yRotation > 0.0f)
 		cam.yRotation = 0.0f;
@@ -64,14 +58,14 @@ void ComboRotate(Camera& cam,float amountX, float amountY){
 	if (cam.yRotation < -3.14129f / 2.0f)
 		cam.yRotation =  -3.14129f / 2.0f;
 
-	cam.lookVec.x = cam.heading.x =  cosf(cam.xRotation) - sinf(cam.xRotation);
-	cam.lookVec.z = cam.heading.z =  sinf(cam.xRotation) + cosf(cam.xRotation);
-
+	cam.lookVec = rotateY(cam.lookVec,-amountX);
+	cam.heading = normalize(vec3(cam.lookVec.x, 0.0f, cam.lookVec.z));
 	cam.lookVec = normalize(cam.lookVec);
 
-	cam.lookVec.y = cosf(cam.yRotation) + sinf(cam.yRotation);
-	cam.lookVec.z = cam.lookVec.z  * -sinf(cam.yRotation) + cam.lookVec.z * cosf(cam.yRotation);
-
+	if (cam.yRotation < 0.0f && cam.yRotation > -3.14129f / 2.0f){
+		cam.lookVec = rotate(cam.lookVec, -amountY, cam.rightVec);
+		cam.lookVec = normalize(cam.lookVec);
+	}
 
 	vec3 lookPoint  = cam.pos + glm::normalize(cam.lookVec);
 	cam.rightVec = glm::cross(cam.lookVec, cam.upVec);
