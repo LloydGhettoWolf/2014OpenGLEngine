@@ -15,8 +15,8 @@
 #include "VertexArray.h"
 
 //support functions for use by Init();
-void				GetBoundingBox(glm::vec3& min, glm::vec3& max, const aiScene* scene);
-void				GetBoundingBoxForNode(const aiNode* node, glm::vec3& min, glm::vec3& max, aiMatrix4x4& trafo, const aiScene* scene);
+void				GetBoundingBox(glm::vec3& min, glm::vec3& max, const aiMesh* scene);
+void				GetBoundingBoxForNode(const aiMesh* scene,glm::vec3& min, glm::vec3& max);
 
 Material			LoadMaterial(aiMaterial* materials);
 GLuint   			LoadTexture(aiMaterial* material, const string& directory, aiTextureType type);
@@ -42,22 +42,6 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 		std::cout <<"couldn't load scene! Reason: "<< importer.GetErrorString() <<std::endl;
 		return false;
 	}
-
-	vec3 min, max;
-	GetBoundingBox(min,max,scene);
-
-	float biggestDifferenceAxis = 0.0f;
-	biggestDifferenceAxis = max.x - min.x;
-
-	if (max.y - min.y > biggestDifferenceAxis){
-		biggestDifferenceAxis = max.y - min.y;
-	}
-
-	if (max.z - min.z > biggestDifferenceAxis){
-		biggestDifferenceAxis = max.z - min.z;
-	}
-
-	mesh.m_boundingBox = BoundingBox(min, max);
 
 	std::cout<<"number of meshes in Init: "<< scene->mNumMeshes << std::endl;
 
@@ -86,7 +70,14 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 		//create a new objectdata to store the mesh data on the gfx card
 		MeshComponent* newComp = new MeshComponent;
 		newComp->m_numFaces = numFaces;
+
+		vec3 min, max;
+		GetBoundingBox(min, max, thisMesh);
+
+		newComp->m_boundingBox = BoundingBox(min, max);
+
 		unsigned int numVerts = thisMesh->mNumVertices;
+
 		//here is a slightly messy way of allocating object data....
 		//generate vertex array for this mesh using objectData
 		int vecSize = sizeof(float) * 3;
@@ -95,9 +86,9 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 			CustomVertexNormBiTangentUV *vertices = new CustomVertexNormBiTangentUV[numVerts];
 
 			for (unsigned int vertex = 0; vertex < numVerts; vertex++){
-				memcpy(&vertices[vertex].uv,		  &thisMesh->mTextureCoords,    vecSize);
-				memcpy(&vertices[vertex].vertexPoint, &thisMesh->mVertices[vertex], vecSize);
-				memcpy(&vertices[vertex].normal,      &thisMesh->mNormals[vertex],  vecSize);
+				memcpy(&vertices[vertex].uv,		  &thisMesh->mTextureCoords,      vecSize);
+				memcpy(&vertices[vertex].vertexPoint, &thisMesh->mVertices[vertex],   vecSize);
+				memcpy(&vertices[vertex].normal,      &thisMesh->mNormals[vertex],    vecSize);
 				memcpy(&vertices[vertex].biTangent,   &thisMesh->mBitangents[vertex], vecSize);
 				memcpy(&vertices[vertex].tangent,     &thisMesh->mTangents[vertex],   vecSize);
 				memcpy(&vertices[vertex].uv, &thisMesh->mTextureCoords[0][vertex],    vecSize);
@@ -172,46 +163,29 @@ bool InitStaticMesh(StaticMesh& mesh, const string& fileName, const string& dire
 }
 
 
-void GetBoundingBox(glm::vec3& min,glm::vec3& max,const aiScene* scene){
-	aiMatrix4x4 trafo;
+void GetBoundingBox(glm::vec3& min,glm::vec3& max,const aiMesh* mesh){
    
     min.x = min.y = min.z =  1e10f;
     max.x = max.y = max.z = -1e10f;
-    GetBoundingBoxForNode(scene->mRootNode,min,max,trafo,scene);
+    GetBoundingBoxForNode(mesh,min,max);
 }
 
-void GetBoundingBoxForNode(const aiNode* node,glm::vec3& min,glm::vec3& max,aiMatrix4x4& trafo,
-				                        const aiScene* scene){
-	aiMatrix4x4 prev;
+void GetBoundingBoxForNode(const aiMesh* mesh,glm::vec3& min,glm::vec3& max){
 
-	prev = trafo;
-	trafo *= node->mTransformation;
 
-	for (unsigned int n = 0; n < node->mNumMeshes; ++n) {
-        const struct aiMesh* mesh = scene->mMeshes[node->mMeshes[n]];
-            
-		for (unsigned int t = 0; t < mesh->mNumVertices; ++t) {
+	for (unsigned int t = 0; t < mesh->mNumVertices; ++t) {
 
-                auto tmp = mesh->mVertices[t];
-                tmp *= trafo;
+        auto tmp = mesh->mVertices[t];
 
-                min.x = glm::min(min.x,tmp.x);
-                min.y = glm::min(min.y,tmp.y);
-                min.z = glm::min(min.z,tmp.z);
+        min.x = glm::min(min.x,tmp.x);
+        min.y = glm::min(min.y,tmp.y);
+        min.z = glm::min(min.z,tmp.z);
 
-                max.x = glm::max(max.x,tmp.x);
-                max.y = glm::max(max.y,tmp.y);
-                max.z = glm::max(max.z,tmp.z);
-        }
+        max.x = glm::max(max.x,tmp.x);
+        max.y = glm::max(max.y,tmp.y);
+        max.z = glm::max(max.z,tmp.z);
     }
-
-    for (unsigned int n = 0; n < node->mNumChildren; n++) {
-        GetBoundingBoxForNode(node->mChildren[n],min,max,trafo,scene);
-    }
-
-
-
-    trafo = prev;
+    
 }
 
 Material LoadMaterial(aiMaterial* material)
