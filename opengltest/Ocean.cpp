@@ -10,7 +10,7 @@
 
 using namespace std;
 
-
+const float TEXTURE_SIZE = 1024.0f;
 
 OceanApp::~OceanApp(){
 
@@ -41,7 +41,7 @@ bool OceanApp::Init(){
 
 	m_camera = CreateCamera(vec3(50.0f, 0.0f, 50.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 1.0f, 2000.0f, APP_WIDTH, APP_HEIGHT, 45.0f);
 
-	m_planeData = CreatePlaneData(2048, 2048, 1.0f, 0.25f);
+	m_planeData = CreatePlaneData(512, 512, 1.0f, 0.25f);
 
 	if (!CreateWaveTex(m_fbo,m_waveTex)){
 		cout << "wave tex create fail!" << endl;
@@ -59,14 +59,14 @@ bool OceanApp::Init(){
 	
 	for (int i = 0; i < NUM_WAVES; ++i){
 
-		float  waveLength = (float)(64 + rand() % 192 + 1);
-		float  angle = (float)(rand() % 60 + 1);
+		float  waveLength = (float)(m_medianLength / 2 + rand() % (2 * m_medianLength) + 1);
+		float  angle = (float)(rand() % m_variation + 1);
 
-		float speed = (float)(rand() % 40);
+		float speed = (float)(rand() % m_speed);
 
 		vec2 newDir = (vec2)rotateZ(dir, angle);
 
-		m_waves.amplitude[i] = (float)(rand() % 10 + 1);
+		m_waves.amplitude[i] = (float)(rand() % m_medianAmp + 1);
 		m_waves.dir[i]       = newDir;
 		m_waves.freq[i]      = (2.0f*3.14129f) / waveLength;
 		m_waves.rho[i]		 = m_waves.freq[i] * speed;
@@ -175,13 +175,12 @@ void OceanApp::Render(){
 	GLint screenSizeUni= glGetUniformLocation(m_oceanShader, "texSize");
 
 	static float tVal = 0.0f;
-	vec2 size = vec2(256.0f, 256.0f);
+	vec2 size = vec2(TEXTURE_SIZE, TEXTURE_SIZE);
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-		glViewport(0, 0, 512, 512);
 
 
 		glDrawBuffer(GL_COLOR_ATTACHMENT0);
@@ -196,9 +195,11 @@ void OceanApp::Render(){
 			glUniform2fv(screenSizeUni, 1, &size[0]);
 			glUniform1f(t, tVal);
 
+			glViewport(0, 0, TEXTURE_SIZE, TEXTURE_SIZE);
 			glBindVertexArray(m_quadBuffer);
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			glBindVertexArray(0);
+
 		glUseProgram(0);
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -209,6 +210,7 @@ void OceanApp::Render(){
 	GLint mvpUni     = glGetUniformLocation(m_oceanDispshader, "mvpMatrix");
 	GLint texSize    = glGetUniformLocation(m_oceanDispshader, "texSize");
 
+	
 	glViewport(0, 0, APP_WIDTH, APP_HEIGHT);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -223,10 +225,12 @@ void OceanApp::Render(){
 		glBindTexture(GL_TEXTURE_2D, m_waveTex);
 		glBindVertexArray(m_planeData);
 			//glPolygonMode(GL_FRONT, GL_LINE);
-			glDrawElements(GL_TRIANGLES, 2047 * 2047 * 6, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, 511 * 511 * 6, GL_UNSIGNED_INT, 0);
 			//glPolygonMode(GL_FRONT, GL_FILL);
 		glBindVertexArray(0);
+
 	glUseProgram(0);
+	
 	
 }
 
@@ -245,7 +249,7 @@ bool OceanApp::CreateWaveTex(GLuint& data, GLuint& waveData){
 
 	
 	glBindTexture(GL_TEXTURE_2D, waveData);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 512, 512, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,waveData, 0);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -253,7 +257,7 @@ bool OceanApp::CreateWaveTex(GLuint& data, GLuint& waveData){
 	
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_REPEAT);
 	
 	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
 		std::cout << "problem creating wave tex!" << std::endl;

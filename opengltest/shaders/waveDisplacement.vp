@@ -9,20 +9,20 @@ out vec3 normals;
 out vec2 uvs;
 
 void main(){
-	vec2 texCoords = (inCoords.xz/texSize) * 2.0;
+	vec2 texCoords = vec2(inCoords.xz/texSize) * 1.0;
 
 	uvs = texCoords;
 
 	vec3 displacementVals = texture(waveTexture,texCoords).xyz;
-	displacementVals *= 50.0;
-	displacementVals -= 25.0;
+	displacementVals *= 20.0;
+	displacementVals -= 10.0;
 
 	float xOffset = 1.0/texSize;
 	float yOffset = 1.0/texSize;
 
 	vec3 displacementValsY = texture(waveTexture,texCoords+vec2(0.0,yOffset)).xyz;
-	displacementValsY *= 70.0;
-	displacementValsY -= 35.0;
+	displacementValsY *= 20.0;
+	displacementValsY -= 10.0;
 
 	vec3 displacementValsX = texture(waveTexture,texCoords+vec2(xOffset,0.0)).xyz;
 	displacementValsX *= 50.0;

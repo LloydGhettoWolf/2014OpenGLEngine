@@ -39,13 +39,15 @@ private:
 	GLint m_cubeMap;
 	CubemapShader m_cubeMapShader;
 
-
 	WaveData m_waves;
 
 	TwBar* waveBar;
 
 	//texturestuff
 	GLuint m_fbo, m_waveTex;
+
 	//full screen quad
 	GLuint m_quadBuffer;
+
+	int m_medianLength = 128, m_medianAmp = 40, m_variation = 90, m_speed = 40;
 };
