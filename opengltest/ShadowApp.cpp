@@ -123,7 +123,8 @@ void ShadowApp::Run(){
 		mat4 identity;
 		mat4x4 fromQuat = mat4_cast(m_model1Rotation);
 		m_scaleMatrix = scale(identity, vec3(0.5f, 0.5f, 0.5f));
-		m_worldMatrix =  fromQuat * rotate(identity, 180.0f, vec3(0.0f, 1.0f, 0.0f)) * m_scaleMatrix * translate(identity, vec3(0.0f, -m_centerOffset, 0.0f));
+		m_worldMatrix = translate(identity, vec3(0.0f, 5.0f, 0.0f)) * fromQuat * 
+						rotate(identity, 180.0f, vec3(0.0f, 1.0f, 0.0f)) * m_scaleMatrix * translate(identity, vec3(0.0f, -m_centerOffset, 0.0f));
 
 		m_normalMatrix = inverseTranspose(mat3(m_worldMatrix));
 
@@ -172,6 +173,7 @@ void ShadowApp::RenderShadow(){
 void ShadowApp::RenderMeshes(){
 
 	mat4 identity;
+	identity = translate(identity, vec3(0.0f, -3.0f, 0.0f));
 	glUseProgram(m_shadowShader.GetShadowHandle());
 		
 		ShadowShaderUniforms shadowUniforms = m_shadowShader.GetShadowUniforms();
