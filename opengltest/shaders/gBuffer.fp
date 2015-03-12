@@ -12,8 +12,7 @@ in vec2 UVs;
 
 layout(location = 0) out vec3 worldPosOut;
 layout(location = 1) out vec3 normalsOut;
-layout(location = 2) out vec3 ambientOut;
-layout(location = 3) out vec3 diffuseOut;
+layout(location = 2) out vec3 diffuseOut;
 
 void main(){
   worldPosOut  = worldPos;
@@ -25,6 +24,5 @@ void main(){
   normalize(TBN * normalMapNormal);
 
   normalsOut   = normalize((TBN * normalMapNormal + 1.0) * 0.5);
-  ambientOut   = materialAmbient;
   diffuseOut   = texture(myTexture,UVs).xyz;
 }

@@ -69,6 +69,7 @@ void DeferredRenderer::UnbindFBO(){
 void DeferredRenderer::PrepareGeometry(){
 	glDrawBuffer(GL_COLOR_ATTACHMENT4);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0,
 		GL_COLOR_ATTACHMENT1,
 		GL_COLOR_ATTACHMENT2,
@@ -104,9 +105,9 @@ void DeferredRenderer::PresentToScreen(){
 		glUniform2fv(uniforms.screenSizeUniform, 1, &screenSize[0]);
 		glBindBuffer(GL_ARRAY_BUFFER, m_quadBuffer);
 
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), 0);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), 0);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -142,7 +143,7 @@ void DeferredRenderer::RenderLights(mat4& viewProjection,PointLightData& lightDa
 
 		glUseProgram(m_deferredShader.GetNULLPassHandle());
 
-			float scale = CalcSphereDistance(lightData, light);
+		float scale = lightData.effectiveDist[light];
 			worldMatrix = viewProjection * glm::translate(identity, lightPositions[light]) * glm::scale(identity, vec3(scale, scale, scale));
 			glUniformMatrix4fv(m_deferredShader.GetNULLWVPMatrix(), 1, false, &worldMatrix[0][0]);
 			RenderStaticMeshComponent(m_sphereMesh.m_meshData[0]);
@@ -208,13 +209,13 @@ bool DeferredRenderer::CreateGBuffer(){
 	return CreateGBufferData(m_gBuffer);
 }
 
-float DeferredRenderer::CalcSphereDistance(const PointLightData& pLight, int index){
+void DeferredRenderer::CalcSphereDistance(const PointLightData& pLight, int index){
 	float maxChan = std::max(std::max(pLight.color[index].r, pLight.color[index].g), pLight.color[index].b);
 
 	float ret = (-pLight.attData[index].linearAtt + sqrtf(pLight.attData[index].linearAtt * pLight.attData[index].linearAtt
 		- 4.0f *pLight.attData[index].expAtt * (pLight.attData[index].expAtt - 256.0f * maxChan))) / (2.0f*pLight.attData[index].expAtt);
 
-	return ret;
+	pLight.effectiveDist[index] = ret;
 }
 
 

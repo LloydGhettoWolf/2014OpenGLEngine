@@ -45,7 +45,7 @@ vec4 ColorPoint(vec3 lightDir,vec3 worldPos,vec3 normal,vec3 diffuse,float Atten
         float diffFactor = max(dot(normal,lightDir),0.0);
         vec3 viewDir     = normalize(eyePos - worldPos);
         vec3 halfVec     = normalize((lightDir + viewDir) * 0.5);
-        float specFactor = spec * pow(max(dot(normal,halfVec),0.0),10.0f);
+        float specFactor = spec * pow(max(dot(normal,halfVec),0.0),64.0f);
         vec3 col = lightColor * ((diffuse * diffFactor) + specFactor);
         col = clamp(Attenuation * col,0.0,1.0);
         return vec4(col,1.0);

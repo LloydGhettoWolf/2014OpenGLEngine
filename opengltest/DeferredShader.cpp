@@ -12,7 +12,7 @@ DeferredShader::~DeferredShader(){
 bool DeferredShader::CreateGBufferShader(){
 	const int numAttribs = 6;
 	const char* attribs[numAttribs] = { "inCoords", "inNormals", "inTangents", "inBitangents", "inUVs","inPositions" };
-	m_gBufferHandle = CreateShader("gBufferSponza.vp", "gBufferSponza.fp", attribs, numAttribs);
+	m_gBufferHandle = CreateShader("gBuffer.vp", "gBuffer.fp", attribs, numAttribs);
 
 	if (!m_gBufferHandle) return false;
 

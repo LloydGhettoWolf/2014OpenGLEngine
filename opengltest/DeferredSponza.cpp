@@ -142,10 +142,6 @@ void DeferredSponza::Run(){
 
 			vec4 testPos =  vec4(m_lights.position[light],1.0);
 
-
-			if (TestSphere(m_frustum, m_lights.position[light], m_lights.effectiveDist[light])){
-				visibleLights.push_back(light);
-			}
 		}
 
 

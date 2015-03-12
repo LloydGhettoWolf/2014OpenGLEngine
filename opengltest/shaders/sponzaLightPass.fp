@@ -30,7 +30,7 @@ vec3 CalcPointLight(vec3 worldPos,vec3 normal,vec3 diffuse,float spec){
         vec3 lightDir   = lightPos-worldPos;
         float dist      = length(lightDir);
         vec3 lightNorm  = normalize(lightDir);
-        float Attenuation = 1.0 +  0.2 + 0.02 *  dist * dist;
+        float Attenuation = 1.0 +  0.1 + 0.01 *  dist * dist;
         Attenuation = 1.0/max(1.0, Attenuation);
     return ColorPoint(lightNorm,worldPos,normal,diffuse,Attenuation,spec).xzy;
 }
