@@ -1,0 +1,8 @@
+//wavegen.vp - writes a heightfield to a render target
+//and displacement maps for x and z axes too
+#version 400
+in vec3 inCoords;
+
+void main(){
+    gl_Position = vec4(inCoords,1.0);
+}

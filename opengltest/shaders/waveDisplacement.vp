@@ -1,0 +1,35 @@
+#version 400
+
+uniform sampler2D waveTexture;
+uniform mat4 mvpMatrix;
+uniform vec2 texSize;
+
+in vec3 inCoords;
+out vec3 normals;
+out vec2 uvs;
+
+void main(){
+	vec2 texCoords = (inCoords.xz/texSize) * 2.0;
+
+	uvs = texCoords;
+
+	vec3 displacementVals = texture(waveTexture,texCoords).xyz;
+	displacementVals *= 50.0;
+	displacementVals -= 25.0;
+
+	float xOffset = 1.0/texSize;
+	float yOffset = 1.0/texSize;
+
+	vec3 displacementValsY = texture(waveTexture,texCoords+vec2(0.0,yOffset)).xyz;
+	displacementValsY *= 70.0;
+	displacementValsY -= 35.0;
+
+	vec3 displacementValsX = texture(waveTexture,texCoords+vec2(xOffset,0.0)).xyz;
+	displacementValsX *= 50.0;
+	displacementValsX -= 25.0;
+
+	normals = normalize(cross(normalize(displacementValsY-displacementVals),normalize(displacementValsX-displacementVals)));
+
+	gl_Position = mvpMatrix * vec4(inCoords + displacementVals,1.0);
+	//gl_Position = mvpMatrix * vec4(inCoords,1.0);
+}

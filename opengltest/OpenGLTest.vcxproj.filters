@@ -125,6 +125,9 @@
     <ClCompile Include="DeferredSponza.cpp">
       <Filter>Header Files\Apps</Filter>
     </ClCompile>
+    <ClCompile Include="Ocean.cpp">
+      <Filter>Header Files\Apps</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Defines.h">
@@ -224,6 +227,9 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="DeferredSponza.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="Ocean.h">
       <Filter>Header Files\Apps</Filter>
     </ClInclude>
   </ItemGroup>
@@ -329,6 +335,18 @@
     </None>
     <None Include="shaders\sponzaLightPass.vp">
       <Filter>Shaders\DeferredShaders</Filter>
+    </None>
+    <None Include="shaders\waveGen.fp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\waveGen.vp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\waveDisplacement.fp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\waveDisplacement.vp">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -102,6 +102,7 @@
     <ClCompile Include="GroundPlane.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainApp.cpp" />
+    <ClCompile Include="Ocean.cpp" />
     <ClCompile Include="ParticleApp.cpp" />
     <ClCompile Include="ParticleShader.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="GroundPlane.h" />
     <ClInclude Include="LightsAndMaterials.h" />
     <ClInclude Include="MainApp.h" />
+    <ClInclude Include="Ocean.h" />
     <ClInclude Include="ParticleApp.h" />
     <ClInclude Include="ParticleShader.h" />
     <ClInclude Include="ParticleSystem.h" />
@@ -186,6 +188,10 @@
     <None Include="shaders\shadow.vp" />
     <None Include="shaders\sponzaLightPass.fp" />
     <None Include="shaders\sponzaLightPass.vp" />
+    <None Include="shaders\waveDisplacement.fp" />
+    <None Include="shaders\waveDisplacement.vp" />
+    <None Include="shaders\waveGen.fp" />
+    <None Include="shaders\waveGen.vp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
