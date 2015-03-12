@@ -39,7 +39,7 @@ bool ShadowApp::Init(){
 
 	m_shadowCamera = CreateCamera(m_lightPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f),5.0f,350.0f,APP_WIDTH,APP_HEIGHT,45.0f);
 
-	m_groundPlaneBuffer = CreateGroundPlaneData();
+	m_groundPlane = CreatePlaneData(10, 10, 25.0f, 0.25f);
 
 	m_material.ambient = vec3(0.1f, 0.1f, 0.1f);
 	m_material.diffuse = vec3(0.5f, 0.4f, 0.5f);
@@ -160,11 +160,10 @@ void ShadowApp::RenderShadow(){
 
 			RenderStaticMeshComponent(m_teapotMesh.m_meshData[0]);
 
-			m_shadowShader.UpdateDepthUniforms(identity, m_shadowCamera.viewMatrix);
-			glBindVertexArray(m_groundPlaneBuffer);
-			glCullFace(GL_BACK);
+			m_shadowShader.UpdateDepthUniforms(translate(identity, vec3(0.0f, -3.0f, 0.0f)), m_shadowCamera.viewMatrix);
+			glBindVertexArray(m_groundPlane);
 			glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
+			glCullFace(GL_BACK);
 		glUseProgram(0);
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
@@ -191,10 +190,9 @@ void ShadowApp::RenderMeshes(){
 		RenderStaticMeshComponent(m_teapotMesh.m_meshData[0]);
 
 		m_shadowMatrix = m_biasMatrix * m_shadowCamera.projectionMatrix * m_shadowCamera.viewMatrix;
-		glBindVertexArray(m_groundPlaneBuffer);
 		m_shadowShader.UpdateShadowUniforms(identity, mat3(identity), m_camera.viewMatrix, m_camera.pos, m_shadowMatrix, m_lightPos);
+		glBindVertexArray(m_groundPlane);
 		glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
 	glUseProgram(0);
 }
 

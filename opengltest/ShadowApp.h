@@ -3,6 +3,7 @@
 #include "MainApp.h"
 #include "ShadowShader.h"
 #include "DepthBuffer.h"
+#include "GroundPlane.h"
 
 class ShadowApp : public App{
 public:
@@ -22,7 +23,7 @@ private:
 	ShadowShader	  m_shadowShader;
 
 	StaticMesh        m_teapotMesh;
-	GLuint			  m_groundPlaneBuffer;
+	GLuint			  m_groundPlane;
 
 	float m_centerOffset;
 

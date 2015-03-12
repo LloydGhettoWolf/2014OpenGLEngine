@@ -10,7 +10,6 @@
 #include "DepthBuffer.h"
 #include "VertexTypes.h"
 #include "TeapotApp.h"
-#include "GroundPlane.h"
 #include "Defines.h"
 #include "CubeMap.h"
 
@@ -44,8 +43,11 @@ bool TeapotApp::Init(){
 	m_camera = CreateCamera(vec3(0.0f,0.0f,-40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f),3.0f,500.0f,APP_WIDTH,APP_HEIGHT,45.0f);
 
 
-	m_groundPlaneBuffer = CreateGroundPlaneData();
+	m_groundPlaneData = CreatePlaneData(10, 10, 5.0f, 0.25f);
 
+	m_lights.attData = new Attenuation[NUM_POINT_LIGHTS];
+	m_lights.color = new vec3[NUM_POINT_LIGHTS];
+	m_lights.position = new vec3[NUM_POINT_LIGHTS];
 	
 	for (int light = 0; light < NUM_POINT_LIGHTS; light++){
 		m_lights.attData[light].constantAtt = 1.0f;
@@ -208,7 +210,7 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 		
 		glUniformMatrix4fv(teapotUniforms.worldMatrixUniform, 1, GL_FALSE, &identity[0][0]);
 		glUniform1i(teapotUniforms.instancedUniform, 0);
-		glBindVertexArray(m_groundPlaneBuffer);
+		glBindVertexArray(m_groundPlaneData);
 		m_teapotShader.UpdateUniforms(identity, normalMatrix, m_camera.viewMatrix, m_camera.pos, m_lights.position[0], 1);
 		glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
 	glUseProgram(0);
@@ -226,8 +228,6 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 }
 
 void TeapotApp::ShutDown(){
-
-	glDeleteVertexArrays(1, &m_groundPlaneBuffer);
 
 	glDeleteShader(m_teapotShader.GetHandle());
 	glDeleteShader(m_cubemapShader.GetHandle());

@@ -2,4 +2,4 @@
 #pragma once
 #include <gl\glew.h>
 
-GLuint   CreateGroundPlaneData();
+GLuint   CreatePlaneData(int width, int length, float size, float textureDiv);

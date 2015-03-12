@@ -60,17 +60,18 @@ bool DeferredApp::Init(){
 
 	m_camera = CreateCamera(vec3(0.0f, 0.0f, -40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f),3.0f,500.0f,APP_WIDTH,APP_HEIGHT,45.0f);
 
-	m_groundPlaneBuffer = CreateGroundPlaneData();
+	m_groundPlaneBuffer = CreatePlaneData(10, 10, 25.0f, 0.25f);
 
 
 	m_lights.position		= new vec3[NUM_POINT_LIGHTS];
 	m_lights.color			= new vec3[NUM_POINT_LIGHTS];
 	m_lights.attData	    = new Attenuation[NUM_POINT_LIGHTS];
+	m_lights.effectiveDist  = new float[NUM_POINT_LIGHTS];
 
 	for (int light = 0; light < NUM_POINT_LIGHTS; light++){
 		m_lights.attData[light].constantAtt = 1.0f;
 		m_lights.attData[light].linearAtt = 0.1f;
-		m_lights.attData[light].expAtt = 0.7f;
+		m_lights.attData[light].expAtt = 0.04f;
 
 
 		float randomX = (float)(rand() % 120) - 60.0f;
