@@ -86,7 +86,9 @@ bool DeferredApp::Init(){
 
 		m_lights.color[light] = vec3(randomR, randomG, randomB);
 
-		m_radii[light] = (float)(rand() % 20) - 10.0f;
+		m_radii[light] = (float)(rand() % 10) - 5.0f;
+
+		m_deferredRenderer.CalcSphereDistance(m_lights, light);
 	}
 
 
@@ -149,7 +151,7 @@ void DeferredApp::Run(){
 		float cosAmount = cosf(rotationAmount);
 		float sinAmount = sinf(rotationAmount);
 
-		rotationAmount += 0.05f;
+		rotationAmount += 0.02f;
 
 
 		for (int light = 0; light < NUM_POINT_LIGHTS; light++){
@@ -195,9 +197,6 @@ void DeferredApp::RenderDeferred(int numLights){
 
 
 void DeferredApp::ShutDown(){
-
-	glDeleteVertexArrays(1, &m_groundPlaneBuffer);
-
 	glDeleteTextures(1, &cubeMap);
 	glDeleteTextures(1, &m_teaTexture);
 	glDeleteTextures(1, &m_normalTexture);
@@ -238,7 +237,6 @@ void DeferredApp::RenderGeometry(){
 
 	glUniformMatrix4fv(scaleUniform,1, GL_FALSE, &identity[0][0]);
 	glBindVertexArray(m_groundPlaneBuffer);
-
 	glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

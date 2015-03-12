@@ -4,8 +4,9 @@
 #include "DeferredShader.h"
 #include "CubemapShader.h"
 #include "DeferredRenderer.h"
+#include "GroundPlane.h"
 
-const int NUM_POINT_LIGHTS = 100;
+const int NUM_POINT_LIGHTS = 50;
 const int NUM_MESHES = 64;
 
 class DeferredApp : public App{
