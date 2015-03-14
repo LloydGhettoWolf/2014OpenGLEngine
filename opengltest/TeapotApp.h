@@ -33,7 +33,7 @@ private:
 
 	GLuint				  m_cubeMap;
 
-	GLuint				  m_groundPlaneData;
+	Plane			m_groundPlane;
 
 	PointLightData  m_lights;
 	vec3            lightPos[100];

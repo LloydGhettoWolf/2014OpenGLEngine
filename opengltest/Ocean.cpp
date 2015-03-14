@@ -10,7 +10,7 @@
 
 using namespace std;
 
-const float TEXTURE_SIZE = 1024.0f;
+const float TEXTURE_SIZE = 512.0f;
 
 OceanApp::~OceanApp(){
 
@@ -41,7 +41,7 @@ bool OceanApp::Init(){
 
 	m_camera = CreateCamera(vec3(50.0f, 0.0f, 50.0f), vec3(0.0f, 2.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 1.0f, 2000.0f, APP_WIDTH, APP_HEIGHT, 45.0f);
 
-	m_planeData = CreatePlaneData(512, 512, 1.0f, 0.25f);
+	CreatePlaneData(m_groundPlane,1024, 1024, 1.0f, 0.25f);
 
 	if (!CreateWaveTex(m_fbo,m_waveTex)){
 		cout << "wave tex create fail!" << endl;
@@ -223,9 +223,9 @@ void OceanApp::Render(){
 		glActiveTexture(GL_TEXTURE0);
 		glBindVertexArray(0);
 		glBindTexture(GL_TEXTURE_2D, m_waveTex);
-		glBindVertexArray(m_planeData);
+		glBindVertexArray(m_groundPlane.planeBuffer);
 			//glPolygonMode(GL_FRONT, GL_LINE);
-			glDrawElements(GL_TRIANGLES, 511 * 511 * 6, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, 1023 * 1023 * 6, GL_UNSIGNED_INT, 0);
 			//glPolygonMode(GL_FRONT, GL_FILL);
 		glBindVertexArray(0);
 
@@ -252,8 +252,8 @@ bool OceanApp::CreateWaveTex(GLuint& data, GLuint& waveData){
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,waveData, 0);
 
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

@@ -43,7 +43,7 @@ bool TeapotApp::Init(){
 	m_camera = CreateCamera(vec3(0.0f,0.0f,-40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f),3.0f,500.0f,APP_WIDTH,APP_HEIGHT,45.0f);
 
 
-	m_groundPlaneData = CreatePlaneData(10, 10, 5.0f, 0.25f);
+	CreatePlaneData(m_groundPlane,10, 10, 5.0f, 0.25f);
 
 	m_lights.attData = new Attenuation[NUM_POINT_LIGHTS];
 	m_lights.color = new vec3[NUM_POINT_LIGHTS];
@@ -210,7 +210,7 @@ void TeapotApp::RenderForward(const vec3* lightPositions,const vec3* teapotPosit
 		
 		glUniformMatrix4fv(teapotUniforms.worldMatrixUniform, 1, GL_FALSE, &identity[0][0]);
 		glUniform1i(teapotUniforms.instancedUniform, 0);
-		glBindVertexArray(m_groundPlaneData);
+		glBindVertexArray(m_groundPlane.planeBuffer);
 		m_teapotShader.UpdateUniforms(identity, normalMatrix, m_camera.viewMatrix, m_camera.pos, m_lights.position[0], 1);
 		glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
 	glUseProgram(0);

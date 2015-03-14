@@ -31,7 +31,7 @@ private:
 	bool LoadShader();
 	bool CreateWaveTex(GLuint& data, GLuint& waveData);
 
-	GLuint m_planeData;
+	Plane			m_groundPlane;
 
 	GLuint m_oceanShader,m_oceanDispshader;
 

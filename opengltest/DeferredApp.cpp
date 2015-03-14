@@ -60,7 +60,7 @@ bool DeferredApp::Init(){
 
 	m_camera = CreateCamera(vec3(0.0f, 0.0f, -40.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f),3.0f,500.0f,APP_WIDTH,APP_HEIGHT,45.0f);
 
-	m_groundPlaneBuffer = CreatePlaneData(10, 10, 25.0f, 0.25f);
+	CreatePlaneData(m_groundPlane,10, 10, 25.0f, 0.25f);
 
 
 	m_lights.position		= new vec3[NUM_POINT_LIGHTS];
@@ -236,7 +236,7 @@ void DeferredApp::RenderGeometry(){
 	RenderInstancedStaticMeshComponent(m_teapotMesh.m_meshData[1], 64);
 
 	glUniformMatrix4fv(scaleUniform,1, GL_FALSE, &identity[0][0]);
-	glBindVertexArray(m_groundPlaneBuffer);
+	glBindVertexArray(m_groundPlane.planeBuffer);
 	glDrawElements(GL_TRIANGLES, 9 * 9 * 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

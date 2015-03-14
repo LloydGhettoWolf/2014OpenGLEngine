@@ -2,4 +2,10 @@
 #pragma once
 #include <gl\glew.h>
 
-GLuint   CreatePlaneData(int width, int length, float size, float textureDiv);
+struct Plane{
+	GLuint planeBuffer;
+
+	~Plane(){ glDeleteVertexArrays(1, &planeBuffer); }
+};
+
+void  CreatePlaneData(Plane& planeData,int width, int length, float size, float textureDiv);

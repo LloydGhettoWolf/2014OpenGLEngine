@@ -3,7 +3,7 @@
 #include "VertexTypes.h"
 #include "VertexArray.h"
 
-GLuint CreatePlaneData(int width,int length,float size,float textureDiv){
+void  CreatePlaneData(Plane& planeData, int width, int length, float size, float textureDiv){
 	int numVertices = width * length;
 	CustomVertexNormBiTangentUV* groundPlaneData = new CustomVertexNormBiTangentUV[numVertices];
 
@@ -15,9 +15,9 @@ GLuint CreatePlaneData(int width,int length,float size,float textureDiv){
 	for (int x = 0; x < width; x++){
 		for (int z = 0; z < length; z++){
 			index = x * length + z;
-			groundPlaneData[index].vertexPoint.x = (x - halfWidth) * size;
+			groundPlaneData[index].vertexPoint.x = (x - width/2)  * size;
 			groundPlaneData[index].vertexPoint.y = -5.0f;
-			groundPlaneData[index].vertexPoint.z = (z - halfHeight) * size;
+			groundPlaneData[index].vertexPoint.z = (z - length/2) * size;
 			groundPlaneData[index].normal	 = vec3(0.0f, 1.0f, 0.0f);
 			groundPlaneData[index].biTangent = vec3(1.0f, 0.0f, 0.0f);
 			groundPlaneData[index].tangent   = vec3(0.0f, 0.0f, -1.0f);
@@ -47,5 +47,5 @@ GLuint CreatePlaneData(int width,int length,float size,float textureDiv){
 	
 	delete[] indices;
 	delete[] groundPlaneData;
-	return data;
+	planeData.planeBuffer = data;
 }

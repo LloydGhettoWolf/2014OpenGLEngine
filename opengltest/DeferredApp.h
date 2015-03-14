@@ -36,7 +36,7 @@ private:
 	Material       m_material;
 
 	StaticMesh		m_teapotMesh;
-	GLuint			m_groundPlaneBuffer;
+	Plane			m_groundPlane;
 	vec3			m_positions[NUM_MESHES];
 	GLuint			m_teaTexture, m_normalTexture;
 

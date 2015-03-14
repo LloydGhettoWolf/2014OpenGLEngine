@@ -23,9 +23,9 @@ private:
 	ShadowShader	  m_shadowShader;
 
 	StaticMesh        m_teapotMesh;
-	GLuint			  m_groundPlane;
+	Plane			  m_groundPlane;
 
-	float m_centerOffset;
+	float			m_centerOffset;
 
 	vec3            m_lightPos,m_lightDir;
 	Material        m_material;
