@@ -1,4 +1,5 @@
 //ComparisonShader.h - shader class for the two model, side by side comparison of two Blinn-Phong with refraction/reflection/transparency and directional light
+#pragma once
 #include "LightsAndMaterials.h"
 #include "Shader.h"
 

@@ -1,4 +1,5 @@
 //CookTorrance.h
+#pragma once
 #include "LightsAndMaterials.h"
 #include "Shader.h"
 

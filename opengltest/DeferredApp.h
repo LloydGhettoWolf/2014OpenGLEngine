@@ -1,4 +1,5 @@
 //DeferredApp.h
+#pragma once
 #include "MainApp.h"
 #include "GBufferData.h"
 #include "DeferredShader.h"

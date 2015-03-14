@@ -1,4 +1,5 @@
 //ShadowShader.h
+#pragma once
 #include "LightsAndMaterials.h"
 #include "Shader.h"
 #include <gtc\quaternion.hpp>
