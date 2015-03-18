@@ -1,0 +1,7 @@
+//waveUpdate.vp
+#version 400
+in vec3 inCoords;
+
+void main(){
+    gl_Position = vec4(inCoords,1.0);
+}

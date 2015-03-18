@@ -29,11 +29,11 @@ private:
 	bool InitGui();
 
 	bool LoadShader();
-	bool CreateWaveTex(GLuint& data, GLuint& waveData);
+	bool CreateWaveTex();
 
 	Plane			m_groundPlane;
 
-	GLuint m_oceanShader,m_oceanDispshader;
+	GLuint m_oceanShader, m_oceanDispshader, m_oceanUpdateShader;
 
 	StaticMesh m_cube;
 	GLint m_cubeMap;
@@ -44,7 +44,7 @@ private:
 	TwBar* waveBar;
 
 	//texturestuff
-	GLuint m_fbo, m_waveTex;
+	GLuint m_fbo, m_waveTex[3];
 
 	//full screen quad
 	GLuint m_quadBuffer;

@@ -348,5 +348,11 @@
     <None Include="shaders\waveDisplacement.vp">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\waveUpdate.fp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\waveUpdate.vp">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -192,6 +192,8 @@
     <None Include="shaders\waveDisplacement.vp" />
     <None Include="shaders\waveGen.fp" />
     <None Include="shaders\waveGen.vp" />
+    <None Include="shaders\waveUpdate.fp" />
+    <None Include="shaders\waveUpdate.vp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
