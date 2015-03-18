@@ -91,7 +91,8 @@ bool OceanApp::Init(){
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3),0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+	
+	InitGui();
 
 	return true;
 }
@@ -115,8 +116,15 @@ bool OceanApp::LoadShader(){
 
 
 bool OceanApp::InitGui(){
-	//define a 5 component vector for amp,dir,freq,speed values in the ui
+	TwInit(TW_OPENGL, NULL);
+	TwWindowSize(APP_WIDTH, APP_HEIGHT);
 
+	waveBar = TwNewBar("WaveData");
+
+	TwAddVarRW(waveBar, "Amp",  TW_TYPE_FLOAT, &m_amp, "min=0.1f max=10.0f step=0.1f");
+	TwAddVarRW(waveBar, "DirX", TW_TYPE_FLOAT, &m_waveDir.x, "min=0.1f max=1.0f step=0.1f");
+	TwAddVarRW(waveBar, "DirY", TW_TYPE_FLOAT, &m_waveDir.y, "min=0.1f max=1.0f step=0.1f");
+	TwAddVarRW(waveBar, "Vel" , TW_TYPE_FLOAT, &m_freq, "min=1.0f max=100.0f step=1.0f");
 	return true;
 }
 
@@ -147,6 +155,7 @@ void OceanApp::Run(){
 		rotationAmount += 0.005f;
 
 		Render();
+		TwDraw();
 		glfwSwapBuffers();
 
 		ReadMouse();
@@ -166,18 +175,15 @@ void OceanApp::Run(){
 void OceanApp::Render(){
 	
 
-	GLint directionUni = glGetUniformLocation(m_oceanShader, "directions");
+	GLint directionUni = glGetUniformLocation(m_oceanShader, "waveDir");
 	GLint amplitudeUni = glGetUniformLocation(m_oceanShader, "amplitude");
-	GLint freqUni      = glGetUniformLocation(m_oceanShader, "freq");
-	GLint rhoUni       = glGetUniformLocation(m_oceanShader, "rho");
-	//GLint qUni         = glGetUniformLocation(m_oceanShader, "qVar");
-	GLint t		       = glGetUniformLocation(m_oceanShader, "t");
+	GLint freqUni      = glGetUniformLocation(m_oceanShader, "velocity");
 	GLint screenSizeUni= glGetUniformLocation(m_oceanShader, "texSize");
 
 	static float tVal = 0.0f;
 	vec2 size = vec2(TEXTURE_SIZE, TEXTURE_SIZE);
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -187,13 +193,11 @@ void OceanApp::Render(){
 
 		glUseProgram(m_oceanShader);
 
-			glUniform2fv(directionUni, NUM_WAVES, &(m_waves.dir[0][0]));
-			glUniform1fv(amplitudeUni, NUM_WAVES, &m_waves.amplitude[0]);
-			glUniform1fv(freqUni,      NUM_WAVES, &m_waves.freq[0]);
-			glUniform1fv(rhoUni,       NUM_WAVES, &m_waves.rho[0]);
+			glUniform2fv(directionUni, 1,  &(m_waveDir[0]));
+			glUniform1f(amplitudeUni,  m_amp);
+			glUniform1f(freqUni,       m_freq);
 			//glUniform1fv(qUni,         NUM_WAVES, &m_waves.q[0]);
 			glUniform2fv(screenSizeUni, 1, &size[0]);
-			glUniform1f(t, tVal);
 
 			glViewport(0, 0, TEXTURE_SIZE, TEXTURE_SIZE);
 			glBindVertexArray(m_quadBuffer);
@@ -202,7 +206,7 @@ void OceanApp::Render(){
 
 		glUseProgram(0);
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
 	tVal += 0.05f;
 
@@ -210,7 +214,7 @@ void OceanApp::Render(){
 	GLint mvpUni     = glGetUniformLocation(m_oceanDispshader, "mvpMatrix");
 	GLint texSize    = glGetUniformLocation(m_oceanDispshader, "texSize");
 
-	
+	/*
 	glViewport(0, 0, APP_WIDTH, APP_HEIGHT);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -230,7 +234,7 @@ void OceanApp::Render(){
 		glBindVertexArray(0);
 
 	glUseProgram(0);
-	
+	*/
 	
 }
 

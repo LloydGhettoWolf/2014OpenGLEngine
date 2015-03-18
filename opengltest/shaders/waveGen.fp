@@ -1,11 +1,12 @@
 #version 400
 
-const int NUM_WAVES = 15;
+//waveGen.fp - simply create an initial spectrum to feed into a ifft to create a height
+//map later on
 
-uniform vec2  directions[NUM_WAVES];
-uniform float amplitude[NUM_WAVES];
-uniform float freq[NUM_WAVES];
-uniform float rho[NUM_WAVES];
+uniform float amplitude;
+uniform vec2  waveDir;
+uniform float velocity;
+//uniform float rho[NUM_WAVES];
 //uniform float qVar[NUM_WAVES];
 uniform float t;
 
@@ -13,26 +14,44 @@ uniform vec2  texSize;
 
 out vec3 color;
 
+
+//random num generator for range -1.0 to 1.0 with a normal distribution
+float rand(vec2 co){
+  return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+
+//create a value depending on the position of the fragment from the center of the 
+//render target
+
+float PhillipsSpectrum(vec2 k){
+  float kLen = length(k);
+  float kSq = kLen * kLen;
+  float Amp = amplitude;
+  float L = (velocity*velocity)/9.81;
+  float dir = dot(normalize(waveDir),normalize(k));
+
+  return Amp * (dir*dir) * exp(-1.0/(kSq * L * L))/ (kSq * kSq) ;
+}
+
 void main(){
 	
 	vec3 sums;
 
-	vec2 screenPos = vec2(gl_FragCoord.x,gl_FragCoord.y);
+	//get screenpos - center is 0.0 and ranges from -0.5 to 0.5 in both
+	//directions
+	vec2 screenPos = vec2(gl_FragCoord.x,gl_FragCoord.y)/texSize - vec2(0.5,0.5);
+	
+	float period = (2.0 * 3.141519) / texSize.x;
 
-	for(int i = 0; i < NUM_WAVES; ++i){
-		float dotvec = dot(directions[i], screenPos);
-		float cosVal = cos(freq[i] * dotvec + rho[i] * t);
+	//get random Guass number
+	vec2 randomGuass = period * vec2(rand(screenPos),rand(screenPos.yx));
 
-		float coeff = 0.2 * amplitude[i] * cosVal;
+	//use phillips spectrum as a filter depending on position in freq domain
+	float Phil = sqrt(PhillipsSpectrum(screenPos));
+	float coeff = 1.0/sqrt(2.0);
 
-		sums.x += screenPos.x/texSize.x + coeff * directions[i].x;
-		sums.y += amplitude[i] * sin(freq[i] * dotvec + rho[i] * t);
-		sums.z += screenPos.y/texSize.y + coeff * directions[i].y;
-	}
+	vec2 result = (coeff * randomGuass * Phil);
 
-	sums /= 15.0;
-	sums += 10.0;
-	sums /= 20.0;
-
-	color = vec3(sums);
+	color = vec3(result,0.0);
 }

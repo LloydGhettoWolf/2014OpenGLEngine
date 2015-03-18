@@ -5,7 +5,7 @@
 #include "CubemapShader.h"
 #include "ShadowApp.h"
 
-const int NUM_WAVES = 15;
+const int NUM_WAVES = 30;
 
 struct WaveData{
 	float rho[NUM_WAVES];
@@ -49,5 +49,9 @@ private:
 	//full screen quad
 	GLuint m_quadBuffer;
 
-	int m_medianLength = 128, m_medianAmp = 40, m_variation = 90, m_speed = 40;
+	vec2 m_waveDir = vec2(1.0f,0.0f);
+	float m_amp = 1.0f;
+	float m_freq = 60.0f;
+
+	int m_medianLength = 24, m_medianAmp = 60, m_variation = 90, m_speed = 9;
 };
